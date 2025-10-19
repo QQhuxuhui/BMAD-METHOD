@@ -1,66 +1,85 @@
 // Zod schema definition for *.agent.yaml files
+const assert = require('node:assert');
 const { z } = require('zod');
 
 const COMMAND_TARGET_KEYS = ['workflow', 'validate-workflow', 'exec', 'action', 'tmpl', 'data', 'run-workflow'];
-const TRIGGER_PATTERN = /^\*?[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const KEBAB_CASE_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
-const BUILTIN_TRIGGER_PREFIX = '*';
+const TRIGGER_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 // Public API ---------------------------------------------------------------
 
-function agentSchema(options = {}) {
-  const expectedModule = typeof options.module === 'string' && options.module.trim().length > 0 ? options.module.trim() : null;
-
-  return z
-    .object({
-      agent: buildAgentSchema(expectedModule),
-    })
-    .strict()
-    .superRefine((value, ctx) => {
-      const seenTriggers = new Set();
-
-      let index = 0;
-      for (const item of value.agent.menu) {
-        const triggerValue = item.trigger;
-
-        if (!TRIGGER_PATTERN.test(triggerValue)) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['agent', 'menu', index, 'trigger'],
-            message: 'agent.menu[].trigger must be kebab-case (allowing an optional leading *)',
-          });
-          return;
-        }
-
-        const canonicalTrigger = triggerValue.startsWith(BUILTIN_TRIGGER_PREFIX) ? triggerValue.slice(1) : triggerValue;
-
-        if (!KEBAB_CASE_PATTERN.test(canonicalTrigger)) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['agent', 'menu', index, 'trigger'],
-            message: 'agent.menu[].trigger must be kebab-case after removing the leading * prefix',
-          });
-          return;
-        }
-
-        if (seenTriggers.has(canonicalTrigger)) {
-          ctx.addIssue({
-            code: 'custom',
-            path: ['agent', 'menu', index, 'trigger'],
-            message: `agent.menu[].trigger duplicates "${canonicalTrigger}" within the same agent`,
-          });
-        } else {
-          seenTriggers.add(canonicalTrigger);
-        }
-        index += 1;
-      }
-    });
+/**
+ * Validate an agent YAML payload against the schema derived from its file location.
+ * Exposed as the single public entry point, so callers do not reach into schema internals.
+ *
+ * @param {string} filePath Path to the agent file (used to infer module scope).
+ * @param {unknown} agentYaml Parsed YAML content.
+ * @returns {import('zod').SafeParseReturnType<unknown, unknown>} SafeParse result.
+ */
+function validateAgentFile(filePath, agentYaml) {
+  const expectedModule = deriveModuleFromPath(filePath);
+  const schema = agentSchema({ module: expectedModule });
+  return schema.safeParse(agentYaml);
 }
 
-module.exports = { agentSchema };
+module.exports = { validateAgentFile };
 
-// Schema builders ----------------------------------------------------------
+// Internal helpers ---------------------------------------------------------
 
+/**
+ * Build a Zod schema for validating a single agent definition.
+ * The schema is generated per call so module-scoped agents can pass their expected
+ * module slug while core agents leave it undefined.
+ *
+ * @param {Object} [options]
+ * @param {string|null|undefined} [options.module] Module slug for module agents; omit or null for core agents.
+ * @returns {import('zod').ZodSchema} Configured Zod schema instance.
+ */
+function agentSchema(options = {}) {
+  const expectedModule = normalizeModuleOption(options.module);
+
+  return (
+    z
+      .object({
+        agent: buildAgentSchema(expectedModule),
+      })
+      .strict()
+      // Refinement: enforce trigger format and uniqueness rules after structural checks.
+      .superRefine((value, ctx) => {
+        const seenTriggers = new Set();
+
+        let index = 0;
+        for (const item of value.agent.menu) {
+          const triggerValue = item.trigger;
+
+          if (!TRIGGER_PATTERN.test(triggerValue)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['agent', 'menu', index, 'trigger'],
+              message: 'agent.menu[].trigger must be kebab-case (lowercase words separated by hyphen)',
+            });
+            return;
+          }
+
+          if (seenTriggers.has(triggerValue)) {
+            ctx.addIssue({
+              code: 'custom',
+              path: ['agent', 'menu', index, 'trigger'],
+              message: `agent.menu[].trigger duplicates "${triggerValue}" within the same agent`,
+            });
+            return;
+          }
+
+          seenTriggers.add(triggerValue);
+          index += 1;
+        }
+      })
+  );
+}
+
+/**
+ * Assemble the full agent schema using the module expectation provided by the caller.
+ * @param {string|null} expectedModule Trimmed module slug or null for core agents.
+ */
 function buildAgentSchema(expectedModule) {
   return z
     .object({
@@ -73,6 +92,10 @@ function buildAgentSchema(expectedModule) {
     .strict();
 }
 
+/**
+ * Validate metadata shape and cross-check module expectation against caller input.
+ * @param {string|null} expectedModule Trimmed module slug or null when core agent metadata is expected.
+ */
 function buildMetadataSchema(expectedModule) {
   const schemaShape = {
     id: createNonEmptyString('agent.metadata.id'),
@@ -82,32 +105,35 @@ function buildMetadataSchema(expectedModule) {
     module: createNonEmptyString('agent.metadata.module').optional(),
   };
 
-  return z
-    .object(schemaShape)
-    .strict()
-    .superRefine((value, ctx) => {
-      const moduleValue = typeof value.module === 'string' ? value.module.trim() : null;
+  return (
+    z
+      .object(schemaShape)
+      .strict()
+      // Refinement: guard presence and correctness of metadata.module.
+      .superRefine((value, ctx) => {
+        const moduleValue = typeof value.module === 'string' ? value.module.trim() : null;
 
-      if (expectedModule && !moduleValue) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['module'],
-          message: 'module-scoped agents must declare agent.metadata.module',
-        });
-      } else if (!expectedModule && moduleValue) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['module'],
-          message: 'core agents must not include agent.metadata.module',
-        });
-      } else if (expectedModule && moduleValue !== expectedModule) {
-        ctx.addIssue({
-          code: 'custom',
-          path: ['module'],
-          message: `agent.metadata.module must equal "${expectedModule}"`,
-        });
-      }
-    });
+        if (expectedModule && !moduleValue) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['module'],
+            message: 'module-scoped agents must declare agent.metadata.module',
+          });
+        } else if (!expectedModule && moduleValue) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['module'],
+            message: 'core agents must not include agent.metadata.module',
+          });
+        } else if (expectedModule && moduleValue !== expectedModule) {
+          ctx.addIssue({
+            code: 'custom',
+            path: ['module'],
+            message: `agent.metadata.module must equal "${expectedModule}"`,
+          });
+        }
+      })
+  );
 }
 
 function buildPersonaSchema() {
@@ -135,6 +161,9 @@ function buildPromptSchema() {
     .strict();
 }
 
+/**
+ * Schema for individual menu entries ensuring they are actionable.
+ */
 function buildMenuItemSchema() {
   return z
     .object({
@@ -162,6 +191,38 @@ function buildMenuItemSchema() {
         });
       }
     });
+}
+
+/**
+ * Derive expected module slug from a file path residing under src/modules/<module>/agents/.
+ * @param {string} filePath Absolute or relative agent path.
+ * @returns {string|null} Module slug if identifiable, otherwise null.
+ */
+function deriveModuleFromPath(filePath) {
+  if (!filePath) {
+    return null;
+  }
+
+  assert(typeof filePath === 'string', 'validateAgentFile expects filePath to be a string');
+  assert(filePath.startsWith('src/'), 'validateAgentFile expects filePath to start with "src/"');
+
+  const marker = 'src/modules/';
+  if (!filePath.startsWith(marker)) {
+    return null;
+  }
+
+  const remainder = filePath.slice(marker.length);
+  const slashIndex = remainder.indexOf('/');
+  return slashIndex === -1 ? null : remainder.slice(0, slashIndex);
+}
+
+function normalizeModuleOption(moduleOption) {
+  if (typeof moduleOption !== 'string') {
+    return null;
+  }
+
+  const trimmed = moduleOption.trim();
+  return trimmed.length > 0 ? trimmed : null;
 }
 
 // Primitive validators -----------------------------------------------------

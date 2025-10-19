@@ -23,15 +23,15 @@ agent:
 
   # Agent menu items
   menu:
-    - trigger: "*list-tasks"
+    - trigger: "list-tasks"
       action: "list all tasks from {project-root}/bmad/_cfg/task-manifest.csv"
       description: "List Available Tasks"
 
-    - trigger: "*list-workflows"
+    - trigger: "list-workflows"
       action: "list all workflows from {project-root}/bmad/_cfg/workflow-manifest.csv"
       description: "List Workflows"
 
-    - trigger: "*party-mode"
+    - trigger: "party-mode"
       workflow: "{project-root}/bmad/core/workflows/party-mode/workflow.yaml"
       description: "Group chat with all agents"
 
