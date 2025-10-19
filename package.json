@@ -31,6 +31,7 @@
     "format:fix": "prettier --write \"**/*.{js,cjs,mjs,json,md,yaml}\"",
     "install:bmad": "node tools/cli/bmad-cli.js install",
     "lint": "eslint . --ext .js,.cjs,.mjs,.yaml --max-warnings=0",
+    "lint:agents": "node tools/validate-agent-schema.js",
     "lint:fix": "eslint . --ext .js,.cjs,.mjs,.yaml --fix",
     "prepare": "husky",
     "rebundle": "node tools/cli/bundlers/bundle-web.js rebundle",
