@@ -84,7 +84,8 @@
     "prettier": "^3.5.3",
     "prettier-plugin-packagejson": "^2.5.19",
     "yaml-eslint-parser": "^1.2.3",
-    "yaml-lint": "^1.7.0"
+    "yaml-lint": "^1.7.0",
+    "zod": "^4.1.12"
   },
   "engines": {
     "node": ">=20.0.0"
