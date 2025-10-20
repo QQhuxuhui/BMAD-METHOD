@@ -1,0 +1,22 @@
+# QE Validate Workflow (source)
+
+description: "Validate a document/solution against syntax, logic, constraint, and baseline gates; output consolidated report."
+
+config_source: "{project-root}/bmad/hanyunaps/config.yaml"
+output_folder: "{config_source}:output_folder"
+communication_language: "{config_source}:communication_language"
+
+installed_path: "{project-root}/bmad/hanyunaps/workflows/qe-validate"
+instructions: "{installed_path}/instructions.md"
+template: "{installed_path}/template.md"
+
+web_bundle:
+  instructions: "bmad/hanyunaps/workflows/qe-validate/instructions.md"
+  template: "bmad/hanyunaps/workflows/qe-validate/template.md"
+  files:
+    - "bmad/core/tasks/workflow.xml"
+
+output:
+  filename: "hanyunaps-qe-report.md"
+  folder: "{output_folder}"
+  description: "Consolidated QE report with remediation"

@@ -1,0 +1,23 @@
+# Knowledge Index Workflow (source)
+
+description: "Scan Hanyun APS expert libraries and create a categorized index."
+
+config_source: "{project-root}/bmad/hanyunaps/config.yaml"
+output_folder: "{config_source}:output_folder"
+communication_language: "{config_source}:communication_language"
+expert_lib_root: "{config_source}:expert_lib_root"
+
+installed_path: "{project-root}/bmad/hanyunaps/workflows/knowledge-index"
+instructions: "{installed_path}/instructions.md"
+template: "{installed_path}/template.md"
+
+web_bundle:
+  instructions: "bmad/hanyunaps/workflows/knowledge-index/instructions.md"
+  template: "bmad/hanyunaps/workflows/knowledge-index/template.md"
+  files:
+    - "bmad/core/tasks/workflow.xml"
+
+output:
+  filename: "hanyunaps-knowledge-index.md"
+  folder: "{output_folder}"
+  description: "Categorized index across expert libraries"

@@ -1,0 +1,24 @@
+# Assemble Solution Workflow (source)
+
+description: "Run five-phase assembly leveraging Hanyun APS experts (算法/约束/目标/领域) with orchestrator and quality checks."
+
+config_source: "{project-root}/bmad/hanyunaps/config.yaml"
+output_folder: "{config_source}:output_folder"
+communication_language: "{config_source}:communication_language"
+docs_root: "{config_source}:docs_root"
+expert_lib_root: "{config_source}:expert_lib_root"
+
+installed_path: "{project-root}/bmad/hanyunaps/workflows/assemble-solution"
+instructions: "{installed_path}/instructions.md"
+template: "{installed_path}/template.md"
+
+web_bundle:
+  instructions: "bmad/hanyunaps/workflows/assemble-solution/instructions.md"
+  template: "bmad/hanyunaps/workflows/assemble-solution/template.md"
+  files:
+    - "bmad/core/tasks/workflow.xml"
+
+output:
+  filename: "hanyunaps-assembled-solution.md"
+  folder: "{output_folder}"
+  description: "Composed solution with validation notes"

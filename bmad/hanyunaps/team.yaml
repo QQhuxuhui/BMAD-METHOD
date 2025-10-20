@@ -1,0 +1,46 @@
+version: "1.0"
+updated: "2025-10-20"
+
+# 标准团队注册表（用于渲染与校验）
+team:
+  - id: system-orchestrator
+    name: 系统编排协调智能体
+    icon: "🤖"
+    doc: "hanyunaps/docs/agents/智能体团队/系统编排协调智能体.md"
+    aliases: ["系统编排", "编排智能体", "Orchestrator", "系统编排协调", "总指挥"]
+
+  - id: domain-expert
+    name: 领域应用专家智能体
+    icon: "🏭"
+    doc: "hanyunaps/docs/agents/智能体团队/领域应用专家智能体.md"
+    aliases: ["领域专家", "Domain Expert", "领域智能体", "领域应用专家"]
+
+  - id: constraint-expert
+    name: 约束模式专家智能体
+    icon: "🔧"
+    doc: "hanyunaps/docs/agents/智能体团队/约束模式专家智能体.md"
+    aliases: ["约束专家", "Constraint Expert", "约束模式专家"]
+
+  - id: objective-expert
+    name: 目标优化专家智能体
+    icon: "🎯"
+    doc: "hanyunaps/docs/agents/智能体团队/目标优化专家智能体.md"
+    aliases: ["目标专家", "Objective Expert", "目标优化专家"]
+
+  - id: algorithm-expert
+    name: 调度算法专家智能体
+    icon: "💡"
+    doc: "hanyunaps/docs/agents/智能体团队/调度算法专家智能体.md"
+    aliases: ["算法专家", "Algorithm Expert", "调度算法专家"]
+
+  - id: qe-agent
+    name: 质量与评测智能体
+    icon: "🛡️"
+    doc: "hanyunaps/docs/agents/智能体团队/质量与评测智能体.md"
+    aliases: ["QE聚合器", "QE Aggregator", "Hanyun QE", "质量与评测专家", "质量评估智能体", "质量与评估智能体", "质量门禁", "QE"]
+
+# 校验配置
+validation:
+  owner_label: "负责专家"
+  allow_at_prefix: true # 允许 @名称 形式
+  enforce_canonical_output: true # 修复时输出为：{icon}/@{name}

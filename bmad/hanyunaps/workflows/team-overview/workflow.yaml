@@ -1,0 +1,27 @@
+# Team Overview Workflow Configuration
+
+description: "Summarize Hanyun APS agent team, roles, knowledge libraries, and HITL/Todo mechanisms."
+
+# Config
+config_source: "{project-root}/bmad/hanyunaps/config.yaml"
+output_folder: "{config_source}:output_folder"
+user_name: "{config_source}:user_name"
+communication_language: "{config_source}:communication_language"
+docs_root: "{config_source}:docs_root"
+expert_lib_root: "{config_source}:expert_lib_root"
+
+# Installed path
+installed_path: "{project-root}/bmad/hanyunaps/workflows/team-overview"
+instructions: "{installed_path}/instructions.md"
+template: "{installed_path}/template.md"
+
+web_bundle:
+  instructions: "bmad/hanyunaps/workflows/team-overview/instructions.md"
+  template: "bmad/hanyunaps/workflows/team-overview/template.md"
+  files:
+    - "bmad/core/tasks/workflow.xml"
+
+output:
+  filename: "hanyunaps-team-overview.md"
+  folder: "{output_folder}"
+  description: "Hanyun APS agent team overview"

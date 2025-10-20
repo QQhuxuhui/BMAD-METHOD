@@ -1,0 +1,10 @@
+# Hanyun APS Module Configuration
+# Generated for BMAD v6 integration
+
+user_name: "{project-root}/bmad/core/config.yaml:user_name"
+communication_language: "Chinese"
+output_folder: "{project-root}/docs"
+
+# Knowledge roots
+docs_root: "{project-root}/hanyunaps/docs"
+expert_lib_root: "{project-root}/hanyunaps/docs/agents/专家库"

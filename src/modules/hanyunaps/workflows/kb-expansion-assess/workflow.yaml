@@ -1,0 +1,24 @@
+# KB Expansion Assess Workflow (source)
+
+description: "Assess knowledge libraries for BMAD v6 compatibility and produce an expansion/migration plan."
+
+config_source: "{project-root}/bmad/hanyunaps/config.yaml"
+output_folder: "{config_source}:output_folder"
+communication_language: "{config_source}:communication_language"
+docs_root: "{config_source}:docs_root"
+expert_lib_root: "{config_source}:expert_lib_root"
+
+installed_path: "{project-root}/bmad/hanyunaps/workflows/kb-expansion-assess"
+instructions: "{installed_path}/instructions.md"
+template: "{installed_path}/template.md"
+
+web_bundle:
+  instructions: "bmad/hanyunaps/workflows/kb-expansion-assess/instructions.md"
+  template: "bmad/hanyunaps/workflows/kb-expansion-assess/template.md"
+  files:
+    - "bmad/core/tasks/workflow.xml"
+
+output:
+  filename: "hanyunaps-kb-expansion-plan.md"
+  folder: "{output_folder}"
+  description: "KB expansion and migration plan"

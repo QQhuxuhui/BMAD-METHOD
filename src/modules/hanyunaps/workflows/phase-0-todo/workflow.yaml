@@ -1,0 +1,23 @@
+# Phase-0 Todo Workflow (source)
+
+description: "Generate Phase-0 Todo plan and HITL checkpoints for a request."
+
+config_source: "{project-root}/bmad/hanyunaps/config.yaml"
+output_folder: "{config_source}:output_folder"
+communication_language: "{config_source}:communication_language"
+docs_root: "{config_source}:docs_root"
+
+installed_path: "{project-root}/bmad/hanyunaps/workflows/phase-0-todo"
+instructions: "{installed_path}/instructions.md"
+template: "{installed_path}/template.md"
+
+web_bundle:
+  instructions: "bmad/hanyunaps/workflows/phase-0-todo/instructions.md"
+  template: "bmad/hanyunaps/workflows/phase-0-todo/template.md"
+  files:
+    - "bmad/core/tasks/workflow.xml"
+
+output:
+  filename: "hanyunaps-phase-0-todo.md"
+  folder: "{output_folder}"
+  description: "Phase-0 Todo and HITL plan"

@@ -1,0 +1,19 @@
+# BMAD™ Module Installer - Hanyun APS Scheduling Agents
+
+code: hanyunaps
+name: "Hanyun APS Scheduling Agents"
+default_selected: true
+
+prompt: "Install Hanyun APS v4.2 Agent-as-Doc team (Todo + HITL)."
+
+# Variables from Core Config are available: user_name, communication_language, output_folder
+
+docs_root:
+  prompt: "Where is the Hanyun APS knowledge root?"
+  default: "hanyunaps/docs"
+  result: "{project-root}/{value}"
+
+expert_lib_root:
+  prompt: "Where is the expert library root?"
+  default: "hanyunaps/docs/agents/专家库"
+  result: "{project-root}/{value}"
