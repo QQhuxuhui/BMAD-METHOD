@@ -164,7 +164,7 @@ algorithm-library/
 # ✅ 正确示例
 5_algorithm:
   name: "遗传算法"
-  citation: "@专家库/算法库/heuristic/genetic-algorithm.md"
+  citation: "@专家库/算法库/heuristic/遗传算法.md"
 
 # ❌ 错误示例 (违反Guardrails)
 5_algorithm:
@@ -178,7 +178,7 @@ algorithm-library/
 @专家库/{library-name}/{category}/{module-name}.md
 
 示例:
-@专家库/算法库/heuristic/genetic-algorithm.md
+@专家库/算法库/heuristic/遗传算法.md
 @专家库/约束库/capacity/vehicle-capacity.md
 @专家库/目标库/time-objectives/makespan.md
 @专家库/领域库/logistics/vehicle-routing.md
@@ -218,7 +218,7 @@ capability_gap_report:
 **场景1**: 车辆路径问题求解
 
 - Agent: algorithm-expert + constraint-expert
-- 加载: algorithm-library/README (5K) + heuristic/genetic-algorithm (2K) + constraint-library/README (5K) + routing/\* (3K)
+- 加载: algorithm-library/README (5K) + heuristic/遗传算法 (2K) + constraint-library/README (5K) + routing/\* (3K)
 - 总Token: 15K (vs 传统60K, 节省75%)
 
 **场景2**: 生产调度问题
@@ -287,7 +287,7 @@ mkdir bmad/aps/templates/new-library/
 2. 自动加载: templates/algorithm-library/README.md
 3. 用户描述问题
 4. 专家查找: 问题规模中等(500变量) → 推荐启发式
-5. 专家引用: @专家库/算法库/heuristic/genetic-algorithm.md
+5. 专家引用: @专家库/算法库/heuristic/遗传算法.md
 6. 返回: 算法配置 + 实现模板
 ```
 

@@ -38,6 +38,32 @@ expert_libraries:
   domain: "templates/domain-library"
   extension: "templates/extension-library"
   quality: "templates/quality-library"
+  modeling: "templates/modeling-library"
+  collaboration: "templates/collaboration"
+  examples: "templates/examples"
+
+# Knowledge Module Detailed Paths
+knowledge_modules:
+  algorithm:
+    heuristic: "templates/algorithm-library/heuristic/遗传算法.md"
+  constraint:
+    temporal: "templates/constraint-library/temporal/time-window-constraint.md"
+  objective:
+    cost: "templates/objective-library/cost/cost-minimization.md"
+  domain:
+    vehicle: "templates/domain-library/vehicle/vehicle-routing-domain.md"
+  modeling:
+    core:
+      - "templates/modeling-library/core/ten-element-modeling.md"
+      - "templates/modeling-library/core/time-model.md"
+      - "templates/modeling-library/core/uncertainty-modeling.md"
+  collaboration:
+    - "templates/collaboration/agent-as-doc-mode.md"
+    - "templates/collaboration/knowledge-dependency-framework.md"
+    - "templates/collaboration/agent-collaboration-protocol.md"
+  examples:
+    - "templates/examples/algorithm-extension-case.md"
+    - "templates/examples/fresh-delivery-case.md"
 
 # Interaction Modes
 interaction_modes:

@@ -14,11 +14,10 @@ algorithm-library/
 │   ├── priority-based.md
 │   └── constructive-heuristics.md
 ├── heuristic/                   # 启发式算法
-│   ├── genetic-algorithm.md
-│   ├── simulated-annealing.md
-│   ├── tabu-search.md
-│   ├── variable-neighborhood-search.md
-│   └── ant-colony-optimization.md
+│   ├── 遗传算法.md
+│   ├── 构造式启发式.md
+│   ├── 改进式启发式.md
+│   └── 贪心算法.md
 ├── exact/                       # 精确算法
 │   ├── branch-and-bound.md
 │   ├── branch-and-cut.md
@@ -53,12 +52,12 @@ algorithm-library/
 
 ### 按优化目标
 
-| 目标类型     | 推荐算法                | 引用路径                                                      |
-| ------------ | ----------------------- | ------------------------------------------------------------- |
-| 单目标最小化 | 所有算法适用            | 根据规模选择                                                  |
-| 单目标最大化 | 所有算法适用            | 根据规模选择                                                  |
-| 多目标       | NSGA-II, MOEA/D, 加权和 | @专家库/算法库/heuristic/genetic-algorithm.md#multi-objective |
-| 鲁棒优化     | 场景优化、随机规划      | @专家库/算法库/specialized/robust-optimization.md             |
+| 目标类型     | 推荐算法                | 引用路径                                             |
+| ------------ | ----------------------- | ---------------------------------------------------- |
+| 单目标最小化 | 所有算法适用            | 根据规模选择                                         |
+| 单目标最大化 | 所有算法适用            | 根据规模选择                                         |
+| 多目标       | NSGA-II, MOEA/D, 加权和 | @专家库/算法库/heuristic/遗传算法.md#multi-objective |
+| 鲁棒优化     | 场景优化、随机规划      | @专家库/算法库/specialized/robust-optimization.md    |
 
 ### 按约束类型
 
@@ -217,7 +216,7 @@ graph TD
 5_algorithm:
   name: '遗传算法'
   type: 'heuristic'
-  citation: '@专家库/算法库/heuristic/genetic-algorithm.md'
+  citation: '@专家库/算法库/heuristic/遗传算法.md'
   configuration:
     population_size: 100
     generations: 500

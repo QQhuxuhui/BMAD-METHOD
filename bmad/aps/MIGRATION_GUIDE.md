@@ -258,9 +258,10 @@ bmad/aps/templates/algorithm-library/
 │   ├── basic-greedy.md
 │   └── priority-based.md
 ├── heuristic/                   # 启发式算法
-│   ├── genetic-algorithm.md
-│   ├── simulated-annealing.md
-│   └── tabu-search.md
+│   ├── 遗传算法.md
+│   ├── 构造式启发式.md
+│   ├── 改进式启发式.md
+│   └── 贪心算法.md
 ├── exact/                       # 精确算法
 │   ├── branch-and-bound.md
 │   ├── dynamic-programming.md

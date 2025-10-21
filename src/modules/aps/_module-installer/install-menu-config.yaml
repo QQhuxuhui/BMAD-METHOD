@@ -1,0 +1,56 @@
+# APS Module Installation Menu Configuration
+
+code: aps
+name: "APS: Advanced Planning & Scheduling"
+description: "Expert agent team for scheduling optimization with Theory-to-Code workflow"
+version: "1.0.0-alpha"
+default_selected: false # Optional module, not selected by default
+
+prompt:
+  - "APS (Advanced Planning & Scheduling) provides a 7-agent expert system"
+  - "for solving complex scheduling and optimization problems."
+  - "Includes: Algorithm selection, Constraint modeling, Objective optimization,"
+  - "Domain expertise, Quality assurance, and Knowledge extension capabilities."
+  - ""
+  - "All paths are relative to project root, with no leading slash."
+
+# Variables from Core Config inserted:
+## user_name
+## communication_language
+## output_folder
+
+# APS-specific configuration
+orchestration_mode:
+  prompt:
+    - "Select the default orchestration mode:"
+    - "Centralized: Fast, expert-friendly, requires domain knowledge"
+    - "Incremental: Guided, beginner-friendly, step-by-step interaction"
+  default: "centralized"
+  result: "{value}"
+  single-select:
+    - value: "centralized"
+      label: "Centralized - Expert Mode (20-25 min, global view)"
+    - value: "incremental"
+      label: "Incremental - Guided Mode (30-40 min, contextual)"
+
+enable_todo_tracking:
+  prompt: "Enable Todo List tracking for all scheduling workflows?"
+  default: true
+  result: "{value}"
+  boolean: true
+
+enable_human_in_loop:
+  prompt: "Enable Human-in-the-Loop confirmations for critical decisions?"
+  default: true
+  result: "{value}"
+  boolean: true
+
+models_output_location:
+  prompt: "Where should TenElementModel files be saved?"
+  default: "aps-outputs/models"
+  result: "{project-root}/{value}"
+
+reports_output_location:
+  prompt: "Where should quality evaluation reports be saved?"
+  default: "aps-outputs/reports"
+  result: "{project-root}/{value}"

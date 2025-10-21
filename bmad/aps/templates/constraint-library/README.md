@@ -14,7 +14,7 @@ constraint-library/
 │   ├── vehicle-capacity.md
 │   └── warehouse-capacity.md
 ├── temporal/                    # 时间约束
-│   ├── time-windows.md
+│   ├── time-window-constraint.md
 │   ├── precedence.md
 │   ├── makespan.md
 │   └── deadline.md
@@ -216,7 +216,7 @@ graph TD
       name: '客户时间窗约束'
       type: 'temporal'
       hard_or_soft: 'hard'
-      citation: '@专家库/约束库/temporal/time-windows.md'
+      citation: '@专家库/约束库/temporal/time-window-constraint.md'
       mathematical_form: 'linear_inequality'
       description: '必须在客户指定的时间窗内服务'
       formula: 'e_i ≤ arrival_i ≤ l_i, ∀i'

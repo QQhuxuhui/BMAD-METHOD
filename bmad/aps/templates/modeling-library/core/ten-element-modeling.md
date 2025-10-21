@@ -1,0 +1,109 @@
+<!-- Powered by BMAD-CORE™ -->
+<!-- Module ID: bmad/aps/templates/modeling-library/core/ten-element-modeling.md -->
+<!-- Aliases: @专家库/建模库/core/ten-element-modeling.md, @专家库/建模模块/十要素建模流程.md -->
+
+---
+
+module_name: 十要素建模流程
+category: 建模模块
+version: v1.0.0
+updated: 2025-10-10
+keywords: ['十要素', '领域建模', '时间模型', '不确定性', '求解策略']
+description: 标准化的十要素建模对话与产出结构，供编排与各专家模块统一消费。
+
+---
+
+# 十要素建模流程 - Ten-Element Modeling Flow
+
+## 🎯 目标
+
+- 将业务描述转化为标准化“十要素”结构，作为后续算法推荐、约束建模、目标建模与代码生成的唯一真相源（SSOT）。
+
+## 🔌 输入
+
+- 业务问题自然语言描述（必需）
+- 现有数据示例/指标/SLA（可选）
+
+## 📤 输出（统一数据结构）
+
+```json
+{
+  "resources": { "types": [], "attributes": {}, "counts": {} },
+  "tasks": { "types": [], "attributes": {}, "counts": {} },
+  "decision_variables": [{ "name": "", "type": "binary|integer|real|vector|matrix", "meaning": "" }],
+  "parameters": { "cost": {}, "capacity": {}, "performance": {} },
+  "constraints": [{ "name": "", "category": "time|capacity|logic|space|business", "hard": true, "spec": {} }],
+  "objectives": [{ "name": "", "direction": "min|max", "formula": "", "weight": 1.0 }],
+  "time_model": { "type": "continuous|discrete|event|rolling", "resolution": null, "horizon": null, "windows": [] },
+  "uncertainty_model": { "type": "none|stochastic|robust|scenario", "distributions": {}, "uncertainty_set": {}, "scenarios": [] },
+  "domain_knowledge": { "rules": [], "best_practices": [], "regulations": [] },
+  "solution_strategy": { "class": "exact|heuristic|metaheuristic", "candidates": [], "realtime": false }
+}
+```
+
+## 🗺️ 对话化建模脚本（精简版）
+
+1. 领域识别 → 输出领域候选与置信度
+2. 实体定义（资源/任务）
+3. 决策变量建议（矩阵/向量/序列）
+4. 约束捕获（硬/软、优先级）
+5. 目标函数（单/多目标与权重）
+6. 时间模型选择（连续/离散/事件/滚动）
+7. 不确定性建模（随机/鲁棒/场景/无）
+8. 领域知识补充（业务规则/法规/最佳实践）
+9. 求解策略与实时性（exact/heuristic/meta + latency）
+10. 需求确认与一致性校验
+
+> 详细时间模型与不确定性建模参考：
+>
+> - @知识模块库/建模模块/时间模型.md
+> - @知识模块库/建模模块/不确定性建模.md
+
+## ✅ 一致性校验清单
+
+- 变量-约束对齐：每个约束涉及的变量均在 decision_variables 中定义
+- 目标-参数对齐：目标所需参数在 parameters 中存在来源与口径
+- 时间一致性：time_model 与时间类约束/目标的尺度一致
+- 不确定性一致性：uncertainty_model 与策略/评估口径一致
+
+## 🔗 下游映射
+
+- 算法专家 → 基于规模/约束密度/实时性与 time/uncertainty 选择策略
+- 约束专家 → 约束表达式/验证/修复代码生成
+- 目标专家 → 目标函数实现/多目标策略
+- 领域专家 → 规则落地与适配器代码
+- 编排智能体 → 统一装配与质量门控
+
+## 🧪 示例（车辆调度-带时间窗与需求波动）
+
+```yaml
+resources:
+  types: [vehicles]
+  attributes: {capacity_kg: "float", depot: "location"}
+  counts: {vehicles: 25}
+tasks:
+  types: [deliveries]
+  attributes: {demand_kg: "float", tw: "[e,l]"}
+decision_variables:
+  - {name: x[i,j], type: binary, meaning: "是否走 i->j"}
+  - {name: t[i], type: real, meaning: "到达时间"}
+parameters:
+  cost: {distance_km_cost: 1.2}
+  capacity: {vehicle_capacity_kg: 1500}
+constraints:
+  - {name: time_window, category: time, hard: true}
+  - {name: vehicle_capacity, category: capacity, hard: true}
+objectives:
+  - {name: total_time, direction: min, weight: 0.7}
+  - {name: total_cost, direction: min, weight: 0.3}
+time_model: {type: discrete, resolution: 5m, horizon: 12h}
+uncertainty_model:
+  type: stochastic
+  distributions: {demand_kg: Normal(mu=8, sigma=2)}
+domain_knowledge:
+  rules: ["冷链优先递送，时间窗更严格"]
+solution_strategy:
+  class: metaheuristic
+  candidates: ["遗传算法", "禁忌搜索"]
+  realtime: false
+```

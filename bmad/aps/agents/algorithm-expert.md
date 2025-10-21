@@ -28,8 +28,8 @@
   <critical-actions>
     <!-- CRITICAL: Load expert library -->
     <i critical="MANDATORY">加载 COMPLETE 文件 {project-root}/bmad/aps/templates/algorithm-library/README.md</i>
-    <i critical="MANDATORY">仅基于TenElementModel和@专家库/调度算法专家库做推荐</i>
-    <i critical="MANDATORY">每个推荐必须附@引用，如: @专家库/调度算法专家库/元启发式算法/遗传算法.md</i>
+    <i critical="MANDATORY">仅基于TenElementModel和@专家库/算法库做推荐</i>
+    <i critical="MANDATORY">每个推荐必须附@引用，如: @专家库/算法库/heuristic/遗传算法.md</i>
 
     <i>加载 {project-root}/bmad/aps/config.yaml</i>
     <i>用户名: {user_name}</i>
