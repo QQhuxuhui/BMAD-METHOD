@@ -1,0 +1,84 @@
+# APS Module Configuration
+# Advanced Planning & Scheduling Module for BMAD-CORE v6
+
+module_name: "Advanced Planning & Scheduling"
+module_code: "aps"
+version: "1.0.0-alpha"
+
+# User Configuration
+user_name: "User" # Will be set during installation
+communication_language: "Chinese" # Default language
+
+# Module Settings
+orchestration_mode: "centralized" # centralized | incremental
+confidence_threshold: 0.70
+todo_tracking_enabled: true
+human_in_loop_enabled: true
+
+# Output Paths
+output_folder: "aps-outputs"
+models_folder: "models"
+workflows_folder: "workflows"
+reports_folder: "reports"
+
+# Quality Gates
+quality_gates:
+  syntax_check: true
+  logic_verification: true
+  constraint_consistency: true
+  benchmark_evaluation: true
+  citation_required: true
+
+# Expert Library Paths
+expert_libraries:
+  orchestrator: "templates/orchestrator-library"
+  algorithm: "templates/algorithm-library"
+  constraint: "templates/constraint-library"
+  objective: "templates/objective-library"
+  domain: "templates/domain-library"
+  extension: "templates/extension-library"
+  quality: "templates/quality-library"
+
+# Interaction Modes
+interaction_modes:
+  mode_a:
+    name: "集中确认模式"
+    description: "快速高效，全局视角"
+    estimated_time: "20-25分钟"
+    user_type: "专家用户"
+  mode_b:
+    name: "增量确认模式"
+    description: "渐进式，上下文丰富"
+    estimated_time: "30-40分钟"
+    user_type: "业务用户"
+
+# Phase Configuration
+phases:
+  phase_0:
+    name: "任务规划"
+    enabled: true
+    todo_generation: true
+  phase_0_5:
+    name: "交互模式选择"
+    enabled: true
+    mode_selection: true
+  phase_1:
+    name: "需求分析"
+    enabled: true
+    deviation_detection: true
+  phase_1_5:
+    name: "十要素建模"
+    enabled: true
+    user_confirmation_required: true
+  phase_2:
+    name: "专家协调"
+    enabled: true
+    consistency_check: true
+  phase_3:
+    name: "方案集成"
+    enabled: true
+    conflict_resolution: true
+  phase_4:
+    name: "质量保证"
+    enabled: true
+    quality_gates: true

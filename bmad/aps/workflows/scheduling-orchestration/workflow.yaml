@@ -1,0 +1,468 @@
+workflow_id: "aps-scheduling-orchestration"
+workflow_name: "APS调度求解完整流程"
+version: "4.3"
+description: "Phase 0-4完整调度优化流程，支持双模式交互和Todo List追踪"
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-20"
+  bmad_version: "v6-alpha"
+  estimated_time:
+    mode_a: "70-95分钟"
+    mode_b: "95-130分钟"
+
+config:
+  interaction_mode: "auto" # auto | mode_a | mode_b
+  confidence_threshold: 0.70
+  todo_tracking: true
+  human_in_loop: true
+  quality_gates_enabled: true
+
+phases:
+  - phase_id: "phase-0"
+    phase_name: "Phase 0: 任务规划"
+    estimated_time: "5-8分钟"
+    description: "生成Todo List，用户确认形成执行合同"
+
+    steps:
+      - step_id: "0.1"
+        name: "需求理解与初步分析"
+        action: "exec"
+        target: "bmad/aps/tasks/analyze-user-request.md"
+        inputs:
+          - user_request
+        outputs:
+          - initial_understanding
+          - key_requirements
+          - problem_domain
+
+      - step_id: "0.2"
+        name: "生成Todo List"
+        action: "exec"
+        target: "bmad/aps/tasks/generate-todo-list.md"
+        inputs:
+          - initial_understanding
+          - key_requirements
+        outputs:
+          - todo_list
+          - estimated_timeline
+
+      - step_id: "0.3"
+        name: "用户确认Todo List"
+        action: "human_confirmation"
+        trigger_level: "P0"
+        confirmation_type: "todo_contract"
+        template: "@交互对话模板库/Todo确认模板.md"
+        inputs:
+          - todo_list
+          - estimated_timeline
+        outputs:
+          - confirmed_todo_list
+          - user_adjustments
+
+      - step_id: "0.4"
+        name: "初始化TodoTracker"
+        action: "exec"
+        target: "bmad/aps/tasks/initialize-todo-tracker.md"
+        inputs:
+          - confirmed_todo_list
+        outputs:
+          - tracker_initialized
+          - baseline_contract
+
+  - phase_id: "phase-0.5"
+    phase_name: "Phase 0.5: 双模式交互选择"
+    estimated_time: "2-3分钟"
+    description: "用户选择集中确认或增量确认模式"
+
+    steps:
+      - step_id: "0.5.1"
+        name: "呈现模式对比"
+        action: "exec"
+        target: "bmad/aps/tasks/present-interaction-modes.md"
+        outputs:
+          - mode_comparison
+          - recommendation
+
+      - step_id: "0.5.2"
+        name: "用户选择交互模式"
+        action: "human_confirmation"
+        trigger_level: "P0"
+        confirmation_type: "mode_selection"
+        template: "@交互对话模板库/模式选择模板.md"
+        inputs:
+          - mode_comparison
+        outputs:
+          - selected_mode
+
+      - step_id: "0.5.3"
+        name: "记录模式并初始化工作流"
+        action: "exec"
+        target: "bmad/aps/tasks/configure-workflow-mode.md"
+        inputs:
+          - selected_mode
+        outputs:
+          - workflow_configuration
+          - phase_plan
+
+  - phase_id: "phase-1"
+    phase_name: "Phase 1: 需求分析"
+    estimated_time: "10-15分钟"
+    description: "深入理解用户需求，检测偏离"
+
+    steps:
+      - step_id: "1.1"
+        name: "需求深度理解"
+        action: "run-workflow"
+        target: "bmad/aps/workflows/phase-1-requirements/workflow.yaml"
+        inputs:
+          - user_request
+          - confirmed_todo_list
+        outputs:
+          - requirement_analysis
+          - clarification_questions
+
+      - step_id: "1.2"
+        name: "用户澄清（如需要）"
+        action: "conditional_human_confirmation"
+        condition: "confidence < 0.70 OR has_clarification_questions"
+        trigger_level: "P1"
+        template: "@交互对话模板库/需求澄清模板.md"
+        inputs:
+          - clarification_questions
+        outputs:
+          - clarified_requirements
+
+      - step_id: "1.3"
+        name: "TodoTracker偏离检测"
+        action: "exec"
+        target: "bmad/aps/tasks/check-todo-deviation.md"
+        inputs:
+          - current_analysis
+          - baseline_contract
+        outputs:
+          - deviation_score
+          - deviation_alert
+        threshold: 0.60
+        on_deviation: "trigger_replan"
+
+  - phase_id: "phase-1.5"
+    phase_name: "Phase 1.5: 十要素建模"
+    estimated_time:
+      mode_a: "10-15分钟"
+      mode_b: "5-8分钟"
+    description: "构建TenElementModel统一真相源"
+
+    steps:
+      - step_id: "1.5.1"
+        name: "初步建模"
+        action: "run-workflow"
+        target: "bmad/aps/workflows/phase-1.5-modeling/workflow.yaml"
+        inputs:
+          - requirement_analysis
+        outputs:
+          - ten_element_model_draft
+
+      - step_id: "1.5.2"
+        name: "用户确认TenElementModel"
+        action: "conditional_human_confirmation"
+        condition: "workflow_mode"
+        trigger_level: "P0"
+        mode_a:
+          confirmation_type: "complete_model"
+          template: "@交互对话模板库/完整十要素确认模板.md"
+        mode_b:
+          confirmation_type: "framework_only"
+          template: "@交互对话模板库/框架十要素确认模板.md"
+        inputs:
+          - ten_element_model_draft
+        outputs:
+          - ten_element_model_confirmed
+
+      - step_id: "1.5.3"
+        name: "固化TenElementModel"
+        action: "exec"
+        target: "bmad/aps/tasks/finalize-ten-element-model.md"
+        inputs:
+          - ten_element_model_confirmed
+        outputs:
+          - ten_element_model
+          - model_baseline
+
+  - phase_id: "phase-2"
+    phase_name: "Phase 2: 专家协调"
+    estimated_time:
+      mode_a: "10-15分钟"
+      mode_b: "31-48分钟"
+    description: "调用专家智能体分析并协调"
+
+    conditional_flow:
+      mode_a:
+        steps:
+          - step_id: "2.A.1"
+            name: "并行调用所有专家"
+            action: "parallel_exec"
+            agents:
+              - "bmad/aps/agents/domain-expert.md"
+              - "bmad/aps/agents/constraint-expert.md"
+              - "bmad/aps/agents/objective-expert.md"
+              - "bmad/aps/agents/algorithm-expert.md"
+            inputs:
+              - ten_element_model
+            outputs:
+              - domain_analysis
+              - constraint_analysis
+              - objective_analysis
+              - algorithm_recommendations
+
+          - step_id: "2.A.2"
+            name: "跨专家一致性校验"
+            action: "run-workflow"
+            target: "bmad/aps/workflows/consistency-check/workflow.yaml"
+            inputs:
+              - domain_analysis
+              - constraint_analysis
+              - objective_analysis
+              - algorithm_recommendations
+            outputs:
+              - consistency_report
+              - conflicts
+
+          - step_id: "2.A.3"
+            name: "冲突仲裁（如需要）"
+            action: "conditional_human_confirmation"
+            condition: "has_conflicts"
+            trigger_level: "P2"
+            template: "@交互对话模板库/冲突仲裁模板.md"
+            inputs:
+              - conflicts
+            outputs:
+              - conflict_resolutions
+
+      mode_b:
+        steps:
+          - step_id: "2.B.1"
+            name: "Phase 2.1: 领域专家增量确认"
+            action: "sequential_exec"
+            agent: "bmad/aps/agents/domain-expert.md"
+            inputs:
+              - ten_element_model
+            outputs:
+              - domain_analysis
+            confirmation:
+              trigger_level: "P0"
+              template: "@交互对话模板库/领域确认模板.md"
+
+          - step_id: "2.B.2"
+            name: "Phase 2.2: 约束专家增量确认"
+            action: "sequential_exec"
+            agent: "bmad/aps/agents/constraint-expert.md"
+            inputs:
+              - ten_element_model
+              - domain_analysis
+            outputs:
+              - constraint_analysis
+            confirmation:
+              trigger_level: "P0"
+              template: "@交互对话模板库/约束确认模板.md"
+
+          - step_id: "2.B.3"
+            name: "Phase 2.3: 目标专家增量确认"
+            action: "sequential_exec"
+            agent: "bmad/aps/agents/objective-expert.md"
+            inputs:
+              - ten_element_model
+              - domain_analysis
+              - constraint_analysis
+            outputs:
+              - objective_analysis
+            confirmation:
+              trigger_level: "P0"
+              template: "@交互对话模板库/目标权重模板.md"
+
+          - step_id: "2.B.4"
+            name: "Phase 2.4: 算法专家增量确认"
+            action: "sequential_exec"
+            agent: "bmad/aps/agents/algorithm-expert.md"
+            inputs:
+              - ten_element_model
+              - domain_analysis
+              - constraint_analysis
+              - objective_analysis
+            outputs:
+              - algorithm_recommendations
+            confirmation:
+              trigger_level: "P0"
+              template: "@交互对话模板库/算法确认模板.md"
+
+          - step_id: "2.B.5"
+            name: "Phase 2.5: 跨专家一致性校验"
+            action: "run-workflow"
+            target: "bmad/aps/workflows/consistency-check/workflow.yaml"
+            inputs:
+              - domain_analysis
+              - constraint_analysis
+              - objective_analysis
+              - algorithm_recommendations
+            outputs:
+              - consistency_report
+
+  - phase_id: "phase-3"
+    phase_name: "Phase 3: 方案集成"
+    estimated_time: "15-20分钟"
+    description: "融合专家建议，生成可执行方案"
+
+    steps:
+      - step_id: "3.1"
+        name: "方案融合"
+        action: "run-workflow"
+        target: "bmad/aps/workflows/phase-3-integration/workflow.yaml"
+        inputs:
+          - ten_element_model
+          - domain_analysis
+          - constraint_analysis
+          - objective_analysis
+          - algorithm_recommendations
+        outputs:
+          - integrated_solution
+          - implementation_code
+
+      - step_id: "3.2"
+        name: "一致性最终检查"
+        action: "exec"
+        target: "bmad/aps/tasks/final-consistency-check.md"
+        inputs:
+          - integrated_solution
+          - ten_element_model
+        outputs:
+          - consistency_validation
+
+      - step_id: "3.3"
+        name: "生成完整代码"
+        action: "exec"
+        target: "bmad/aps/tasks/generate-complete-code.md"
+        inputs:
+          - integrated_solution
+        outputs:
+          - complete_code
+          - code_documentation
+
+  - phase_id: "phase-4"
+    phase_name: "Phase 4: 质量保证"
+    estimated_time: "9-12分钟"
+    description: "质量门禁验证，确保可交付"
+
+    steps:
+      - step_id: "4.1"
+        name: "质量全面验证"
+        action: "exec"
+        agent: "bmad/aps/agents/quality-evaluator.md"
+        command: "*validate-all"
+        inputs:
+          - complete_code
+          - ten_element_model
+        outputs:
+          - quality_report
+
+      - step_id: "4.2"
+        name: "质量门禁判断"
+        action: "exec"
+        target: "bmad/aps/tasks/quality-gate-check.md"
+        inputs:
+          - quality_report
+        outputs:
+          - gate_status
+          - issues
+        gate_criteria:
+          - level: "pass"
+          - citations_complete: true
+          - syntax_valid: true
+          - logic_verified: true
+
+      - step_id: "4.3"
+        name: "问题修复（如需要）"
+        action: "conditional_loop"
+        condition: "gate_status != pass"
+        max_iterations: 3
+        loop_steps:
+          - fix_issues
+          - revalidate
+        outputs:
+          - fixed_code
+          - final_quality_report
+
+      - step_id: "4.4"
+        name: "Todo完成度检查"
+        action: "exec"
+        target: "bmad/aps/tasks/check-todo-completion.md"
+        inputs:
+          - confirmed_todo_list
+          - tracker_initialized
+        outputs:
+          - completion_status
+          - uncompleted_items
+
+      - step_id: "4.5"
+        name: "交付确认"
+        action: "human_confirmation"
+        trigger_level: "P0"
+        confirmation_type: "delivery"
+        template: "@交互对话模板库/交付确认模板.md"
+        inputs:
+          - final_quality_report
+          - completion_status
+          - complete_code
+        outputs:
+          - user_acceptance
+
+outputs:
+  deliverables:
+    - ten_element_model
+    - complete_code
+    - code_documentation
+    - quality_report
+    - todo_completion_report
+
+  artifacts:
+    - expert_analyses
+    - consistency_reports
+    - workflow_log
+
+error_handling:
+  on_confidence_low:
+    action: "human_confirmation"
+    trigger_level: "P1"
+
+  on_capability_gap:
+    action: "submit_gap_report"
+    template: "@交互对话模板库/能力缺口模板.md"
+
+  on_deviation:
+    action: "replan"
+    notify_user: true
+
+  on_quality_gate_fail:
+    action: "fix_and_retry"
+    max_retries: 3
+
+guardrails:
+  allowed_sources:
+    - "TenElementModel"
+    - "@专家库/*"
+    - "@知识模块库/*"
+
+  citations_required: true
+
+  blocked_actions:
+    - "虚构算法"
+    - "编造约束"
+    - "猜测目标"
+    - "未经引用的推断"
+
+metrics:
+  track:
+    - phase_duration
+    - confidence_scores
+    - deviation_events
+    - human_confirmations
+    - quality_gate_passes
