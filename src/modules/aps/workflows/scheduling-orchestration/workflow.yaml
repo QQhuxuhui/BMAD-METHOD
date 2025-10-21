@@ -338,14 +338,25 @@ phases:
           - consistency_validation
 
       - step_id: "3.3"
-        name: "生成完整代码"
+        name: "生成完整代码并保存到输出目录"
         action: "exec"
         target: "bmad/aps/tasks/generate-complete-code.md"
+        mandatory_save: true
+        description: "🚨 CRITICAL: 必须保存所有交付物到{output_folder}"
         inputs:
           - integrated_solution
+          - ten_element_model
+          - output_folder
+          - models_folder
+          - docs_folder
         outputs:
+          - saved_files
+          - verification_result
           - complete_code
           - code_documentation
+        post_action_verify:
+          - check: "verification_result.all_saved == true"
+            on_fail: "block_and_retry"
 
   - phase_id: "phase-4"
     phase_name: "Phase 4: 质量保证"
@@ -364,12 +375,31 @@ phases:
         outputs:
           - quality_report
 
+      - step_id: "4.1.5"
+        name: "验证交付物已保存（门禁6前置）"
+        action: "exec"
+        target: "bmad/aps/tasks/verify-deliverables-saved.md"
+        mandatory: true
+        description: "验证所有交付物已保存到{output_folder}，为质量门禁6提供数据"
+        inputs:
+          - saved_files
+          - output_folder
+          - deliverable_manifest
+        outputs:
+          - verification_results
+          - deliverable_check
+        verification_gate:
+          critical: true
+          check: "verification_results.all_required_valid == true"
+          on_fail: "block_delivery"
+
       - step_id: "4.2"
-        name: "质量门禁判断"
+        name: "质量门禁判断（6重门禁）"
         action: "exec"
         target: "bmad/aps/tasks/quality-gate-check.md"
         inputs:
           - quality_report
+          - deliverable_check
         outputs:
           - gate_status
           - issues
@@ -378,6 +408,8 @@ phases:
           - citations_complete: true
           - syntax_valid: true
           - logic_verified: true
+          - constraint_consistent: true
+          - deliverables_saved: true
 
       - step_id: "4.3"
         name: "问题修复（如需要）"
@@ -403,17 +435,22 @@ phases:
           - uncompleted_items
 
       - step_id: "4.5"
-        name: "交付确认"
+        name: "交付确认（展示完整文件清单）"
         action: "human_confirmation"
         trigger_level: "P0"
         confirmation_type: "delivery"
-        template: "@交互对话模板库/交付确认模板.md"
+        template: "@交互对话模板库/delivery-confirmation-template.md"
+        description: "展示所有已保存交付物的完整路径和元数据，获取用户最终确认"
         inputs:
           - final_quality_report
           - completion_status
-          - complete_code
+          - saved_files
+          - verification_results
+          - deliverable_check
+          - ten_element_model
         outputs:
           - user_acceptance
+          - delivery_timestamp
 
 outputs:
   deliverables:

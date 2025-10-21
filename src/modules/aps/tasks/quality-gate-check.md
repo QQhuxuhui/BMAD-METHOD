@@ -132,6 +132,63 @@ pass_criteria: '至少2个criteria为true'
 fail_action: 'warning_only'
 ```
 
+### 门禁6: 交付物持久化 🔴 CRITICAL
+
+```yaml
+gate_id: 'deliverable_persistence'
+severity: 'critical'
+blocking: true
+
+criteria:
+  - name: '所有交付物已保存到输出目录'
+    check: 'quality_report.deliverable_check.all_saved == true'
+    required: true
+    description: '验证所有交付物（代码、模型、文档、报告）已保存到{output_folder}'
+
+  - name: '文件路径有效且可访问'
+    check: 'quality_report.deliverable_check.all_paths_accessible == true'
+    required: true
+    description: '验证所有保存的文件路径真实存在且可读取'
+
+  - name: '交付物完整性检查'
+    check: 'quality_report.deliverable_check.completeness == true'
+    required: true
+    description: '验证文件非空，包含预期内容'
+
+  - name: '文件命名规范符合'
+    check: 'quality_report.deliverable_check.naming_compliant == true'
+    description: '验证文件命名符合规范和可追溯性要求'
+
+required_deliverables:
+  - ten_element_model:
+      path: '{output_folder}/models/ten_element_model_*.yaml'
+      min_size: 1024  # bytes
+      required: true
+
+  - complete_code:
+      path: '{output_folder}/models/scheduling_solution_*.py'
+      min_size: 2048
+      required: true
+
+  - code_documentation:
+      path: '{output_folder}/docs/solution_documentation_*.md'
+      min_size: 512
+      required: true
+
+  - quality_report:
+      path: '{output_folder}/reports/quality_report_*.json'
+      min_size: 256
+      required: true
+
+  - todo_completion_report:
+      path: '{output_folder}/reports/todo_completion_*.json'
+      min_size: 128
+      required: false
+
+pass_criteria: '所有required=true的criteria为true'
+fail_action: 'block_delivery_and_save_files'
+```
+
 ## 处理逻辑
 
 ### 步骤1: 解析质量报告
@@ -143,7 +200,8 @@ def parse_quality_report(report):
         "syntax_check": report.get("syntax_validation", {}),
         "logic_check": report.get("logic_verification", {}),
         "consistency_check": report.get("constraint_consistency", {}),
-        "benchmark": report.get("benchmark_evaluation", {})
+        "benchmark": report.get("benchmark_evaluation", {}),
+        "deliverable_check": report.get("deliverable_persistence", {})
     }
 ```
 
@@ -257,6 +315,22 @@ def generate_fix_suggestions(gate_results):
                     "priority": "P1",
                     "gate": gate["gate_id"],
                     "action": "调整代码以匹配TenElementModel",
+                    "details": gate["failed_items"]
+                })
+
+            elif gate["gate_id"] == "deliverable_persistence":
+                suggestions.append({
+                    "priority": "P0",
+                    "gate": gate["gate_id"],
+                    "action": "保存所有交付物到{output_folder}目录",
+                    "required_actions": [
+                        "创建输出目录结构（models/, docs/, reports/）",
+                        "保存 TenElementModel 到 models/ten_element_model_[timestamp].yaml",
+                        "保存完整代码到 models/scheduling_solution_[timestamp].py",
+                        "保存代码文档到 docs/solution_documentation_[timestamp].md",
+                        "保存质量报告到 reports/quality_report_[timestamp].json",
+                        "验证所有文件可访问且非空"
+                    ],
                     "details": gate["failed_items"]
                 })
 
@@ -375,20 +449,23 @@ graph TD
 
 ## 质量检查
 
-- [ ] 所有门禁定义清晰
-- [ ] 严重性级别合理
+- [ ] 所有6个门禁定义清晰
+- [ ] 严重性级别合理（3个CRITICAL + 1个HIGH + 2个MEDIUM）
 - [ ] 通过标准明确
 - [ ] 修复建议可执行
 - [ ] 决策逻辑无漏洞
+- [ ] 交付物持久化验证完整
 
 ## 引用
 
 - @质量评测专家库/质量门禁标准
 - @编排协调专家库/交付决策流程
 - V4.3架构规范: 质量门禁机制
+- @输出管理规范/交付物持久化要求
 
 ---
 
 **创建**: 2025-10-20
+**更新**: 2025-10-21 - 添加门禁6：交付物持久化验证
 **BMAD版本**: v6-alpha
-**核心机制**: 质量门禁，确保可交付性
+**核心机制**: 6重质量门禁，确保可交付性与持久化
