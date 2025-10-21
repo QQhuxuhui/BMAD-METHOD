@@ -1,0 +1,191 @@
+workflow_id: "aps-todo-management"
+workflow_name: "Todo List管理工作流"
+version: "4.3"
+description: "Todo List生成、追踪、偏离检测完整流程"
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-20"
+  bmad_version: "v6-alpha"
+  usage: "Phase 0任务规划核心流程"
+
+config:
+  deviation_threshold: 0.60
+  auto_alert: true
+  tracking_granularity: "task" # task | step | action
+
+steps:
+  - step_id: "todo-1"
+    name: "分析用户需求生成任务清单"
+    description: "从用户需求中提取关键任务和里程碑"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-todo-list.md"
+    inputs:
+      - user_request
+      - initial_understanding
+    outputs:
+      - todo_items
+      - estimated_timeline
+      - dependencies
+
+  - step_id: "todo-2"
+    name: "结构化Todo List"
+    description: "按Phase组织，标注优先级和依赖"
+    action: "exec"
+    target: "bmad/aps/tasks/structure-todo-list.md"
+    inputs:
+      - todo_items
+      - dependencies
+    outputs:
+      - structured_todo_list
+    structure:
+      levels:
+        - phase
+        - task
+        - subtask
+      attributes:
+        - priority
+        - estimated_duration
+        - dependencies
+        - success_criteria
+
+  - step_id: "todo-3"
+    name: "用户确认Todo List"
+    description: "展示清单，获取用户确认和调整"
+    action: "human_confirmation"
+    trigger_level: "P0"
+    confirmation_type: "todo_contract"
+    template: "@交互对话模板库/Todo确认模板.md"
+    inputs:
+      - structured_todo_list
+      - estimated_timeline
+    presentation_format:
+      include_timeline: true
+      include_dependencies: true
+      include_success_criteria: true
+      visualization: "checklist"
+    outputs:
+      - confirmed_todo_list
+      - user_adjustments
+      - user_priorities
+
+  - step_id: "todo-4"
+    name: "初始化追踪器"
+    description: "建立基线，启动实时追踪"
+    action: "exec"
+    target: "bmad/aps/tasks/initialize-todo-tracker.md"
+    inputs:
+      - confirmed_todo_list
+    outputs:
+      - tracker_state
+      - baseline_contract
+      - tracking_log_initialized
+
+  - step_id: "todo-5"
+    name: "实时进度更新"
+    description: "在执行过程中持续更新Todo状态"
+    action: "continuous"
+    frequency: "on_task_complete"
+    target: "bmad/aps/tasks/update-todo-progress.md"
+    inputs:
+      - tracker_state
+      - current_task_status
+    outputs:
+      - updated_tracker_state
+      - completion_percentage
+
+  - step_id: "todo-6"
+    name: "偏离检测"
+    description: "对比当前执行与baseline，检测偏离"
+    action: "continuous"
+    frequency: "on_phase_complete"
+    target: "bmad/aps/tasks/check-todo-deviation.md"
+    inputs:
+      - baseline_contract
+      - current_execution_log
+      - updated_tracker_state
+    detection_logic:
+      similarity_metric: "cosine"
+      threshold: 0.60
+      alert_on_below: true
+    outputs:
+      - deviation_score
+      - deviation_items
+      - deviation_severity
+
+  - step_id: "todo-7"
+    name: "偏离处理"
+    description: "当检测到偏离时，触发重新规划或用户确认"
+    action: "conditional"
+    condition: "deviation_score < 0.60"
+    branches:
+      - condition: "deviation_severity == critical"
+        action: "human_confirmation"
+        trigger_level: "P1"
+        template: "@交互对话模板库/偏离告警模板.md"
+        options:
+          - replan
+          - adjust_baseline
+          - continue_with_explanation
+
+      - condition: "deviation_severity == moderate"
+        action: "auto_adjust"
+        target: "bmad/aps/tasks/adjust-todo-baseline.md"
+
+      - condition: "deviation_severity == minor"
+        action: "log_and_continue"
+
+    outputs:
+      - deviation_resolution
+      - updated_baseline
+
+  - step_id: "todo-8"
+    name: "完成度检查"
+    description: "Phase或workflow结束时验证Todo完成情况"
+    action: "exec"
+    target: "bmad/aps/tasks/check-todo-completion.md"
+    inputs:
+      - confirmed_todo_list
+      - updated_tracker_state
+    validation:
+      require_all_completed: false
+      minimum_completion: 0.90
+      allow_justified_skips: true
+    outputs:
+      - completion_status
+      - uncompleted_items
+      - completion_report
+
+outputs:
+  primary:
+    - confirmed_todo_list
+    - baseline_contract
+    - completion_report
+
+  tracking_data:
+    - tracker_state
+    - execution_log
+    - deviation_history
+
+visualization:
+  progress_bar: true
+  checklist_view: true
+  timeline_view: true
+  deviation_chart: true
+
+integration:
+  with_orchestrator: true
+  phase_checkpoints:
+    - phase_0_complete
+    - phase_1_complete
+    - phase_2_complete
+    - phase_3_complete
+    - phase_4_complete
+
+metrics:
+  track:
+    - total_tasks
+    - completed_tasks
+    - deviation_count
+    - average_deviation_score
+    - replan_count

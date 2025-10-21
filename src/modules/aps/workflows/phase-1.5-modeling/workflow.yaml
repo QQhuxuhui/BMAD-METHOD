@@ -1,0 +1,304 @@
+workflow_id: "aps-phase-1.5-modeling"
+workflow_name: "Phase 1.5: 十要素建模工作流"
+version: "4.3"
+description: "构建TenElementModel统一真相源，支持双模式确认"
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-20"
+  bmad_version: "v6-alpha"
+  phase: "Phase 1.5"
+  estimated_time:
+    mode_a: "10-15分钟"
+    mode_b: "5-8分钟"
+
+config:
+  interaction_mode: "inherit" # inherit from parent workflow
+  validation_level: "strict"
+  allow_incomplete_elements: false
+
+ten_element_model_schema:
+  elements:
+    1:
+      name: "决策变量"
+      key: "decision_variables"
+      required: true
+      validation: "must_have_domain_and_type"
+
+    2:
+      name: "参数"
+      key: "parameters"
+      required: true
+      validation: "must_specify_source"
+
+    3:
+      name: "约束"
+      key: "constraints"
+      required: true
+      validation: "must_cite_constraint_library"
+
+    4:
+      name: "优化目标"
+      key: "objectives"
+      required: true
+      validation: "must_cite_objective_library"
+
+    5:
+      name: "算法"
+      key: "algorithm"
+      required: true
+      validation: "must_cite_algorithm_library"
+
+    6:
+      name: "时间模型"
+      key: "time_model"
+      required: true
+      validation: "must_specify_horizon_and_granularity"
+
+    7:
+      name: "不确定性"
+      key: "uncertainty"
+      required: false
+      validation: "if_present_must_specify_type"
+
+    8:
+      name: "求解配置"
+      key: "solver_config"
+      required: true
+      validation: "must_specify_solver_and_params"
+
+    9:
+      name: "输入数据"
+      key: "input_data"
+      required: true
+      validation: "must_specify_format_and_source"
+
+    10:
+      name: "输出格式"
+      key: "output_format"
+      required: true
+      validation: "must_specify_structure"
+
+steps:
+  - step_id: "1.5.1"
+    name: "从需求分析提取要素"
+    description: "基于Phase 1需求分析结果，识别10要素候选"
+    action: "exec"
+    target: "bmad/aps/tasks/extract-ten-elements.md"
+    inputs:
+      - requirement_analysis
+      - user_request
+    extraction_strategy:
+      decision_variables: "identify from problem description"
+      parameters: "extract from given data and constants"
+      constraints: "identify from requirements and restrictions"
+      objectives: "extract from goals and KPIs"
+      algorithm: "preliminary recommendation based on problem type"
+      time_model: "infer from temporal keywords"
+      uncertainty: "detect from probabilistic keywords"
+      solver_config: "default configuration with notes"
+      input_data: "identify from data sources mentioned"
+      output_format: "infer from deliverable requirements"
+    outputs:
+      - element_candidates
+
+  - step_id: "1.5.2"
+    name: "初步建模"
+    description: "将候选要素组织成TenElementModel初稿"
+    action: "exec"
+    target: "bmad/aps/tasks/draft-ten-element-model.md"
+    inputs:
+      - element_candidates
+    modeling_guidelines:
+      use_templates: true
+      cite_sources: true
+      mark_uncertainties: true
+      include_alternatives: true
+    outputs:
+      - ten_element_model_draft
+      - confidence_scores
+      - alternative_options
+
+  - step_id: "1.5.3"
+    name: "模型验证"
+    description: "检查模型完整性和一致性"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-ten-element-model.md"
+    inputs:
+      - ten_element_model_draft
+    validation_checks:
+      - completeness: "all required elements present"
+      - consistency: "no contradictions between elements"
+      - citations: "all elements cite proper sources"
+      - feasibility: "algorithm matches constraints and objectives"
+    outputs:
+      - validation_report
+      - issues_found
+
+  - step_id: "1.5.4"
+    name: "用户确认（双模式）"
+    description: "根据选定模式进行不同程度的用户确认"
+    action: "conditional_human_confirmation"
+    trigger_level: "P0"
+    confirmation_type: "ten_element_model"
+
+    mode_a:
+      name: "集中确认模式 - 完整确认"
+      estimated_time: "10-15分钟"
+      confirmation_scope: "complete_model"
+      template: "@交互对话模板库/完整十要素确认模板.md"
+      presentation:
+        show_all_elements: true
+        show_alternatives: true
+        show_confidence_scores: true
+        show_citations: true
+      interaction_pattern:
+        - present_complete_model
+        - explain_each_element
+        - present_alternatives
+        - collect_user_choices
+        - confirm_final_model
+      inputs:
+        - ten_element_model_draft
+        - validation_report
+        - alternative_options
+      outputs:
+        - ten_element_model_confirmed
+        - user_selections
+        - user_feedback
+
+    mode_b:
+      name: "增量确认模式 - 框架确认"
+      estimated_time: "5-8分钟"
+      confirmation_scope: "framework_only"
+      template: "@交互对话模板库/框架十要素确认模板.md"
+      presentation:
+        show_element_types: true
+        show_element_counts: true
+        show_element_names: true
+        show_detailed_content: false
+      interaction_pattern:
+        - present_model_framework
+        - confirm_element_structure
+        - note_detailed_confirmation_later
+      inputs:
+        - ten_element_model_draft
+        - validation_report
+      outputs:
+        - ten_element_model_framework_confirmed
+      note: "详细内容将在Phase 2各专家环节逐步确认"
+
+  - step_id: "1.5.5"
+    name: "整合用户反馈"
+    description: "根据用户确认调整模型"
+    action: "exec"
+    target: "bmad/aps/tasks/integrate-user-feedback.md"
+    inputs:
+      - ten_element_model_draft
+      - user_selections
+      - user_feedback
+    outputs:
+      - ten_element_model_adjusted
+
+  - step_id: "1.5.6"
+    name: "固化TenElementModel"
+    description: "生成最终版本，作为后续Phase的统一真相源"
+    action: "exec"
+    target: "bmad/aps/tasks/finalize-ten-element-model.md"
+    inputs:
+      - ten_element_model_adjusted
+    finalization_actions:
+      - freeze_version
+      - generate_hash
+      - create_baseline
+      - enable_tracking
+    outputs:
+      - ten_element_model
+      - model_version
+      - model_hash
+      - model_baseline
+
+  - step_id: "1.5.7"
+    name: "生成模型文档"
+    description: "输出可读的TenElementModel文档"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-model-documentation.md"
+    inputs:
+      - ten_element_model
+    documentation_format:
+      - markdown_summary
+      - json_schema
+      - visual_diagram
+    outputs:
+      - model_documentation
+
+outputs:
+  primary:
+    - ten_element_model
+    - model_version
+    - model_baseline
+
+  documentation:
+    - model_documentation
+    - validation_report
+
+  metadata:
+    - confidence_scores
+    - user_selections
+    - model_hash
+
+validation:
+  post_workflow_checks:
+    - all_required_elements_present: true
+    - all_elements_have_citations: true
+    - model_internally_consistent: true
+    - user_confirmed: true
+
+  quality_gates:
+    - name: "Model Completeness"
+      check: "all 10 elements defined"
+      severity: "critical"
+
+    - name: "Citation Compliance"
+      check: "all elements cite sources"
+      severity: "critical"
+
+    - name: "User Confirmation"
+      check: "user confirmed or framework confirmed"
+      severity: "critical"
+
+    - name: "Internal Consistency"
+      check: "no contradictions"
+      severity: "high"
+
+error_handling:
+  on_incomplete_model:
+    action: "request_clarification"
+    trigger_level: "P1"
+
+  on_citation_missing:
+    action: "block_and_request_citation"
+    severity: "critical"
+
+  on_inconsistency_detected:
+    action: "highlight_and_resolve"
+    trigger_level: "P1"
+
+integration:
+  upstream_phase: "phase-1"
+  downstream_phases:
+    - "phase-2"
+    - "phase-3"
+    - "phase-4"
+
+  provides_to_phases:
+    - unified_truth_source
+    - baseline_for_validation
+    - reference_for_code_generation
+
+metrics:
+  track:
+    - element_confidence_scores
+    - user_adjustment_count
+    - validation_issues_count
+    - time_to_confirmation
