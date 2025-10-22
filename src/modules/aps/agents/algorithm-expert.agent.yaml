@@ -18,24 +18,24 @@ agent:
   critical_actions:
     - 加载 COMPLETE 文件 {project-root}/bmad/aps/templates/algorithm-library/README.md
     - 仅基于TenElementModel和@专家库/算法库做推荐
-    - '每个推荐必须附@引用，如: @专家库/算法库/heuristic/遗传算法.md'
+    - "每个推荐必须附@引用，如: @专家库/算法库/heuristic/遗传算法.md"
     - 加载 {project-root}/bmad/aps/config.yaml
-    - '用户名: {user_name}'
-    - '语言: {communication_language}'
+    - "用户名: {user_name}"
+    - "语言: {communication_language}"
     - 遇到能力缺口时，输出"能力缺口报告"并请求补齐模块
   menu:
     - description: 🎯 算法推荐（基于问题特征）
       trigger: recommend-algorithm
-      workflow: '{project-root}/bmad/aps/workflows/algorithm-recommendation/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/algorithm-recommendation/workflow.yaml"
     - description: 📊 复杂度分析与性能预测
       trigger: analyze-complexity
-      exec: '{project-root}/bmad/aps/tasks/complexity-analysis.md'
+      exec: "{project-root}/bmad/aps/tasks/complexity-analysis.md"
     - description: 💻 生成算法实现代码（Theory-to-Code）
       trigger: generate-code
-      workflow: '{project-root}/bmad/aps/workflows/code-generation/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/code-generation/workflow.yaml"
     - description: 🔍 查询算法库（快速查询模式）
       trigger: query-algorithm
-      exec: '{project-root}/bmad/aps/tasks/query-algorithm-library.md'
+      exec: "{project-root}/bmad/aps/tasks/query-algorithm-library.md"
     - description: ⏱️ 性能预测（时间/质量）
       trigger: performance-predict
-      exec: '{project-root}/bmad/aps/tasks/performance-prediction.md'
+      exec: "{project-root}/bmad/aps/tasks/performance-prediction.md"

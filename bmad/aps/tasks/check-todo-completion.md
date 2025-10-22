@@ -230,7 +230,7 @@ outputs:
 
   uncompleted_items:
     type: array
-    description: "未完成任务列表"
+    description: '未完成任务列表'
 ```
 
 ## 示例输出

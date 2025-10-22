@@ -191,7 +191,7 @@ outputs:
 
   baseline_contract:
     type: object
-    description: "执行合同基线（供偏离检测使用）"
+    description: '执行合同基线（供偏离检测使用）'
 ```
 
 ## 示例输出

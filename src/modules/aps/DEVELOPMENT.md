@@ -81,6 +81,7 @@ node src/modules/aps/build.js
 ```
 
 **构建脚本做什么？**
+
 - 清理 `bmad/aps/` 目录（保留备份文件）
 - 从 `src/modules/aps/` 复制内容
 - 排除开发工具文件（`scripts/`, `build.js`, `DEVELOPMENT.md`）
@@ -117,16 +118,19 @@ git commit -m "feat(aps): Your changes description"
 在开发 APS 模块时，请遵循以下核心设计理念：
 
 ### 1. **Agent as Doc** 理念
+
 - 智能体 = 知识文档化载体
 - 专业能力 = 模板化知识模块
 - 工作流程 = 知识模块调用机制
 
 ### 2. **Sidecar 模式**
+
 - 主智能体轻量（< 5KB）
 - 按需加载专家库 (`@专家库/xxx`)
 - Token 节省 75-87%
 
 ### 3. **Guardrails 强约束**
+
 ```yaml
 allowed_sources:
   - TenElementModel        # 十要素模型
@@ -140,7 +144,9 @@ requirements:
 ```
 
 ### 4. **十要素模型 (TenElementModel)**
+
 统一真相源 (Single Source of Truth)：
+
 1. 决策变量
 2. 参数
 3. 约束
@@ -255,11 +261,13 @@ npm run build:aps
 ### 构建失败
 
 **问题**：构建脚本报错
+
 ```bash
 ❌ Build failed: ENOENT: no such file or directory
 ```
 
 **解决**：
+
 1. 检查源文件是否存在于 `src/modules/aps/`
 2. 确认路径大小写正确
 3. 查看构建脚本的 `COPY_ITEMS` 配置
@@ -269,6 +277,7 @@ npm run build:aps
 **问题**：源码和产物文件数量不一致
 
 **解决**：
+
 ```bash
 # 对比文件列表
 diff <(find src/modules/aps -name "*.md" | sort) \
@@ -306,6 +315,7 @@ npm run build:aps
 ### Related Modules
 
 参考其他模块的实现：
+
 - **BMM** (BMAD Module Maker) - 使用 YAML → MD 构建转换
 - **BMB** (BMAD Builder) - 类似的模块结构
 - **Core** - 核心工作流和任务
@@ -352,12 +362,14 @@ npm run build:aps
 APS 模块已升级为 YAML 架构，与 BMM/BMB 模块完全一致：
 
 **变更内容**：
+
 - ✅ 智能体源码从 `.md` 转换为 `.agent.yaml`
 - ✅ 使用 `YamlXmlBuilder` 进行构建
 - ✅ `<activation>` 块自动生成
 - ✅ 标准化的 YAML 结构（metadata, persona, critical_actions, menu）
 
 **迁移说明**：
+
 - 原始 MD 文件已备份到 `agents-md-backup/`
 - YAML 文件通过逆向转换工具生成
 - 功能完全保持，架构更统一

@@ -20,25 +20,25 @@ agent:
     - 仅执行验证与评估，不输出超出职责的方案
     - 报告需引用对应子模块与@路径证据
     - 加载 {project-root}/bmad/aps/config.yaml
-    - '用户名: {user_name}'
-    - '语言: {communication_language}'
-    - '质量门禁: level≠pass → 退回补齐或升级裁决'
+    - "用户名: {user_name}"
+    - "语言: {communication_language}"
+    - "质量门禁: level≠pass → 退回补齐或升级裁决"
   menu:
     - description: 🛡️ 统一验证（语法/逻辑/约束/基准）
       trigger: validate-all
-      workflow: '{project-root}/bmad/aps/workflows/quality-validation/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/quality-validation/workflow.yaml"
     - description: 📝 语法检查（Python为起点）
       trigger: syntax-check
-      exec: '{project-root}/bmad/aps/tasks/syntax-check.md'
+      exec: "{project-root}/bmad/aps/tasks/syntax-check.md"
     - description: 🧠 逻辑验证（用例/桩件/覆盖度）
       trigger: logic-verify
-      exec: '{project-root}/bmad/aps/tasks/logic-verification.md'
+      exec: "{project-root}/bmad/aps/tasks/logic-verification.md"
     - description: 🔗 约束一致性（实现 vs TenElementModel）
       trigger: consistency-check
-      exec: '{project-root}/bmad/aps/tasks/consistency-check.md'
+      exec: "{project-root}/bmad/aps/tasks/consistency-check.md"
     - description: ⏱️ 基准评测（性能测试）
       trigger: benchmark
-      exec: '{project-root}/bmad/aps/tasks/benchmark-evaluation.md'
+      exec: "{project-root}/bmad/aps/tasks/benchmark-evaluation.md"
     - description: 📊 聚合报告（统一评分与建议）
       trigger: aggregate-report
-      exec: '{project-root}/bmad/aps/tasks/report-aggregation.md'
+      exec: "{project-root}/bmad/aps/tasks/report-aggregation.md"

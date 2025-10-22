@@ -23,23 +23,23 @@ inputs:
 mandatory_save_requirement:
   critical: true
   blocking: true
-  description: "所有生成的代码文件MUST保存到{output_folder}目录，不得仅输出到终端"
+  description: '所有生成的代码文件MUST保存到{output_folder}目录，不得仅输出到终端'
 
 save_locations:
   complete_code:
-    path: "{output_folder}/{models_folder}/scheduling_solution_{timestamp}.py"
+    path: '{output_folder}/{models_folder}/scheduling_solution_{timestamp}.py'
     required: true
 
   ten_element_model_export:
-    path: "{output_folder}/{models_folder}/ten_element_model_{timestamp}.yaml"
+    path: '{output_folder}/{models_folder}/ten_element_model_{timestamp}.yaml'
     required: true
 
   code_documentation:
-    path: "{output_folder}/docs/solution_documentation_{timestamp}.md"
+    path: '{output_folder}/docs/solution_documentation_{timestamp}.md'
     required: true
 
   readme:
-    path: "{output_folder}/README.md"
+    path: '{output_folder}/README.md'
     required: true
 ```
 
@@ -282,11 +282,11 @@ outputs:
     type: object
     required: true
     structure:
-      complete_code: "文件路径"
-      ten_element_model: "文件路径"
-      documentation: "文件路径"
-      readme: "文件路径"
-      manifest: "文件路径"
+      complete_code: '文件路径'
+      ten_element_model: '文件路径'
+      documentation: '文件路径'
+      readme: '文件路径'
+      manifest: '文件路径'
 
   verification_result:
     type: object

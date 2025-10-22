@@ -30,26 +30,10 @@ const SOURCE_DIR = path.join(PROJECT_ROOT, 'src/modules/aps');
 const TARGET_DIR = path.join(PROJECT_ROOT, 'bmad/aps');
 
 // Files and directories to copy (non-agent content)
-const COPY_ITEMS = [
-  'workflows',
-  'templates',
-  'tasks',
-  'config.yaml',
-  'README.md',
-  'MIGRATION_GUIDE.md',
-  '_module-installer',
-];
+const COPY_ITEMS = ['workflows', 'templates', 'tasks', 'config.yaml', 'README.md', 'MIGRATION_GUIDE.md', '_module-installer'];
 
 // Files to exclude from distribution
-const EXCLUDE_PATTERNS = [
-  'build.js',
-  'scripts/',
-  'agents-md-backup/',
-  '*.backup',
-  '.DS_Store',
-  'node_modules',
-  'DEVELOPMENT.md',
-];
+const EXCLUDE_PATTERNS = ['build.js', 'scripts/', 'agents-md-backup/', '*.backup', '.DS_Store', 'node_modules', 'DEVELOPMENT.md'];
 
 /**
  * Calculate hash of a directory or file
@@ -88,7 +72,7 @@ async function buildAgents(builder) {
 
   // Find all .agent.yaml files
   const files = await fs.readdir(sourceAgentsDir);
-  const yamlFiles = files.filter(f => f.endsWith('.agent.yaml'));
+  const yamlFiles = files.filter((f) => f.endsWith('.agent.yaml'));
 
   let builtCount = 0;
 

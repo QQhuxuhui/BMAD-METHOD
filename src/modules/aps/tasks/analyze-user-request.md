@@ -233,11 +233,11 @@ outputs:
 
   clarification_needed:
     type: boolean
-    description: "是否需要进一步澄清"
+    description: '是否需要进一步澄清'
 
   suggested_questions:
     type: array
-    description: "如需澄清，建议的问题列表"
+    description: '如需澄清，建议的问题列表'
 ```
 
 ## 示例输出
@@ -252,13 +252,13 @@ outputs:
     },
     "key_requirements": {
       "entities": [
-        {"type": "vehicles", "count": 50},
-        {"type": "orders", "count": 200}
+        { "type": "vehicles", "count": 50 },
+        { "type": "orders", "count": 200 }
       ],
       "constraints": ["时间窗", "容量", "优先级"],
       "objectives": ["minimize_cost", "minimize_time"],
-      "scale": {"medium": true},
-      "time_horizon": {"daily": true},
+      "scale": { "medium": true },
+      "time_horizon": { "daily": true },
       "special_needs": []
     },
     "complexity_assessment": {
@@ -267,16 +267,8 @@ outputs:
       "description": "复杂：中大规模、多约束或多目标"
     },
     "estimated_phases": ["0", "0.5", "1", "1.5", "2", "3", "4"],
-    "recommended_experts": [
-      "domain-expert",
-      "constraint-expert",
-      "objective-expert",
-      "algorithm-expert"
-    ],
-    "potential_challenges": [
-      "多目标优化，需要权衡策略",
-      "复杂约束组合，需要仔细建模"
-    ],
+    "recommended_experts": ["domain-expert", "constraint-expert", "objective-expert", "algorithm-expert"],
+    "potential_challenges": ["多目标优化，需要权衡策略", "复杂约束组合，需要仔细建模"],
     "confidence": 0.75
   },
   "clarification_needed": false,

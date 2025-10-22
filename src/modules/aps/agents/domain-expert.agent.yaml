@@ -20,18 +20,18 @@ agent:
     - 仅基于TenElementModel和@专家库/领域*进行领域识别/规则/适配
     - 输出需附@引用；缺失则提交"能力缺口报告"
     - 加载 {project-root}/bmad/aps/config.yaml
-    - '用户名: {user_name}'
-    - '语言: {communication_language}'
+    - "用户名: {user_name}"
+    - "语言: {communication_language}"
   menu:
     - description: 🔍 领域识别与分类
       trigger: identify-domain
-      workflow: '{project-root}/bmad/aps/workflows/domain-identification/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/domain-identification/workflow.yaml"
     - description: 📋 业务规则提取与建模
       trigger: extract-rules
-      workflow: '{project-root}/bmad/aps/workflows/business-rules-extraction/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/business-rules-extraction/workflow.yaml"
     - description: 🔄 领域适配（通用→特定）
       trigger: adapt-solution
-      workflow: '{project-root}/bmad/aps/workflows/domain-adaptation/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/domain-adaptation/workflow.yaml"
     - description: ⭐ 行业最佳实践推荐
       trigger: best-practices
-      exec: '{project-root}/bmad/aps/tasks/domain-best-practices.md'
+      exec: "{project-root}/bmad/aps/tasks/domain-best-practices.md"

@@ -20,21 +20,21 @@ agent:
     - 所有知识提取基于实际代码AST分析
     - 模板生成必须符合架构标准并附@引用
     - 加载 {project-root}/bmad/aps/config.yaml
-    - '用户名: {user_name}'
-    - '语言: {communication_language}'
+    - "用户名: {user_name}"
+    - "语言: {communication_language}"
   menu:
     - description: 🔍 代码分析（AST解析与模式识别）
       trigger: analyze-code
-      workflow: '{project-root}/bmad/aps/workflows/code-analysis/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/code-analysis/workflow.yaml"
     - description: 📚 知识提取（算法/约束/目标/领域）
       trigger: extract-knowledge
-      workflow: '{project-root}/bmad/aps/workflows/knowledge-extraction/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/knowledge-extraction/workflow.yaml"
     - description: 🏗️ 模板生成（标准化知识模板）
       trigger: generate-template
-      workflow: '{project-root}/bmad/aps/workflows/template-generation/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/template-generation/workflow.yaml"
     - description: 🔌 模块集成（自动化集成到知识库）
       trigger: integrate-module
-      workflow: '{project-root}/bmad/aps/workflows/module-integration/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/module-integration/workflow.yaml"
     - description: ✅ 兼容性检查（冲突检测）
       trigger: compatibility-check
-      exec: '{project-root}/bmad/aps/tasks/compatibility-check.md'
+      exec: "{project-root}/bmad/aps/tasks/compatibility-check.md"

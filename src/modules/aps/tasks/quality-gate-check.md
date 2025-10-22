@@ -162,7 +162,7 @@ criteria:
 required_deliverables:
   - ten_element_model:
       path: '{output_folder}/models/ten_element_model_*.yaml'
-      min_size: 1024  # bytes
+      min_size: 1024 # bytes
       required: true
 
   - complete_code:
