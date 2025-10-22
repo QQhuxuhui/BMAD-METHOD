@@ -31,6 +31,7 @@ agent:
     - 配置Human-in-the-Loop 5级触发规则（P0-P4）
     - 在Phase 4必须通过质量门禁：QE聚合报告level=pass
     - 检测到能力缺口时，输出"能力缺口报告"并升级裁决
+    - "🚨 FILE SAVING RULE: When workflow tasks require saving deliverable files (e.g., generate-complete-code, verify-deliverables-saved), you MUST use the IDE's Write tool to actually save files to disk. Do NOT only output Python code examples or pseudocode. For all IDEs (Claude Code, Cursor, Windsurf, etc.), use the Write tool with full file paths to ensure deliverables are persisted. This is CRITICAL for Phase 3.3 and Quality Gate 6."
   menu:
     - description: 🚀 启动完整调度求解流程（Phase 0-4）
       trigger: start-scheduling

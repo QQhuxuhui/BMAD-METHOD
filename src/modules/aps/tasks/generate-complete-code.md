@@ -43,6 +43,37 @@ save_locations:
     required: true
 ```
 
+### 1.1 IDE 工具调用指令（跨 IDE 兼容）
+
+**🚨 CRITICAL - 文件保存方法**：
+
+不同 IDE 中，AI 必须使用 IDE 提供的**文件写入工具**来保存文件，而不是输出 Python 代码示例。
+
+**指令**：
+1. **Claude Code/Cursor/Windsurf/其他 IDE**: 使用 `Write` 工具保存文件
+2. **文件路径**: 必须使用完整的绝对路径或项目相对路径
+3. **保存顺序**: 按照以下顺序逐个保存，每保存一个文件后验证成功
+
+**示例（伪代码，实际使用 IDE 工具）**：
+```
+Tool: Write
+Path: {project-root}/{output_folder}/models/scheduling_solution_{timestamp}.py
+Content: [生成的完整代码]
+
+Tool: Write
+Path: {project-root}/{output_folder}/models/ten_element_model_{timestamp}.yaml
+Content: [TenElementModel YAML 导出]
+
+Tool: Write
+Path: {project-root}/{output_folder}/docs/solution_documentation_{timestamp}.md
+Content: [使用文档]
+```
+
+**验证**：每个文件保存后，确认以下信息：
+- ✓ 文件路径
+- ✓ 文件大小 > 最小要求
+- ✓ 文件可访问
+
 ### 2. 文件命名规范
 
 ```python
@@ -169,64 +200,103 @@ code_components:
 
 ### 步骤3: 保存所有文件（MANDATORY）
 
+**🚨 CRITICAL INSTRUCTIONS - 文件保存执行步骤**：
+
+此步骤必须实际执行文件保存操作，而非仅输出代码。所有 AI（Claude Code、Cursor、Windsurf 等）必须：
+
+1. **使用 IDE 提供的 Write 工具**，不得使用 Python 代码示例替代
+2. **按顺序保存**以下所有文件
+3. **每保存一个文件后立即验证**文件已成功创建
+
+#### 3.1 计算时间戳
+
 ```python
-from datetime import datetime
-import yaml
-import json
+# 首先计算时间戳（用于文件命名）
+timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+# 例如: 20251022_143530
+```
 
-def save_all_deliverables(integrated_solution, ten_element_model, output_paths, timestamp):
-    """
-    🚨 CRITICAL: 保存所有交付物到指定目录
-    此步骤为强制要求，不得跳过
+#### 3.2 使用 Write 工具保存文件
 
-    Returns:
-        dict: 保存的文件路径清单
-    """
-    saved_files = {}
+**文件 1: 完整代码**
+```
+IDE Tool: Write
+File Path: {output_folder}/models/scheduling_solution_{timestamp}.py
+Content: [生成的完整调度算法 Python 代码，包含：
+  - 导入语句
+  - 数据模型类
+  - 约束验证函数
+  - 目标函数
+  - 算法主体
+  - 求解器入口
+  - 结果输出
+]
+```
 
-    # 1. 保存完整代码
-    code_path = f"{output_paths['models']}/scheduling_solution_{timestamp}.py"
-    with open(code_path, 'w', encoding='utf-8') as f:
-        f.write(generate_complete_code(integrated_solution, ten_element_model))
-    saved_files['complete_code'] = code_path
-    print(f"✓ 代码已保存: {code_path}")
+**文件 2: TenElementModel 导出**
+```
+IDE Tool: Write
+File Path: {output_folder}/models/ten_element_model_{timestamp}.yaml
+Content: [TenElementModel 的完整 YAML 序列化，包含所有 10 个要素]
+```
 
-    # 2. 保存TenElementModel导出
-    model_path = f"{output_paths['models']}/ten_element_model_{timestamp}.yaml"
-    with open(model_path, 'w', encoding='utf-8') as f:
-        yaml.dump(ten_element_model, f, allow_unicode=True, default_flow_style=False)
-    saved_files['ten_element_model'] = model_path
-    print(f"✓ 模型已保存: {model_path}")
+**文件 3: 代码文档**
+```
+IDE Tool: Write
+File Path: {output_folder}/docs/solution_documentation_{timestamp}.md
+Content: [使用说明文档，包含：
+  - 问题概述
+  - 环境要求
+  - 安装步骤
+  - 使用方法
+  - 参数说明
+  - 示例运行
+]
+```
 
-    # 3. 保存代码文档
-    doc_path = f"{output_paths['docs']}/solution_documentation_{timestamp}.md"
-    with open(doc_path, 'w', encoding='utf-8') as f:
-        f.write(generate_documentation(integrated_solution, ten_element_model, timestamp))
-    saved_files['documentation'] = doc_path
-    print(f"✓ 文档已保存: {doc_path}")
+**文件 4: README（如果不存在）**
+```
+IDE Tool: Write (仅当文件不存在时)
+File Path: {output_folder}/README.md
+Content: [项目总览、目录结构说明、快速开始指南]
+```
 
-    # 4. 生成README.md（如不存在）
-    readme_path = f"{output_paths['base']}/README.md"
-    if not os.path.exists(readme_path):
-        with open(readme_path, 'w', encoding='utf-8') as f:
-            f.write(generate_readme(timestamp))
-        saved_files['readme'] = readme_path
-        print(f"✓ README已创建: {readme_path}")
+**文件 5: 文件清单**
+```
+IDE Tool: Write
+File Path: {output_folder}/file_manifest_{timestamp}.json
+Content: {
+  "timestamp": "{timestamp}",
+  "files": {
+    "complete_code": "{output_folder}/models/scheduling_solution_{timestamp}.py",
+    "ten_element_model": "{output_folder}/models/ten_element_model_{timestamp}.yaml",
+    "documentation": "{output_folder}/docs/solution_documentation_{timestamp}.md"
+  },
+  "ten_element_model_hash": "{model_hash}",
+  "workflow_mode": "{mode}"
+}
+```
 
-    # 5. 保存文件清单元数据
-    manifest_path = f"{output_paths['base']}/file_manifest_{timestamp}.json"
-    manifest = {
-        "timestamp": timestamp,
-        "files": saved_files,
-        "ten_element_model_hash": ten_element_model.get("model_hash"),
-        "workflow_mode": ten_element_model.get("workflow_mode")
-    }
-    with open(manifest_path, 'w', encoding='utf-8') as f:
-        json.dump(manifest, f, indent=2, ensure_ascii=False)
-    saved_files['manifest'] = manifest_path
-    print(f"✓ 文件清单已保存: {manifest_path}")
+#### 3.3 保存后记录
 
-    return saved_files
+保存每个文件后，向用户输出确认信息：
+```
+✓ 代码已保存: {output_folder}/models/scheduling_solution_{timestamp}.py (8432 bytes)
+✓ 模型已保存: {output_folder}/models/ten_element_model_{timestamp}.yaml (3256 bytes)
+✓ 文档已保存: {output_folder}/docs/solution_documentation_{timestamp}.md (5120 bytes)
+✓ 清单已保存: {output_folder}/file_manifest_{timestamp}.json (512 bytes)
+```
+
+#### 3.4 构建 saved_files 数据结构
+
+```python
+saved_files = {
+    "complete_code": f"{output_folder}/models/scheduling_solution_{timestamp}.py",
+    "ten_element_model": f"{output_folder}/models/ten_element_model_{timestamp}.yaml",
+    "documentation": f"{output_folder}/docs/solution_documentation_{timestamp}.md",
+    "readme": f"{output_folder}/README.md",
+    "manifest": f"{output_folder}/file_manifest_{timestamp}.json"
+}
 ```
 
 ### 步骤4: 验证所有文件已保存（MANDATORY）
