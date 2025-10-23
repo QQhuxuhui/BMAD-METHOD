@@ -21,12 +21,14 @@ with open(code_path, 'w', encoding='utf-8') as f:
 ```
 
 这种写法的问题：
+
 - **Claude Code/Trae**: 能够理解隐式意图，自动使用 `Write` 工具保存文件 ✅
 - **Cursor**: 可能将其理解为"输出示例代码"而非"执行文件保存操作" ❌
 
 ### 2. 缺少明确的 IDE 工具调用指令
 
 不同 IDE 对 AI 的指令理解方式不同：
+
 - **Claude Code**: 高度智能化，能理解隐式意图并自动选择工具
 - **Cursor**: 需要更明确的工具调用指令
 
@@ -46,6 +48,7 @@ with open(code_path, 'w', encoding='utf-8') as f:
 不同 IDE 中，AI 必须使用 IDE 提供的**文件写入工具**来保存文件，而不是输出 Python 代码示例。
 
 **指令**：
+
 1. **Claude Code/Cursor/Windsurf/其他 IDE**: 使用 `Write` 工具保存文件
 2. **文件路径**: 必须使用完整的绝对路径或项目相对路径
 3. **保存顺序**: 按照以下顺序逐个保存，每保存一个文件后验证成功
@@ -54,6 +57,7 @@ with open(code_path, 'w', encoding='utf-8') as f:
 #### 2. 修改"保存所有文件"步骤
 
 **原有（隐式）**:
+
 ```python
 def save_all_deliverables(...):
     with open(code_path, 'w', encoding='utf-8') as f:
@@ -61,6 +65,7 @@ def save_all_deliverables(...):
 ```
 
 **新版（显式）**:
+
 ```markdown
 **🚨 CRITICAL INSTRUCTIONS - 文件保存执行步骤**：
 
@@ -74,10 +79,13 @@ def save_all_deliverables(...):
 
 **文件 1: 完整代码**
 ```
+
 IDE Tool: Write
-File Path: {output_folder}/models/scheduling_solution_{timestamp}.py
+File Path: {output*folder}/models/scheduling_solution*{timestamp}.py
 Content: [生成的完整调度算法 Python 代码]
+
 ```
+
 ```
 
 #### 3. Orchestrator 规则更新
@@ -107,6 +115,7 @@ Content: [生成的完整调度算法 Python 代码]
 ### 预期结果
 
 在所有 IDE（Claude Code、Trae、Cursor、Windsurf）中：
+
 - ✅ 所有交付物文件成功保存到输出目录
 - ✅ Phase 4.1.5 验证通过（所有必需交付物已保存）
 - ✅ Phase 4.2 质量门禁6 通过（deliverables_saved: true）
@@ -115,12 +124,12 @@ Content: [生成的完整调度算法 Python 代码]
 
 ### IDE 工具使用差异
 
-| IDE | Write 工具支持 | 隐式意图理解 | 需要显式指令 |
-|-----|---------------|-------------|-------------|
-| Claude Code | ✅ 完全支持 | ✅ 强 | ❌ 否 |
-| Trae | ✅ 完全支持 | ✅ 强 | ❌ 否 |
-| Cursor | ✅ 完全支持 | ⚠️ 中等 | ✅ 是 |
-| Windsurf | ✅ 完全支持 | ⚠️ 待测试 | ✅ 推荐 |
+| IDE         | Write 工具支持 | 隐式意图理解 | 需要显式指令 |
+| ----------- | -------------- | ------------ | ------------ |
+| Claude Code | ✅ 完全支持    | ✅ 强        | ❌ 否        |
+| Trae        | ✅ 完全支持    | ✅ 强        | ❌ 否        |
+| Cursor      | ✅ 完全支持    | ⚠️ 中等      | ✅ 是        |
+| Windsurf    | ✅ 完全支持    | ⚠️ 待测试    | ✅ 推荐      |
 
 ### 最佳实践
 
@@ -132,6 +141,7 @@ Content: [生成的完整调度算法 Python 代码]
 4. **清晰路径**：使用完整的相对路径或绝对路径
 
 **示例（推荐）**：
+
 ```markdown
 ### 步骤: 保存文件
 
@@ -139,13 +149,17 @@ Content: [生成的完整调度算法 Python 代码]
 
 **文件 1**:
 ```
+
 IDE Tool: Write
 File Path: {output_folder}/models/solution.py
 Content: [完整代码]
+
 ```
+
 ```
 
 **示例（不推荐）**：
+
 ```python
 # 不推荐：隐式指令
 with open(f"{output_folder}/models/solution.py", 'w') as f:

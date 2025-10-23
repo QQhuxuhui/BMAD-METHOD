@@ -59,3 +59,11 @@ tools/template-test-generator/test-scenarios/
 # Test Install Output
 
 z*/
+
+
+test/bmad
+test/aps-output
+test/.claude
+test/.cursor
+
+aps-outputs/*

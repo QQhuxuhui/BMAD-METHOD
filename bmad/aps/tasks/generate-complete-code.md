@@ -50,11 +50,13 @@ save_locations:
 不同 IDE 中，AI 必须使用 IDE 提供的**文件写入工具**来保存文件，而不是输出 Python 代码示例。
 
 **指令**：
+
 1. **Claude Code/Cursor/Windsurf/其他 IDE**: 使用 `Write` 工具保存文件
 2. **文件路径**: 必须使用完整的绝对路径或项目相对路径
 3. **保存顺序**: 按照以下顺序逐个保存，每保存一个文件后验证成功
 
 **示例（伪代码，实际使用 IDE 工具）**：
+
 ```
 Tool: Write
 Path: {project-root}/{output_folder}/models/scheduling_solution_{timestamp}.py
@@ -70,6 +72,7 @@ Content: [使用文档]
 ```
 
 **验证**：每个文件保存后，确认以下信息：
+
 - ✓ 文件路径
 - ✓ 文件大小 > 最小要求
 - ✓ 文件可访问
@@ -219,6 +222,7 @@ timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 #### 3.2 使用 Write 工具保存文件
 
 **文件 1: 完整代码**
+
 ```
 IDE Tool: Write
 File Path: {output_folder}/models/scheduling_solution_{timestamp}.py
@@ -234,6 +238,7 @@ Content: [生成的完整调度算法 Python 代码，包含：
 ```
 
 **文件 2: TenElementModel 导出**
+
 ```
 IDE Tool: Write
 File Path: {output_folder}/models/ten_element_model_{timestamp}.yaml
@@ -241,6 +246,7 @@ Content: [TenElementModel 的完整 YAML 序列化，包含所有 10 个要素]
 ```
 
 **文件 3: 代码文档**
+
 ```
 IDE Tool: Write
 File Path: {output_folder}/docs/solution_documentation_{timestamp}.md
@@ -255,6 +261,7 @@ Content: [使用说明文档，包含：
 ```
 
 **文件 4: README（如果不存在）**
+
 ```
 IDE Tool: Write (仅当文件不存在时)
 File Path: {output_folder}/README.md
@@ -262,6 +269,7 @@ Content: [项目总览、目录结构说明、快速开始指南]
 ```
 
 **文件 5: 文件清单**
+
 ```
 IDE Tool: Write
 File Path: {output_folder}/file_manifest_{timestamp}.json
@@ -280,6 +288,7 @@ Content: {
 #### 3.3 保存后记录
 
 保存每个文件后，向用户输出确认信息：
+
 ```
 ✓ 代码已保存: {output_folder}/models/scheduling_solution_{timestamp}.py (8432 bytes)
 ✓ 模型已保存: {output_folder}/models/ten_element_model_{timestamp}.yaml (3256 bytes)
