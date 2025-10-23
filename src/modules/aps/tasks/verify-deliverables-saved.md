@@ -20,38 +20,38 @@ inputs:
 ```yaml
 required_deliverables:
   ten_element_model:
-    file_pattern: "ten_element_model_*.yaml"
-    location: "{output_folder}/models/"
-    min_size: 1024  # bytes
-    description: "十要素模型YAML导出"
+    file_pattern: 'ten_element_model_*.yaml'
+    location: '{output_folder}/models/'
+    min_size: 1024 # bytes
+    description: '十要素模型YAML导出'
     critical: true
 
   complete_code:
-    file_pattern: "scheduling_solution_*.py"
-    location: "{output_folder}/models/"
+    file_pattern: 'scheduling_solution_*.py'
+    location: '{output_folder}/models/'
     min_size: 2048
-    description: "完整可执行代码"
+    description: '完整可执行代码'
     critical: true
 
   code_documentation:
-    file_pattern: "solution_documentation_*.md"
-    location: "{output_folder}/docs/"
+    file_pattern: 'solution_documentation_*.md'
+    location: '{output_folder}/docs/'
     min_size: 512
-    description: "代码使用文档"
+    description: '代码使用文档'
     critical: true
 
   readme:
-    file_pattern: "README.md"
-    location: "{output_folder}/"
+    file_pattern: 'README.md'
+    location: '{output_folder}/'
     min_size: 256
-    description: "项目README"
+    description: '项目README'
     critical: false
 
   file_manifest:
-    file_pattern: "file_manifest_*.json"
-    location: "{output_folder}/"
+    file_pattern: 'file_manifest_*.json'
+    location: '{output_folder}/'
     min_size: 128
-    description: "文件清单元数据"
+    description: '文件清单元数据'
     critical: false
 ```
 
@@ -60,18 +60,18 @@ required_deliverables:
 ```yaml
 optional_deliverables:
   quality_report:
-    file_pattern: "quality_report_*.json"
-    location: "{output_folder}/reports/"
+    file_pattern: 'quality_report_*.json'
+    location: '{output_folder}/reports/'
     min_size: 256
 
   todo_completion_report:
-    file_pattern: "todo_completion_*.json"
-    location: "{output_folder}/reports/"
+    file_pattern: 'todo_completion_*.json'
+    location: '{output_folder}/reports/'
     min_size: 128
 
   benchmark_results:
-    file_pattern: "benchmark_*.json"
-    location: "{output_folder}/reports/"
+    file_pattern: 'benchmark_*.json'
+    location: '{output_folder}/reports/'
     min_size: 128
 ```
 
@@ -294,11 +294,11 @@ outputs:
 
   verification_report:
     type: string
-    description: "易读的验证报告文本"
+    description: '易读的验证报告文本'
 
   deliverable_check:
     type: object
-    description: "供质量门禁6使用的验证数据"
+    description: '供质量门禁6使用的验证数据'
     structure:
       all_saved: boolean
       all_paths_accessible: boolean

@@ -80,19 +80,20 @@
 ---
 
 ### 📁 完整输出目录结构
-
 ```
-{output_folder}/
+
+{output*folder}/
 ├── models/
-│   ├── ten_element_model_{timestamp}.yaml
-│   └── scheduling_solution_{timestamp}.py
+│ ├── ten_element_model*{timestamp}.yaml
+│ └── scheduling*solution*{timestamp}.py
 ├── docs/
-│   └── solution_documentation_{timestamp}.md
+│ └── solution*documentation*{timestamp}.md
 ├── reports/
-│   ├── quality_report_{timestamp}.json
-│   └── todo_completion_{timestamp}.json
+│ ├── quality*report*{timestamp}.json
+│ └── todo*completion*{timestamp}.json
 ├── README.md
-└── file_manifest_{timestamp}.json
+└── file*manifest*{timestamp}.json
+
 ```
 
 ---
@@ -107,12 +108,14 @@
 **问题规模**: {problem_scale}
 
 **关键要素**:
+
 - 决策变量: {decision_variables_count} 个
 - 约束条件: {constraints_count} 个
 - 优化目标: {objectives_description}
 - 选用算法: {algorithm_name} (@引用: {algorithm_citation})
 
 **性能预期**:
+
 - 预计求解时间: {expected_solving_time}
 - 解质量预期: {expected_solution_quality}
 - 适用规模: {applicable_scale}
@@ -125,7 +128,7 @@
 
 ### 第三部分: 下一步建议
 
-```markdown
+````markdown
 ### 🚀 下一步建议
 
 #### 立即可执行
@@ -135,8 +138,10 @@
    cd {output_folder}
    python models/scheduling_solution_{timestamp}.py
    ```
+````
 
 2. **查看文档**
+
    ```bash
    cat docs/solution_documentation_{timestamp}.md
    ```
@@ -160,7 +165,8 @@
 - ✅ **质量提升**: 如需更高质量标准，参考质量报告建议
 
 ---
-```
+
+````
 
 ### 第四部分: 用户确认请求
 
@@ -194,14 +200,14 @@
 > 您的选择: _____
 
 ---
-```
+````
 
 ## 用户响应处理
 
 ### 响应 [a] - 确认交付
 
 ```yaml
-action: "finalize_delivery"
+action: 'finalize_delivery'
 steps:
   - 记录用户确认时间
   - 生成最终交付报告
@@ -228,7 +234,7 @@ output_message: |
 ### 响应 [b] - 需要微调
 
 ```yaml
-action: "collect_adjustment_requests"
+action: 'collect_adjustment_requests'
 steps:
   - 询问用户具体需要调整什么（算法/约束/目标/其他）
   - 根据调整类型调用相应专家
@@ -252,7 +258,7 @@ output_message: |
 ### 响应 [c] - 查看详细质量报告
 
 ```yaml
-action: "display_quality_report"
+action: 'display_quality_report'
 steps:
   - 读取质量报告文件
   - 格式化展示6个质量门禁详情
@@ -287,7 +293,7 @@ output_format: |
 ### 响应 [d] - 导出到其他位置
 
 ```yaml
-action: "export_deliverables"
+action: 'export_deliverables'
 steps:
   - 询问目标导出路径
   - 复制所有交付物到新路径
@@ -306,7 +312,7 @@ output_message: |
 ### 响应 [e] - 咨询问题
 
 ```yaml
-action: "handle_questions"
+action: 'handle_questions'
 steps:
   - 收集用户问题
   - 根据问题类型调用相应专家或提供文档链接
@@ -332,58 +338,58 @@ output_message: |
 ```yaml
 required_variables:
   # 用户信息
-  user_name: "用户名称（从config.yaml加载）"
+  user_name: '用户名称（从config.yaml加载）'
 
   # 文件路径
-  ten_element_model_path: "十要素模型文件路径"
-  complete_code_path: "完整代码文件路径"
-  documentation_path: "文档文件路径"
-  quality_report_path: "质量报告路径"
-  todo_completion_path: "Todo完成度报告路径"
-  manifest_path: "文件清单路径"
-  readme_path: "README路径"
-  output_folder: "输出目录"
+  ten_element_model_path: '十要素模型文件路径'
+  complete_code_path: '完整代码文件路径'
+  documentation_path: '文档文件路径'
+  quality_report_path: '质量报告路径'
+  todo_completion_path: 'Todo完成度报告路径'
+  manifest_path: '文件清单路径'
+  readme_path: 'README路径'
+  output_folder: '输出目录'
 
   # 文件元数据
-  timestamp: "生成时间戳"
-  model_hash: "模型哈希值"
-  workflow_mode: "工作流模式（mode_a/mode_b）"
+  timestamp: '生成时间戳'
+  model_hash: '模型哈希值'
+  workflow_mode: '工作流模式（mode_a/mode_b）'
 
   # 文件大小（KB）
-  ten_element_model_size_kb: "模型文件大小"
-  complete_code_size_kb: "代码文件大小"
-  documentation_size_kb: "文档文件大小"
+  ten_element_model_size_kb: '模型文件大小'
+  complete_code_size_kb: '代码文件大小'
+  documentation_size_kb: '文档文件大小'
 
   # 代码统计
-  total_lines: "代码总行数"
+  total_lines: '代码总行数'
 
   # 解决方案信息
-  problem_domain: "问题领域"
-  problem_scale: "问题规模"
-  decision_variables_count: "决策变量数量"
-  constraints_count: "约束数量"
-  objectives_description: "目标描述"
-  algorithm_name: "算法名称"
-  algorithm_citation: "算法引用"
+  problem_domain: '问题领域'
+  problem_scale: '问题规模'
+  decision_variables_count: '决策变量数量'
+  constraints_count: '约束数量'
+  objectives_description: '目标描述'
+  algorithm_name: '算法名称'
+  algorithm_citation: '算法引用'
 
   # 性能预期
-  expected_solving_time: "预计求解时间"
-  expected_solution_quality: "预期解质量"
-  applicable_scale: "适用规模"
+  expected_solving_time: '预计求解时间'
+  expected_solution_quality: '预期解质量'
+  applicable_scale: '适用规模'
 
   # 质量状态
-  benchmark_status: "基准测试状态"
+  benchmark_status: '基准测试状态'
 
   # Todo统计
-  todo_completion_percentage: "完成度百分比"
-  completed_tasks: "已完成任务数"
-  total_tasks: "总任务数"
+  todo_completion_percentage: '完成度百分比'
+  completed_tasks: '已完成任务数'
+  total_tasks: '总任务数'
 
   # 引用列表
-  citations_list: "引用的知识模块列表"
+  citations_list: '引用的知识模块列表'
 
   # 其他
-  dependency_check_command: "依赖检查命令"
+  dependency_check_command: '依赖检查命令'
 ```
 
 ## 质量检查

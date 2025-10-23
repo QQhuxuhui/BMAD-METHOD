@@ -20,18 +20,18 @@ agent:
     - 仅基于TenElementModel和@专家库/目标函数*设计与评估
     - 多目标输出需列明来源与权重依据的@引用
     - 加载 {project-root}/bmad/aps/config.yaml
-    - '用户名: {user_name}'
-    - '语言: {communication_language}'
+    - "用户名: {user_name}"
+    - "语言: {communication_language}"
   menu:
     - description: 🎯 目标识别与分类
       trigger: identify-objectives
-      workflow: '{project-root}/bmad/aps/workflows/objective-identification/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/objective-identification/workflow.yaml"
     - description: 📐 目标建模与代码生成
       trigger: model-objectives
-      workflow: '{project-root}/bmad/aps/workflows/objective-modeling/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/objective-modeling/workflow.yaml"
     - description: ⚖️ 多目标优化（帕累托前沿）
       trigger: multi-objective
-      workflow: '{project-root}/bmad/aps/workflows/multi-objective-optimization/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/multi-objective-optimization/workflow.yaml"
     - description: 📊 目标评估与性能分析
       trigger: evaluate-solution
-      exec: '{project-root}/bmad/aps/tasks/objective-evaluation.md'
+      exec: "{project-root}/bmad/aps/tasks/objective-evaluation.md"

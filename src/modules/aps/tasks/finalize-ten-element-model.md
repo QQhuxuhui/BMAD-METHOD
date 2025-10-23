@@ -213,7 +213,7 @@ outputs:
   ten_element_model:
     type: object
     required: true
-    description: "固化后的十要素模型（统一真相源）"
+    description: '固化后的十要素模型（统一真相源）'
     structure:
       frozen: true
       frozen_at: string
@@ -232,15 +232,15 @@ outputs:
 
   model_version:
     type: string
-    description: "模型版本号"
+    description: '模型版本号'
 
   model_hash:
     type: string
-    description: "模型内容哈希值"
+    description: '模型内容哈希值'
 
   model_baseline:
     type: object
-    description: "模型基线用于后续一致性检查"
+    description: '模型基线用于后续一致性检查'
 ```
 
 ## 示例输出

@@ -208,7 +208,7 @@ class MDToYAMLConverter {
 
     // Find all .md files in source directory
     const files = await fs.readdir(sourceDir);
-    const mdFiles = files.filter(f => f.endsWith('.md'));
+    const mdFiles = files.filter((f) => f.endsWith('.md'));
 
     const results = [];
 
@@ -255,22 +255,24 @@ async function main() {
   const TARGET_DIR = path.join(__dirname, '../agents-yaml');
 
   console.log('APS Agent MD → YAML Converter\n');
-  console.log('=' .repeat(60) + '\n');
+  console.log('='.repeat(60) + '\n');
 
   const results = await converter.convertDirectory(SOURCE_DIR, TARGET_DIR);
 
   // Summary
-  console.log('=' .repeat(60));
+  console.log('='.repeat(60));
   console.log('\nConversion Summary:');
   console.log(`  Total files: ${results.length}`);
-  console.log(`  Success: ${results.filter(r => r.status === 'success').length}`);
-  console.log(`  Errors: ${results.filter(r => r.status === 'error').length}`);
+  console.log(`  Success: ${results.filter((r) => r.status === 'success').length}`);
+  console.log(`  Errors: ${results.filter((r) => r.status === 'error').length}`);
 
-  if (results.some(r => r.status === 'error')) {
+  if (results.some((r) => r.status === 'error')) {
     console.log('\nFailed files:');
-    results.filter(r => r.status === 'error').forEach(r => {
-      console.log(`  - ${r.file}: ${r.error}`);
-    });
+    results
+      .filter((r) => r.status === 'error')
+      .forEach((r) => {
+        console.log(`  - ${r.file}: ${r.error}`);
+      });
   }
 
   console.log('');

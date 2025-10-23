@@ -221,11 +221,11 @@ outputs:
 
   phase_plan:
     type: object
-    description: "Phase执行计划详情"
+    description: 'Phase执行计划详情'
 
   config_updated:
     type: boolean
-    description: "全局配置是否已更新"
+    description: '全局配置是否已更新'
 ```
 
 ## 示例输出

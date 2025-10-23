@@ -70,6 +70,37 @@ phases:
           - tracker_initialized
           - baseline_contract
 
+      - step_id: "0.5"
+        name: "💾 保存Phase 0状态"
+        action: "exec"
+        target: "bmad/aps/tasks/save-phase-state.md"
+        description: "保存Todo List基线到文件系统，供后续Phase验证使用"
+
+        mandatory_save: true
+        critical: true
+
+        inputs:
+          - phase_id: "phase_0"
+          - state_data:
+              confirmed_todo_list: ${confirmed_todo_list}
+              baseline_contract: ${baseline_contract}
+              tracker_initialized: ${tracker_initialized}
+          - state_folder: "${config.state_management.state_folder}"
+          - format: "${config.state_management.state_format}"
+          - include_metadata: true
+
+        outputs:
+          - saved_state_file
+          - verification_result
+          - file_metadata
+          - manifest_updated
+
+        post_action_verify:
+          - check: "verification_result.all_checks_passed == true"
+            on_fail: "block_and_retry"
+            error_message: "Phase 0状态保存失败，无法继续workflow"
+            max_retries: 3
+
   - phase_id: "phase-0.5"
     phase_name: "Phase 0.5: 双模式交互选择"
     estimated_time: "2-3分钟"
@@ -105,19 +136,89 @@ phases:
           - workflow_configuration
           - phase_plan
 
+      - step_id: "0.5.4"
+        name: "💾 保存Phase 0.5状态"
+        action: "exec"
+        target: "bmad/aps/tasks/save-phase-state.md"
+        description: "保存用户选择的交互模式和工作流配置"
+
+        mandatory_save: true
+        critical: true
+
+        inputs:
+          - phase_id: "phase_0_5"
+          - state_data:
+              selected_mode: ${selected_mode}
+              workflow_configuration: ${workflow_configuration}
+              phase_plan: ${phase_plan}
+          - state_folder: "${config.state_management.state_folder}"
+          - format: "${config.state_management.state_format}"
+          - include_metadata: true
+
+        outputs:
+          - saved_state_file
+          - verification_result
+          - file_metadata
+          - manifest_updated
+
+        post_action_verify:
+          - check: "verification_result.all_checks_passed == true"
+            on_fail: "block_and_retry"
+            error_message: "Phase 0.5状态保存失败"
+            max_retries: 3
+
   - phase_id: "phase-1"
     phase_name: "Phase 1: 需求分析"
     estimated_time: "10-15分钟"
     description: "深入理解用户需求，检测偏离"
 
     steps:
+      - step_id: "1.0"
+        name: "🔍 加载Phase 0状态"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载Todo List基线，用于偏离检测"
+
+        critical: true
+
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_0"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 0 状态文件缺失！
+
+                文件路径: {state_folder}/phase_0_state_latest.yaml
+
+                可能原因:
+                1. Phase 0 未完成
+                2. 文件保存失败
+                3. 文件被误删除
+
+                解决方案:
+                - 请从 Phase 0 重新开始执行工作流
+                - 或检查 {state_folder} 目录权限
+
+        inputs:
+          - phase_id: "phase_0"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
+          - format: "${config.state_management.state_format}"
+
+        outputs:
+          - state_data # 包含baseline_contract, confirmed_todo_list等
+          - metadata
+          - load_success
+          - file_metadata
+
       - step_id: "1.1"
         name: "需求深度理解"
         action: "run-workflow"
         target: "bmad/aps/workflows/phase-1-requirements/workflow.yaml"
         inputs:
           - user_request
-          - confirmed_todo_list
+          - confirmed_todo_list: "${state_data.confirmed_todo_list}" # 从文件加载
         outputs:
           - requirement_analysis
           - clarification_questions
@@ -139,12 +240,43 @@ phases:
         target: "bmad/aps/tasks/check-todo-deviation.md"
         inputs:
           - current_analysis
-          - baseline_contract
+          - baseline_contract: "${state_data.baseline_contract}" # 从文件加载
         outputs:
           - deviation_score
           - deviation_alert
         threshold: 0.60
         on_deviation: "trigger_replan"
+
+      - step_id: "1.4"
+        name: "💾 保存Phase 1状态"
+        action: "exec"
+        target: "bmad/aps/tasks/save-phase-state.md"
+        description: "保存需求分析结果到文件系统"
+
+        mandatory_save: true
+        critical: true
+
+        inputs:
+          - phase_id: "phase_1"
+          - state_data:
+              requirement_analysis: ${requirement_analysis}
+              clarified_requirements: ${clarified_requirements}
+              deviation_score: ${deviation_score}
+          - state_folder: "${config.state_management.state_folder}"
+          - format: "${config.state_management.state_format}"
+          - include_metadata: true
+
+        outputs:
+          - saved_state_file
+          - verification_result
+          - file_metadata
+          - manifest_updated
+
+        post_action_verify:
+          - check: "verification_result.all_checks_passed == true"
+            on_fail: "block_and_retry"
+            error_message: "Phase 1状态保存失败"
+            max_retries: 3
 
   - phase_id: "phase-1.5"
     phase_name: "Phase 1.5: 十要素建模"
@@ -154,12 +286,47 @@ phases:
     description: "构建TenElementModel统一真相源"
 
     steps:
+      - step_id: "1.5.0"
+        name: "🔍 加载Phase 1状态"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载需求分析结果，作为建模输入"
+
+        critical: true
+
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_1"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 1 状态文件缺失！
+
+                文件路径: {state_folder}/phase_1_state_latest.yaml
+
+                可能原因:
+                1. Phase 1 未完成
+                2. 文件保存失败
+
+                解决方案:
+                - 请从 Phase 1 重新开始执行
+
+        inputs:
+          - phase_id: "phase_1"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
+
+        outputs:
+          - state_data # 包含requirement_analysis, clarified_requirements
+          - metadata
+          - load_success
+
       - step_id: "1.5.1"
         name: "初步建模"
         action: "run-workflow"
         target: "bmad/aps/workflows/phase-1.5-modeling/workflow.yaml"
         inputs:
-          - requirement_analysis
+          - requirement_analysis: "${state_data.requirement_analysis}" # 从文件加载
         outputs:
           - ten_element_model_draft
 
@@ -189,6 +356,37 @@ phases:
           - ten_element_model
           - model_baseline
 
+      - step_id: "1.5.4"
+        name: "💾 保存Phase 1.5状态 (TenElementModel)"
+        action: "exec"
+        target: "bmad/aps/tasks/save-phase-state.md"
+        description: "保存TenElementModel基线，这是所有后续Phase的核心依赖"
+
+        mandatory_save: true
+        critical: true
+
+        inputs:
+          - phase_id: "phase_1_5"
+          - state_data:
+              ten_element_model: ${ten_element_model}
+              model_baseline: ${model_baseline}
+              model_hash: ${model_baseline.hash}
+          - state_folder: "${config.state_management.state_folder}"
+          - format: "${config.state_management.state_format}"
+          - include_metadata: true
+
+        outputs:
+          - saved_state_file
+          - verification_result
+          - file_metadata
+          - manifest_updated
+
+        post_action_verify:
+          - check: "verification_result.all_checks_passed == true"
+            on_fail: "block_and_retry"
+            error_message: "TenElementModel保存失败，无法继续workflow"
+            max_retries: 3
+
   - phase_id: "phase-2"
     phase_name: "Phase 2: 专家协调"
     estimated_time:
@@ -196,116 +394,186 @@ phases:
       mode_b: "31-48分钟"
     description: "调用专家智能体分析并协调"
 
-    conditional_flow:
-      mode_a:
-        steps:
-          - step_id: "2.A.1"
-            name: "并行调用所有专家"
-            action: "parallel_exec"
-            agents:
-              - "bmad/aps/agents/domain-expert.md"
-              - "bmad/aps/agents/constraint-expert.md"
-              - "bmad/aps/agents/objective-expert.md"
-              - "bmad/aps/agents/algorithm-expert.md"
-            inputs:
-              - ten_element_model
-            outputs:
-              - domain_analysis
-              - constraint_analysis
-              - objective_analysis
-              - algorithm_recommendations
+    steps:
+      - step_id: "2.0"
+        name: "🔍 加载Phase 1.5状态 (TenElementModel)"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载TenElementModel，作为所有专家分析的输入"
 
-          - step_id: "2.A.2"
-            name: "跨专家一致性校验"
-            action: "run-workflow"
-            target: "bmad/aps/workflows/consistency-check/workflow.yaml"
-            inputs:
-              - domain_analysis
-              - constraint_analysis
-              - objective_analysis
-              - algorithm_recommendations
-            outputs:
-              - consistency_report
-              - conflicts
+        critical: true
 
-          - step_id: "2.A.3"
-            name: "冲突仲裁（如需要）"
-            action: "conditional_human_confirmation"
-            condition: "has_conflicts"
-            trigger_level: "P2"
-            template: "@交互对话模板库/冲突仲裁模板.md"
-            inputs:
-              - conflicts
-            outputs:
-              - conflict_resolutions
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_1_5"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
 
-      mode_b:
-        steps:
-          - step_id: "2.B.1"
-            name: "Phase 2.1: 领域专家增量确认"
-            action: "sequential_exec"
-            agent: "bmad/aps/agents/domain-expert.md"
-            inputs:
-              - ten_element_model
-            outputs:
-              - domain_analysis
-            confirmation:
-              trigger_level: "P0"
-              template: "@交互对话模板库/领域确认模板.md"
+                文件路径: {state_folder}/phase_1_5_state_latest.yaml
 
-          - step_id: "2.B.2"
-            name: "Phase 2.2: 约束专家增量确认"
-            action: "sequential_exec"
-            agent: "bmad/aps/agents/constraint-expert.md"
-            inputs:
-              - ten_element_model
-              - domain_analysis
-            outputs:
-              - constraint_analysis
-            confirmation:
-              trigger_level: "P0"
-              template: "@交互对话模板库/约束确认模板.md"
+                TenElementModel是所有专家分析的核心依赖，必须存在。
 
-          - step_id: "2.B.3"
-            name: "Phase 2.3: 目标专家增量确认"
-            action: "sequential_exec"
-            agent: "bmad/aps/agents/objective-expert.md"
-            inputs:
-              - ten_element_model
-              - domain_analysis
-              - constraint_analysis
-            outputs:
-              - objective_analysis
-            confirmation:
-              trigger_level: "P0"
-              template: "@交互对话模板库/目标权重模板.md"
+                解决方案:
+                - 请从 Phase 1.5 重新执行
 
-          - step_id: "2.B.4"
-            name: "Phase 2.4: 算法专家增量确认"
-            action: "sequential_exec"
-            agent: "bmad/aps/agents/algorithm-expert.md"
-            inputs:
-              - ten_element_model
-              - domain_analysis
-              - constraint_analysis
-              - objective_analysis
-            outputs:
-              - algorithm_recommendations
-            confirmation:
-              trigger_level: "P0"
-              template: "@交互对话模板库/算法确认模板.md"
+        inputs:
+          - phase_id: "phase_1_5"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
 
-          - step_id: "2.B.5"
-            name: "Phase 2.5: 跨专家一致性校验"
-            action: "run-workflow"
-            target: "bmad/aps/workflows/consistency-check/workflow.yaml"
-            inputs:
-              - domain_analysis
-              - constraint_analysis
-              - objective_analysis
-              - algorithm_recommendations
-            outputs:
-              - consistency_report
+        outputs:
+          - state_data # 包含ten_element_model, model_baseline
+          - metadata
+          - load_success
+
+      - step_id: "2.1"
+        name: "专家协调（根据模式分支）"
+        action: "conditional_flow"
+
+        conditional_flow:
+          mode_a:
+            steps:
+              - step_id: "2.A.1"
+                name: "并行调用所有专家"
+                action: "parallel_exec"
+                agents:
+                  - "bmad/aps/agents/domain-expert.md"
+                  - "bmad/aps/agents/constraint-expert.md"
+                  - "bmad/aps/agents/objective-expert.md"
+                  - "bmad/aps/agents/algorithm-expert.md"
+                inputs:
+                  - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                outputs:
+                  - domain_analysis
+                  - constraint_analysis
+                  - objective_analysis
+                  - algorithm_recommendations
+
+              - step_id: "2.A.2"
+                name: "跨专家一致性校验"
+                action: "run-workflow"
+                target: "bmad/aps/workflows/consistency-check/workflow.yaml"
+                inputs:
+                  - domain_analysis
+                  - constraint_analysis
+                  - objective_analysis
+                  - algorithm_recommendations
+                outputs:
+                  - consistency_report
+                  - conflicts
+
+              - step_id: "2.A.3"
+                name: "冲突仲裁（如需要）"
+                action: "conditional_human_confirmation"
+                condition: "has_conflicts"
+                trigger_level: "P2"
+                template: "@交互对话模板库/冲突仲裁模板.md"
+                inputs:
+                  - conflicts
+                outputs:
+                  - conflict_resolutions
+
+          mode_b:
+            steps:
+              - step_id: "2.B.1"
+                name: "Phase 2.1: 领域专家增量确认"
+                action: "sequential_exec"
+                agent: "bmad/aps/agents/domain-expert.md"
+                inputs:
+                  - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                outputs:
+                  - domain_analysis
+                confirmation:
+                  trigger_level: "P0"
+                  template: "@交互对话模板库/领域确认模板.md"
+
+              - step_id: "2.B.2"
+                name: "Phase 2.2: 约束专家增量确认"
+                action: "sequential_exec"
+                agent: "bmad/aps/agents/constraint-expert.md"
+                inputs:
+                  - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                  - domain_analysis
+                outputs:
+                  - constraint_analysis
+                confirmation:
+                  trigger_level: "P0"
+                  template: "@交互对话模板库/约束确认模板.md"
+
+              - step_id: "2.B.3"
+                name: "Phase 2.3: 目标专家增量确认"
+                action: "sequential_exec"
+                agent: "bmad/aps/agents/objective-expert.md"
+                inputs:
+                  - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                  - domain_analysis
+                  - constraint_analysis
+                outputs:
+                  - objective_analysis
+                confirmation:
+                  trigger_level: "P0"
+                  template: "@交互对话模板库/目标权重模板.md"
+
+              - step_id: "2.B.4"
+                name: "Phase 2.4: 算法专家增量确认"
+                action: "sequential_exec"
+                agent: "bmad/aps/agents/algorithm-expert.md"
+                inputs:
+                  - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                  - domain_analysis
+                  - constraint_analysis
+                  - objective_analysis
+                outputs:
+                  - algorithm_recommendations
+                confirmation:
+                  trigger_level: "P0"
+                  template: "@交互对话模板库/算法确认模板.md"
+
+              - step_id: "2.B.5"
+                name: "Phase 2.5: 跨专家一致性校验"
+                action: "run-workflow"
+                target: "bmad/aps/workflows/consistency-check/workflow.yaml"
+                inputs:
+                  - domain_analysis
+                  - constraint_analysis
+                  - objective_analysis
+                  - algorithm_recommendations
+                outputs:
+                  - consistency_report
+      - step_id: "2.9"
+        name: "💾 保存Phase 2状态 (专家分析结果)"
+        action: "exec"
+        target: "bmad/aps/tasks/save-phase-state.md"
+        description: "保存所有专家的分析结果和一致性报告"
+
+        mandatory_save: true
+        critical: true
+
+        inputs:
+          - phase_id: "phase_2"
+          - state_data:
+              domain_analysis: ${domain_analysis}
+              constraint_analysis: ${constraint_analysis}
+              objective_analysis: ${objective_analysis}
+              algorithm_recommendations: ${algorithm_recommendations}
+              consistency_report: ${consistency_report}
+          - state_folder: "${config.state_management.state_folder}"
+          - format: "${config.state_management.state_format}"
+          - include_metadata: true
+
+        outputs:
+          - saved_state_file
+          - verification_result
+          - file_metadata
+          - manifest_updated
+
+        post_action_verify:
+          - check: "verification_result.all_checks_passed == true"
+            on_fail: "block_and_retry"
+            error_message: "Phase 2专家分析结果保存失败"
+            max_retries: 3
 
   - phase_id: "phase-3"
     phase_name: "Phase 3: 方案集成"
@@ -313,16 +581,66 @@ phases:
     description: "融合专家建议，生成可执行方案"
 
     steps:
+      - step_id: "3.0.1"
+        name: "🔍 加载Phase 1.5状态 (TenElementModel)"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载TenElementModel基线"
+
+        critical: true
+
+        inputs:
+          - phase_id: "phase_1_5"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
+
+        outputs:
+          - phase_1_5_state
+          - metadata
+          - load_success
+
+      - step_id: "3.0.2"
+        name: "🔍 加载Phase 2状态 (专家分析)"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载所有专家的分析结果"
+
+        critical: true
+
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_2"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 2 专家分析结果缺失！
+
+                文件路径: {state_folder}/phase_2_state_latest.yaml
+
+                解决方案:
+                - 请从 Phase 2 重新执行
+
+        inputs:
+          - phase_id: "phase_2"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
+
+        outputs:
+          - phase_2_state
+          - metadata
+          - load_success
+
       - step_id: "3.1"
         name: "方案融合"
         action: "run-workflow"
         target: "bmad/aps/workflows/phase-3-integration/workflow.yaml"
         inputs:
-          - ten_element_model
-          - domain_analysis
-          - constraint_analysis
-          - objective_analysis
-          - algorithm_recommendations
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}" # 从文件加载
+          - domain_analysis: "${phase_2_state.state_data.domain_analysis}" # 从文件加载
+          - constraint_analysis: "${phase_2_state.state_data.constraint_analysis}" # 从文件加载
+          - objective_analysis: "${phase_2_state.state_data.objective_analysis}" # 从文件加载
+          - algorithm_recommendations: "${phase_2_state.state_data.algorithm_recommendations}" # 从文件加载
         outputs:
           - integrated_solution
           - implementation_code
@@ -333,7 +651,7 @@ phases:
         target: "bmad/aps/tasks/final-consistency-check.md"
         inputs:
           - integrated_solution
-          - ten_element_model
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}" # 从文件加载
         outputs:
           - consistency_validation
 
@@ -345,7 +663,7 @@ phases:
         description: "🚨 CRITICAL: 必须保存所有交付物到{output_folder}"
         inputs:
           - integrated_solution
-          - ten_element_model
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}" # 从文件加载
           - output_folder
           - models_folder
           - docs_folder
@@ -358,20 +676,133 @@ phases:
           - check: "verification_result.all_saved == true"
             on_fail: "block_and_retry"
 
+      - step_id: "3.9"
+        name: "💾 保存Phase 3状态 (集成方案)"
+        action: "exec"
+        target: "bmad/aps/tasks/save-phase-state.md"
+        description: "保存集成方案和生成的代码"
+
+        mandatory_save: true
+        critical: true
+
+        inputs:
+          - phase_id: "phase_3"
+          - state_data:
+              integrated_solution: ${integrated_solution}
+              implementation_code: ${implementation_code}
+              consistency_validation: ${consistency_validation}
+          - state_folder: "${config.state_management.state_folder}"
+          - format: "${config.state_management.state_format}"
+          - include_metadata: true
+
+        outputs:
+          - saved_state_file
+          - verification_result
+          - file_metadata
+          - manifest_updated
+
+        post_action_verify:
+          - check: "verification_result.all_checks_passed == true"
+            on_fail: "block_and_retry"
+            error_message: "Phase 3集成方案保存失败"
+            max_retries: 3
+
   - phase_id: "phase-4"
     phase_name: "Phase 4: 质量保证"
     estimated_time: "9-12分钟"
     description: "质量门禁验证，确保可交付"
 
     steps:
+      - step_id: "4.0.1"
+        name: "🔍 加载Phase 3状态 (集成方案)"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载集成方案和实现代码"
+
+        critical: true
+
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_3"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 3 集成方案缺失！
+
+                文件路径: {state_folder}/phase_3_state_latest.yaml
+
+                解决方案:
+                - 请从 Phase 3 重新执行
+
+        inputs:
+          - phase_id: "phase_3"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
+
+        outputs:
+          - phase_3_state
+          - metadata
+          - load_success
+
+      - step_id: "4.0.2"
+        name: "🔍 加载Phase 1.5状态 (TenElementModel)"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载TenElementModel用于质量验证"
+
+        critical: true
+
+        inputs:
+          - phase_id: "phase_1_5"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
+
+        outputs:
+          - phase_1_5_state
+          - metadata
+          - load_success
+
+      - step_id: "4.0.3"
+        name: "🛡️ 全面状态完整性验证"
+        action: "exec"
+        target: "bmad/aps/tasks/verify-state-integrity.md"
+        description: "验证整个Phase链的完整性和一致性，确保所有依赖完整"
+
+        critical: true
+
+        inputs:
+          - state_folder: "${config.state_management.state_folder}"
+          - verify_phases: ["phase_0", "phase_0_5", "phase_1", "phase_1_5", "phase_2", "phase_3"]
+          - deep_check: true
+          - fix_issues: false
+
+        outputs:
+          - verification_report
+          - overall_status
+          - issues_found
+          - all_checks_passed
+
+        verification_gate:
+          critical: true
+          check: "all_checks_passed == true"
+          on_fail: "block_delivery"
+          error_message: |
+            ❌ 状态链完整性验证失败！
+
+            请检查验证报告中的问题并修复：
+            - 检查缺失的Phase状态文件
+            - 验证Phase链连续性
+            - 确保所有文件格式正确
+
       - step_id: "4.1"
         name: "质量全面验证"
         action: "exec"
         agent: "bmad/aps/agents/quality-evaluator.md"
         command: "*validate-all"
         inputs:
-          - complete_code
-          - ten_element_model
+          - complete_code: "${phase_3_state.state_data.implementation_code}"
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
         outputs:
           - quality_report
 
@@ -423,13 +854,32 @@ phases:
           - fixed_code
           - final_quality_report
 
+      - step_id: "4.0.4"
+        name: "🔍 加载Phase 0状态 (Todo基线)"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载Todo基线用于完成度检查"
+
+        critical: true
+
+        inputs:
+          - phase_id: "phase_0"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: true
+          - use_latest: true
+
+        outputs:
+          - phase_0_state
+          - metadata
+          - load_success
+
       - step_id: "4.4"
         name: "Todo完成度检查"
         action: "exec"
         target: "bmad/aps/tasks/check-todo-completion.md"
         inputs:
-          - confirmed_todo_list
-          - tracker_initialized
+          - confirmed_todo_list: "${phase_0_state.state_data.confirmed_todo_list}"
+          - tracker_initialized: "${phase_0_state.state_data.tracker_initialized}"
         outputs:
           - completion_status
           - uncompleted_items
@@ -447,10 +897,39 @@ phases:
           - saved_files
           - verification_results
           - deliverable_check
-          - ten_element_model
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - verification_report
         outputs:
           - user_acceptance
           - delivery_timestamp
+
+      - step_id: "4.9"
+        name: "💾 保存Phase 4状态 (质量报告)"
+        action: "exec"
+        target: "bmad/aps/tasks/save-phase-state.md"
+        description: "保存质量报告和交付确认状态（可选）"
+
+        mandatory_save: false
+        critical: false
+
+        inputs:
+          - phase_id: "phase_4"
+          - state_data:
+              quality_report: ${final_quality_report}
+              gate_status: ${gate_status}
+              todo_completion_status: ${completion_status}
+              verification_report: ${verification_report}
+              user_acceptance: ${user_acceptance}
+              delivery_timestamp: ${delivery_timestamp}
+          - state_folder: "${config.state_management.state_folder}"
+          - format: "${config.state_management.state_format}"
+          - include_metadata: true
+
+        outputs:
+          - saved_state_file
+          - verification_result
+          - file_metadata
+          - manifest_updated
 
 outputs:
   deliverables:

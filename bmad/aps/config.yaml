@@ -108,3 +108,130 @@ phases:
     name: "质量保证"
     enabled: true
     quality_gates: true
+
+# State Management Configuration (V4.3新增)
+state_management:
+  # 状态持久化总开关
+  enabled: true
+
+  # 状态文件目录
+  state_folder: "aps-outputs/states"
+
+  # 状态文件格式
+  state_format: "yaml" # yaml | json
+
+  # 保存策略
+  save_policy:
+    auto_save: true # 每个Phase自动保存
+    verify_after_save: true # 保存后立即验证
+    block_on_save_failure: true # 保存失败阻断流程
+    include_timestamp: true # 文件名包含时间戳
+    create_latest_link: true # 创建latest符号链接/副本
+
+  # 加载策略
+  load_policy:
+    verify_before_load: true # 加载前验证文件
+    block_on_missing: true # 缺失文件阻断流程
+    use_latest: true # 优先使用latest链接
+    allow_cache: false # 不允许使用缓存（强制从文件读）
+
+  # 清理策略
+  cleanup_policy:
+    enabled: true
+    retention_days: 30 # 保留最近30天的状态文件
+    keep_latest_n: 5 # 每个Phase保留最新的5个版本
+
+  # 每个Phase的状态定义
+  phase_states:
+    phase_0:
+      file_name: "phase_0_state.yaml"
+      required_by: ["phase_1", "phase_4"] # 哪些Phase依赖此状态
+      content_fields:
+        - confirmed_todo_list
+        - baseline_contract
+        - tracker_initialized
+      mandatory: true # 是否为必需状态
+
+    phase_0_5:
+      file_name: "phase_0_5_state.yaml"
+      required_by: ["phase_1_5", "phase_2"]
+      content_fields:
+        - selected_mode
+        - workflow_configuration
+        - phase_plan
+      mandatory: true
+
+    phase_1:
+      file_name: "phase_1_state.yaml"
+      required_by: ["phase_1_5", "phase_2"]
+      content_fields:
+        - requirement_analysis
+        - clarified_requirements
+        - deviation_score
+      mandatory: true
+
+    phase_1_5:
+      file_name: "phase_1_5_state.yaml"
+      required_by: ["phase_2", "phase_3", "phase_4"]
+      content_fields:
+        - ten_element_model
+        - model_baseline
+        - model_hash
+      mandatory: true # TenElementModel是关键依赖
+
+    phase_2:
+      file_name: "phase_2_state.yaml"
+      required_by: ["phase_3"]
+      content_fields:
+        - domain_analysis
+        - constraint_analysis
+        - objective_analysis
+        - algorithm_recommendations
+        - consistency_report
+      mandatory: true
+
+    phase_3:
+      file_name: "phase_3_state.yaml"
+      required_by: ["phase_4"]
+      content_fields:
+        - integrated_solution
+        - implementation_code
+        - consistency_validation
+      mandatory: true
+
+    phase_4:
+      file_name: "phase_4_state.yaml"
+      required_by: [] # 最终Phase，无依赖者
+      content_fields:
+        - quality_report
+        - gate_status
+        - todo_completion_status
+      mandatory: false # 可选保存
+
+  # 验证配置
+  verification:
+    enabled: true
+    check_on_startup: true # workflow启动时检查状态链
+    check_on_phase_start: true # 每个Phase开始时检查依赖
+    deep_check_on_quality_gate: true # 质量门禁时深度检查
+
+  # 错误处理
+  error_handling:
+    on_save_failure:
+      max_retries: 3
+      retry_delays: [1, 5, 10] # 秒
+      final_action: "block_and_alert"
+
+    on_load_failure:
+      action: "block_and_show_recovery_hint"
+      recovery_hint_template: |
+        ❌ 状态加载失败: {error_message}
+
+        恢复建议:
+        1. 检查状态文件是否存在: {file_path}
+        2. 如果文件缺失，从 {phase_id} 重新执行
+        3. 如果文件损坏，删除后重新执行: rm {file_path}
+
+    on_verification_failure:
+      action: "block_and_report"
+      include_recommendations: true

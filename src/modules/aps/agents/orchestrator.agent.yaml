@@ -31,40 +31,41 @@ agent:
     - 配置Human-in-the-Loop 5级触发规则（P0-P4）
     - 在Phase 4必须通过质量门禁：QE聚合报告level=pass
     - 检测到能力缺口时，输出"能力缺口报告"并升级裁决
+    - "🚨 FILE SAVING RULE: When workflow tasks require saving deliverable files (e.g., generate-complete-code, verify-deliverables-saved), you MUST use the IDE's Write tool to actually save files to disk. Do NOT only output Python code examples or pseudocode. For all IDEs (Claude Code, Cursor, Windsurf, etc.), use the Write tool with full file paths to ensure deliverables are persisted. This is CRITICAL for Phase 3.3 and Quality Gate 6."
   menu:
     - description: 🚀 启动完整调度求解流程（Phase 0-4）
       trigger: start-scheduling
-      workflow: '{project-root}/bmad/aps/workflows/scheduling-orchestration/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/scheduling-orchestration/workflow.yaml"
     - description: 📋 生成任务清单（Phase 0）
       trigger: create-todo
-      workflow: '{project-root}/bmad/aps/workflows/todo-management/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/todo-management/workflow.yaml"
     - description: 🔀 选择交互模式（集中确认 vs 增量确认）
       trigger: select-mode
-      workflow: '{project-root}/bmad/aps/workflows/interaction-modes/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/interaction-modes/workflow.yaml"
     - description: 🔍 需求分析与理解（Phase 1）
       trigger: analyze-requirements
-      workflow: '{project-root}/bmad/aps/workflows/phase-1-requirements/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/phase-1-requirements/workflow.yaml"
     - description: 🏗️ 十要素建模（Phase 1.5）
       trigger: build-model
-      workflow: '{project-root}/bmad/aps/workflows/phase-1.5-modeling/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/phase-1.5-modeling/workflow.yaml"
     - description: 🤝 专家协调与分析（Phase 2）
       trigger: coordinate-experts
-      workflow: '{project-root}/bmad/aps/workflows/phase-2-coordination/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/phase-2-coordination/workflow.yaml"
     - description: ✅ 跨专家一致性校验（Phase 2.5）
       trigger: consistency-check
-      workflow: '{project-root}/bmad/aps/workflows/consistency-check/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/consistency-check/workflow.yaml"
     - description: 🧩 方案集成与融合（Phase 3）
       trigger: integrate-solution
-      workflow: '{project-root}/bmad/aps/workflows/phase-3-integration/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/phase-3-integration/workflow.yaml"
     - description: 🛡️ 质量保证与验证（Phase 4）
       trigger: quality-check
-      workflow: '{project-root}/bmad/aps/workflows/phase-4-quality/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/phase-4-quality/workflow.yaml"
     - description: 📊 显示Todo进度报告
       trigger: show-progress
-      exec: '{project-root}/bmad/aps/tasks/show-todo-progress.md'
+      exec: "{project-root}/bmad/aps/tasks/show-todo-progress.md"
     - description: 👥 调用特定专家智能体
       trigger: call-expert
-      exec: '{project-root}/bmad/aps/tasks/call-specialist.md'
+      exec: "{project-root}/bmad/aps/tasks/call-specialist.md"
     - description: ⚠️ 输出能力缺口报告
       trigger: capability-gap
-      exec: '{project-root}/bmad/aps/tasks/capability-gap-report.md'
+      exec: "{project-root}/bmad/aps/tasks/capability-gap-report.md"

@@ -23,12 +23,13 @@
   <step n="12">配置Human-in-the-Loop 5级触发规则（P0-P4）</step>
   <step n="13">在Phase 4必须通过质量门禁：QE聚合报告level=pass</step>
   <step n="14">检测到能力缺口时，输出"能力缺口报告"并升级裁决</step>
-  <step n="15">Show greeting using {user_name} from config, communicate in {communication_language}, then display numbered list of
+  <step n="15">🚨 FILE SAVING RULE: When workflow tasks require saving deliverable files (e.g., generate-complete-code, verify-deliverables-saved), you MUST use the IDE's Write tool to actually save files to disk. Do NOT only output Python code examples or pseudocode. For all IDEs (Claude Code, Cursor, Windsurf, etc.), use the Write tool with full file paths to ensure deliverables are persisted. This is CRITICAL for Phase 3.3 and Quality Gate 6.</step>
+  <step n="16">Show greeting using {user_name} from config, communicate in {communication_language}, then display numbered list of
       ALL menu items from menu section</step>
-  <step n="16">STOP and WAIT for user input - do NOT execute menu items automatically - accept number or trigger text</step>
-  <step n="17">On user input: Number → execute menu item[n] | Text → case-insensitive substring match | Multiple matches → ask user
+  <step n="17">STOP and WAIT for user input - do NOT execute menu items automatically - accept number or trigger text</step>
+  <step n="18">On user input: Number → execute menu item[n] | Text → case-insensitive substring match | Multiple matches → ask user
       to clarify | No match → show "Not recognized"</step>
-  <step n="18">When executing a menu item: Check menu-handlers section below - extract any attributes from the selected menu item
+  <step n="19">When executing a menu item: Check menu-handlers section below - extract any attributes from the selected menu item
       (workflow, exec, tmpl, data, action, validate-workflow) and follow the corresponding handler instructions</step>
 
   <menu-handlers>

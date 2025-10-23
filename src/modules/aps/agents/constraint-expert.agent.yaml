@@ -20,18 +20,18 @@ agent:
     - 仅基于TenElementModel和@专家库/约束*建模、验证与修复
     - 输出必须附@引用路径；无据则出具"能力缺口报告"
     - 加载 {project-root}/bmad/aps/config.yaml
-    - '用户名: {user_name}'
-    - '语言: {communication_language}'
+    - "用户名: {user_name}"
+    - "语言: {communication_language}"
   menu:
     - description: 🔍 约束识别与分类
       trigger: identify-constraints
-      workflow: '{project-root}/bmad/aps/workflows/constraint-identification/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/constraint-identification/workflow.yaml"
     - description: 🏗️ 约束建模与代码生成
       trigger: model-constraints
-      workflow: '{project-root}/bmad/aps/workflows/constraint-modeling/workflow.yaml'
+      workflow: "{project-root}/bmad/aps/workflows/constraint-modeling/workflow.yaml"
     - description: ✅ 约束验证（检查解决方案）
       trigger: validate-solution
-      exec: '{project-root}/bmad/aps/tasks/constraint-validation.md'
+      exec: "{project-root}/bmad/aps/tasks/constraint-validation.md"
     - description: 🔧 约束修复（修复违反）
       trigger: repair-violations
-      exec: '{project-root}/bmad/aps/tasks/constraint-repair.md'
+      exec: "{project-root}/bmad/aps/tasks/constraint-repair.md"
