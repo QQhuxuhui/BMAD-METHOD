@@ -76,7 +76,13 @@ def load_and_process_result(file_path):
     Returns:
         pandas.DataFrame: 处理后的排产结果数据
     """
-    result = pd.read_csv(file_path, dtype={'产品号': str})
+    result = pd.read_csv(file_path, dtype={
+        '订单号': str,
+        '工单号': str,
+        '工序号': int,
+        '设备号': str,
+        '产品号': str
+    })
     result = result.sort_values(by='开始时间').reset_index(drop=True)
     result['开始时间'] = pd.to_datetime(result['开始时间'])
     result['结束时间'] = pd.to_datetime(result['结束时间'])
@@ -243,17 +249,18 @@ def calculate_a3_score(result, switching):
 def main():
     """主函数"""
     # 加载切换时间数据
-    switching = load_switching_data('./data/raw_data/初赛/切换时间.csv')
+    switching = load_switching_data('/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/切换时间.csv')
+    
     # 加载工艺路线数据
-    process_route = load_process_route("./data/raw_data/初赛/工艺路线.csv")
+    process_route = load_process_route("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/工艺路线.csv")
     # 加载并处理排产结果数据
-    result = load_and_process_result("/usr/src/workspace/github/QQhuxuhui/test/aps-outputs/code/scheduling_result_20251022_101508.csv")
+    result = load_and_process_result("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/aps-outputs/deliverables/results/production_schedule_20251024_133748.csv")
     # 加载产品需求数据并合并
-    demand = load_demand_data("data/raw_data/初赛/产品需求.csv")
+    demand = load_demand_data("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/产品需求.csv")
     # 加载工作日历数据
-    work_calendar = load_work_calendar("./data/raw_data/初赛/工作日历.csv")
+    work_calendar = load_work_calendar("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/工作日历.csv")
     # 加载物料数据
-    material = pd.read_csv("./data/raw_data/初赛/瓶颈物料.csv", dtype={'物料号': str})
+    material = pd.read_csv("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/瓶颈物料.csv", dtype={'物料号': str})
     result = result.merge(demand, on=['订单号', '工单号', '工序号', '产品号'], how='left')
     result['生产日期'] = result['开始时间'].dt.date
     material['供应日期'] = pd.to_datetime(material['供应日期']).dt.date
