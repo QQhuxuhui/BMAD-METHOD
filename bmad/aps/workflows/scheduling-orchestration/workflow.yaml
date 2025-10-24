@@ -214,8 +214,9 @@ phases:
 
       - step_id: "1.1"
         name: "需求深度理解"
-        action: "run-workflow"
-        target: "bmad/aps/workflows/phase-1-requirements/workflow.yaml"
+        action: "exec"
+        target: "bmad/aps/tasks/analyze-requirements-deep.md"
+        description: "基于Phase 0的初步分析，进行需求深度理解和澄清"
         inputs:
           - user_request
           - confirmed_todo_list: "${state_data.confirmed_todo_list}" # 从文件加载
@@ -453,8 +454,9 @@ phases:
 
               - step_id: "2.A.2"
                 name: "跨专家一致性校验"
-                action: "run-workflow"
-                target: "bmad/aps/workflows/consistency-check/workflow.yaml"
+                action: "exec"
+                target: "bmad/aps/tasks/check-cross-expert-consistency.md"
+                description: "检查各专家分析结果的一致性，识别潜在冲突"
                 inputs:
                   - domain_analysis
                   - constraint_analysis
@@ -533,8 +535,9 @@ phases:
 
               - step_id: "2.B.5"
                 name: "Phase 2.5: 跨专家一致性校验"
-                action: "run-workflow"
-                target: "bmad/aps/workflows/consistency-check/workflow.yaml"
+                action: "exec"
+                target: "bmad/aps/tasks/check-cross-expert-consistency.md"
+                description: "检查各专家分析结果的一致性，识别潜在冲突"
                 inputs:
                   - domain_analysis
                   - constraint_analysis
@@ -542,6 +545,7 @@ phases:
                   - algorithm_recommendations
                 outputs:
                   - consistency_report
+                  - conflicts
       - step_id: "2.9"
         name: "💾 保存Phase 2状态 (专家分析结果)"
         action: "exec"
