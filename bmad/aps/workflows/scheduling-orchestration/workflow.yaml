@@ -576,16 +576,17 @@ phases:
             max_retries: 3
 
   - phase_id: "phase-3"
-    phase_name: "Phase 3: 方案集成"
-    estimated_time: "15-20分钟"
-    description: "融合专家建议，生成可执行方案"
+    phase_name: "Phase 3: 方案集成与代码生成"
+    estimated_time: "20-30分钟"
+    description: "两阶段流程: (1)融合专家建议生成完整方案 → (2)基于方案生成可执行代码"
 
     steps:
+      # ====== 阶段1: 方案集成 (Step 3.0.1 - 3.4) ======
       - step_id: "3.0.1"
         name: "🔍 加载Phase 1.5状态 (TenElementModel)"
         action: "exec"
         target: "bmad/aps/tasks/load-phase-state.md"
-        description: "加载TenElementModel基线"
+        description: "加载TenElementModel基线，作为方案生成的核心依据"
 
         critical: true
 
@@ -604,7 +605,7 @@ phases:
         name: "🔍 加载Phase 2状态 (专家分析)"
         action: "exec"
         target: "bmad/aps/tasks/load-phase-state.md"
-        description: "加载所有专家的分析结果"
+        description: "加载所有专家的分析结果，作为方案生成的输入"
 
         critical: true
 
@@ -632,55 +633,169 @@ phases:
           - load_success
 
       - step_id: "3.1"
-        name: "方案融合"
-        action: "run-workflow"
-        target: "bmad/aps/workflows/phase-3-integration/workflow.yaml"
+        name: "📋 方案融合（基于状态文件）"
+        action: "exec"
+        target: "bmad/aps/tasks/integrate-solution.md"
+        description: "融合TenElementModel和专家分析，生成完整的调度优化方案（纯方案，不含代码）"
+
         inputs:
-          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}" # 从文件加载
-          - domain_analysis: "${phase_2_state.state_data.domain_analysis}" # 从文件加载
-          - constraint_analysis: "${phase_2_state.state_data.constraint_analysis}" # 从文件加载
-          - objective_analysis: "${phase_2_state.state_data.objective_analysis}" # 从文件加载
-          - algorithm_recommendations: "${phase_2_state.state_data.algorithm_recommendations}" # 从文件加载
+          # 从Phase 1.5状态文件加载
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - model_baseline: "${phase_1_5_state.state_data.model_baseline}"
+          - model_hash: "${phase_1_5_state.state_data.model_hash}"
+
+          # 从Phase 2状态文件加载
+          - domain_analysis: "${phase_2_state.state_data.domain_analysis}"
+          - constraint_analysis: "${phase_2_state.state_data.constraint_analysis}"
+          - objective_analysis: "${phase_2_state.state_data.objective_analysis}"
+          - algorithm_recommendations: "${phase_2_state.state_data.algorithm_recommendations}"
+          - consistency_report: "${phase_2_state.state_data.consistency_report}"
+
+          # 元数据
+          - phase_1_5_metadata: "${phase_1_5_state.metadata}"
+          - phase_2_metadata: "${phase_2_state.metadata}"
+
         outputs:
-          - integrated_solution
-          - implementation_code
+          - integrated_solution # 完整方案对象（不含代码）
+          - solution_metadata # 方案元数据
 
       - step_id: "3.2"
-        name: "一致性最终检查"
+        name: "✅ 方案一致性检查"
         action: "exec"
         target: "bmad/aps/tasks/final-consistency-check.md"
+        description: "验证方案与TenElementModel的一致性"
+
         inputs:
           - integrated_solution
-          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}" # 从文件加载
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+
         outputs:
           - consistency_validation
 
       - step_id: "3.3"
-        name: "生成完整代码并保存到输出目录"
+        name: "💾 保存方案交付物"
         action: "exec"
-        target: "bmad/aps/tasks/generate-complete-code.md"
+        target: "bmad/aps/tasks/save-solution-document.md"
+        description: "将完整方案保存为Markdown文档，作为独立交付物"
+
         mandatory_save: true
-        description: "🚨 CRITICAL: 必须保存所有交付物到{output_folder}"
+        critical: true
+
         inputs:
           - integrated_solution
-          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}" # 从文件加载
-          - output_folder
-          - models_folder
-          - docs_folder
+          - consistency_validation
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - output_folder: "${config.output_folder}"
+          - docs_folder: "${config.docs_folder}"
+          - include_metadata: true
+          - include_data_sources: true # 标注数据来源
+
         outputs:
-          - saved_files
+          - solution_document_path # 方案文档路径
+          - solution_document_content # 方案文档内容
           - verification_result
-          - complete_code
-          - code_documentation
+          - file_metadata
+
+        post_action_verify:
+          - check: "verification_result.file_saved == true"
+            on_fail: "block_and_retry"
+            error_message: "方案文档保存失败，无法继续"
+            max_retries: 3
+
+      - step_id: "3.4"
+        name: "👤 用户确认方案"
+        action: "human_confirmation"
+        trigger_level: "P0"
+        confirmation_type: "solution_approval"
+        template: "@交互对话模板库/方案确认模板.md"
+        description: "展示完整方案，用户确认后方可进入代码生成阶段"
+
+        inputs:
+          - integrated_solution
+          - solution_document_path
+          - consistency_validation
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+
+        outputs:
+          - user_approved_solution # 用户确认后的方案
+          - user_feedback # 用户反馈意见
+          - approval_timestamp # 确认时间戳
+
+      # ====== 阶段2: 代码生成 (Step 3.5 - 3.7) ======
+      - step_id: "3.5"
+        name: "💻 基于方案生成代码"
+        action: "exec"
+        target: "bmad/aps/tasks/generate-code-from-solution.md"
+        description: "严格按照用户确认的方案生成可执行代码，每个组件都有明确依据"
+
+        inputs:
+          - user_approved_solution # 使用确认后的方案
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - solution_document_path # 方案文档路径（用于引用）
+
+        outputs:
+          - implementation_code # 生成的代码
+          - code_metadata # 代码元数据
+          - code_traceability # 代码与方案的可追溯映射
+
+      - step_id: "3.6"
+        name: "💾 保存所有交付物"
+        action: "exec"
+        target: "bmad/aps/tasks/save-all-deliverables.md"
+        description: "保存代码、模型、方案、文档等所有交付物到输出目录"
+
+        mandatory_save: true
+        critical: true
+
+        inputs:
+          - implementation_code
+          - solution_document_path
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - code_traceability
+          - output_folder: "${config.output_folder}"
+          - models_folder: "${config.models_folder}"
+          - docs_folder: "${config.docs_folder}"
+
+        outputs:
+          - saved_files # 所有保存的文件清单
+          - verification_result # 验证结果
+          - deliverable_manifest # 交付物清单
+
         post_action_verify:
           - check: "verification_result.all_saved == true"
             on_fail: "block_and_retry"
+            error_message: "交付物保存失败"
+            max_retries: 3
 
+      - step_id: "3.7"
+        name: "✅ 验证交付物完整性"
+        action: "exec"
+        target: "bmad/aps/tasks/verify-deliverables-integrity.md"
+        description: "验证所有交付物已保存且格式正确"
+
+        critical: true
+
+        inputs:
+          - saved_files
+          - deliverable_manifest
+          - output_folder: "${config.output_folder}"
+
+        outputs:
+          - integrity_check_result
+          - issues_found
+
+        verification_gate:
+          critical: true
+          check: "integrity_check_result.all_valid == true"
+          on_fail: "block_delivery"
+          error_message: "交付物完整性验证失败"
+
+      # ====== Phase 3 状态保存 ======
       - step_id: "3.9"
-        name: "💾 保存Phase 3状态 (集成方案)"
+        name: "💾 保存Phase 3状态"
         action: "exec"
         target: "bmad/aps/tasks/save-phase-state.md"
-        description: "保存集成方案和生成的代码"
+        description: "保存方案、代码和所有交付物的引用"
 
         mandatory_save: true
         critical: true
@@ -689,8 +804,13 @@ phases:
           - phase_id: "phase_3"
           - state_data:
               integrated_solution: ${integrated_solution}
+              user_approved_solution: ${user_approved_solution}
+              solution_document_path: ${solution_document_path}
               implementation_code: ${implementation_code}
+              code_traceability: ${code_traceability}
               consistency_validation: ${consistency_validation}
+              saved_files: ${saved_files}
+              deliverable_manifest: ${deliverable_manifest}
           - state_folder: "${config.state_management.state_folder}"
           - format: "${config.state_management.state_format}"
           - include_metadata: true
@@ -704,7 +824,7 @@ phases:
         post_action_verify:
           - check: "verification_result.all_checks_passed == true"
             on_fail: "block_and_retry"
-            error_message: "Phase 3集成方案保存失败"
+            error_message: "Phase 3状态保存失败"
             max_retries: 3
 
   - phase_id: "phase-4"
@@ -813,9 +933,9 @@ phases:
         mandatory: true
         description: "验证所有交付物已保存到{output_folder}，为质量门禁6提供数据"
         inputs:
-          - saved_files
-          - output_folder
-          - deliverable_manifest
+          - saved_files: "${phase_3_state.state_data.saved_files}"
+          - output_folder: "${config.output_folder}"
+          - deliverable_manifest: "${phase_3_state.state_data.deliverable_manifest}"
         outputs:
           - verification_results
           - deliverable_check
@@ -894,11 +1014,12 @@ phases:
         inputs:
           - final_quality_report
           - completion_status
-          - saved_files
+          - saved_files: "${phase_3_state.state_data.saved_files}"
           - verification_results
           - deliverable_check
           - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
           - verification_report
+          - solution_document_path: "${phase_3_state.state_data.solution_document_path}"
         outputs:
           - user_acceptance
           - delivery_timestamp

@@ -18,6 +18,7 @@ human_in_loop_enabled: true
 # Output Paths
 output_folder: "aps-outputs"
 models_folder: "models"
+docs_folder: "docs"
 workflows_folder: "workflows"
 reports_folder: "reports"
 
@@ -194,9 +195,14 @@ state_management:
       file_name: "phase_3_state.yaml"
       required_by: ["phase_4"]
       content_fields:
-        - integrated_solution
-        - implementation_code
-        - consistency_validation
+        - integrated_solution # 方案对象
+        - user_approved_solution # 用户确认后的方案
+        - solution_document_path # 方案文档路径
+        - implementation_code # 生成的代码
+        - code_traceability # 代码可追溯性映射
+        - consistency_validation # 一致性验证结果
+        - saved_files # 所有保存的文件清单
+        - deliverable_manifest # 交付物清单
       mandatory: true
 
     phase_4:
