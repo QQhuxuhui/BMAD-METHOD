@@ -1,7 +1,7 @@
 # Task: Generate Code From Solution
 
 **任务ID**: `generate-code-from-solution`
-**版本**: V4.3  
+**版本**: V4.3
 **用途**: Phase 3 Step 3.5 - 严格按照用户确认的方案生成可执行代码
 
 ## 输入
@@ -64,6 +64,35 @@ def validate_precedence_constraint(schedule):
     pass
 ```
 
+### 2.5 代码必须包含6层引用标记体系（增强）
+
+**新增要求**: 代码必须包含完整的引用标记，支持双向追溯和Workflow验证。
+
+#### 必需的引用层次
+
+1. **文件头部**（Line 1-50）
+   - 完整追溯链（方案文档、Hash、数据来源）
+   - 代码组成说明（各部分对应方案章节）
+
+2. **模块分隔**（每个大块开头）
+   - 章节对应、专家库引用、状态文件字段、置信度
+
+3. **类级引用**（每个类的docstring）
+   - 方案章节、TenElementModel元素、字段路径
+
+4. **函数级引用**（关键函数docstring）
+   - 方案章节、专家库引用、状态文件、置信度
+
+5. **参数引用**（配置常量注释）
+   - 每个参数的方案章节、理由、专家库引用
+
+验证要求：
+
+- Section引用 >= 5处
+- 专家库引用 >= 3处
+- 状态文件引用存在
+- 在Step 3.6.5自动验证
+
 ### 3. 只生成代码，不保存文件
 
 本任务**只生成代码内容**，文件保存由后续Step 3.6完成。
@@ -112,6 +141,79 @@ def validate_inputs(user_approved_solution, ten_element_model, solution_document
     print(f"✓ 方案文档: {solution_document_path}")
 
     return validation_report
+```
+
+### 步骤1.5: 生成文件头部追溯信息（新增）
+
+```python
+from datetime import datetime
+import os
+
+def generate_file_header(user_approved_solution, solution_document_path):
+    """
+    生成文件头部的完整追溯信息
+
+    方案依据: 支持双向追溯和一致性验证
+    """
+    # 提取方案元数据
+    metadata = user_approved_solution.get('metadata', {})
+    data_sources = metadata.get('data_sources', {})
+
+    # 提取文件名
+    solution_filename = os.path.basename(solution_document_path)
+
+    header = f'''"""
+调度优化求解器
+
+╔════════════════════════════════════════════════════════════╗
+║ 方案追溯信息                                               ║
+╚════════════════════════════════════════════════════════════╝
+
+方案文档: {solution_filename}
+  └─ 章节: 完整方案（Section 1-6）
+  └─ 路径: {solution_document_path}
+  └─ 确认时间: {user_approved_solution.get('approved_at', 'N/A')}
+
+数据来源:
+  └─ TenElementModel: {data_sources.get('ten_element_model', {}).get('source_file', 'N/A')}
+     └─ Hash: {data_sources.get('ten_element_model', {}).get('hash', 'N/A')}
+  └─ 专家分析: {data_sources.get('expert_analyses', {}).get('source_file', 'N/A')}
+     └─ Hash: {data_sources.get('expert_analyses', {}).get('hash', 'N/A')}
+
+代码生成:
+  └─ 生成时间: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
+  └─ 生成方式: 基于方案 + 引用专家库
+
+╔════════════════════════════════════════════════════════════╗
+║ 代码组成                                                   ║
+╚════════════════════════════════════════════════════════════╝
+
+[第1部分] 数据模型
+  └─ 方案依据: Section 1.1 决策变量, Section 1.2 参数
+  └─ 来源: TenElementModel Element 1, 2
+
+[第2部分] 约束验证
+  └─ 方案依据: Section 3.2 约束处理策略
+  └─ 专家库: @constraint-library/handling-methods/repair-strategies.md
+
+[第3部分] 目标函数
+  └─ 方案依据: Section 4.2 多目标处理
+  └─ 专家库: @objective-library/multi-objective/weighted-sum.md
+
+[第4部分] 算法核心
+  └─ 方案依据: Section 5.1 算法选择, Section 5.2 参数配置
+  └─ 专家库: 引用自专家库（质量评分0.95）
+  └─ 代码来源: 引用专家库（非AI生成）
+
+[第5部分] 求解器入口
+  └─ 方案依据: Section 6 实现路线图
+  └─ 组装: 组合上述1-4部分
+
+"""
+'''
+
+    print("✓ 文件头部追溯信息已生成")
+    return header
 ```
 
 ### 步骤2: 提取代码生成指令
@@ -687,7 +789,7 @@ outputs:
       generated_at: string (ISO8601)
       solution_approved_at: string (ISO8601)
       code_statistics:
-        total_lines: integer
+      total_lines: integer
         code_size_bytes: integer
       algorithm: string
       language: string
@@ -714,15 +816,91 @@ outputs:
 - [ ] 代码可追溯性完整
 - [ ] 代码语法正确（Python 3.8+）
 
+## 引用标记生成规范（新增）
+
+### 模块分隔注释模板
+
+在每个代码模块开头添加：
+
+```python
+# ══════════════════════════════════════════════════════════════
+# 第N部分: 模块名称
+# ══════════════════════════════════════════════════════════════
+# 方案依据: solution_document Section X.X
+# 专家库引用: @xxx-library/yyy/zzz.md
+# 状态文件: phase_X_state_xxx.yaml
+#   - 字段路径: state_data.xxx.yyy
+#   - 置信度: 0.XX
+# 生成方式: 引用专家库/AI生成/模板适配
+# ══════════════════════════════════════════════════════════════
+```
+
+### 类级引用docstring模板
+
+```python
+class ClassName:
+    """
+    类说明
+
+    ┌────────────────────────────────────────────────┐
+    │ 方案引用                                       │
+    ├────────────────────────────────────────────────┤
+    │ 方案文档: Section X.X                          │
+    │ 来源: TenElementModel Element X                │
+    │ 状态文件: phase_X_state.yaml                   │
+    │ 字段路径: state_data.xxx.yyy                   │
+    └────────────────────────────────────────────────┘
+    """
+```
+
+### 函数级引用docstring模板
+
+```python
+def function_name():
+    """
+    函数说明
+
+    ┌────────────────────────────────────────────────┐
+    │ 方案引用                                       │
+    ├────────────────────────────────────────────────┤
+    │ 方案文档: Section X.X                          │
+    │ 专家库: @xxx-library/yyy.md                    │
+    │ 状态文件: phase_X_state.yaml                   │
+    │ 字段路径: state_data.xxx                       │
+    │ 置信度: 0.XX                                   │
+    └────────────────────────────────────────────────┘
+    """
+```
+
+### 参数引用注释模板
+
+```python
+# 参数名 [方案: Section X.X, 理由: XXX]
+# [专家库: @xxx-library/yyy.md]
+# [置信度: 0.XX]
+PARAMETER_NAME = value
+```
+
+### 引用标记验证
+
+生成的代码将在Step 3.6.5自动验证以下内容：
+
+- ✓ 文件头部包含方案追溯信息
+- ✓ Section引用 >= 5处
+- ✓ 专家库引用 >= 3处
+- ✓ 状态文件引用存在
+- ✓ 包含置信度信息
+
 ## 引用
 
 - @算法专家库/代码生成模板
 - @约束专家库/约束实现代码
 - @目标专家库/目标函数实现
 - @编排协调专家库/代码集成规范
+- citation-format-template.md（引用格式规范）
 
 ---
 
 **创建**: 2025-10-24
 **BMAD版本**: v6-alpha  
-**核心机制**: 基于方案的代码生成，方案是唯一权威
+**核心机制**: 基于方案的代码生成，方案是唯一权威，完整的引用标记体系

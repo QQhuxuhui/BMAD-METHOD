@@ -771,6 +771,39 @@ phases:
             error_message: "交付物保存失败"
             max_retries: 3
 
+      - step_id: "3.6.5"
+        name: "🔍 验证代码-方案一致性"
+        action: "exec"
+        target: "bmad/aps/tasks/verify-code-solution-consistency.md"
+        description: "Workflow级别强制验证代码与方案一致性，避免大模型幻觉"
+
+        mandatory: true
+        critical: true
+
+        inputs:
+          - implementation_code
+          - user_approved_solution
+          - solution_document_path
+
+        outputs:
+          - consistency_check_result
+          - inconsistencies_found
+
+        verification_gate:
+          critical: true
+          check: "consistency_check_result.overall_status == 'PASS'"
+          on_fail: "block_and_retry"
+          error_message: |
+            ❌ 代码与方案不一致！
+
+            发现的不一致: {inconsistencies_found}
+
+            解决方案:
+            - 修改代码使其严格遵循方案
+            - 不允许偏离用户确认的方案
+            - 确保代码包含完整的引用标记
+          max_retries: 3
+
       - step_id: "3.7"
         name: "✅ 验证交付物完整性"
         action: "exec"
