@@ -312,26 +312,68 @@ def generate_solution_markdown(
 
     md_content.append("### 5.1 选定算法\n\n")
     selected = algorithm_selection['sections']['selected_algorithm']
-    md_content.append(f"**数据来源**: {selected['source']}\n")
-    md_content.append(f"**引用**: `{selected['reference']}`\n\n")
-    md_content.append(f"- **算法名称**: {selected['algorithm_name']}\n")
-    md_content.append(f"- **算法类型**: {selected['algorithm_type']}\n")
-    md_content.append(f"- **选择理由**: {selected['selection_rationale']}\n")
-    md_content.append(f"- **引用文献**:\n")
-    for cite in selected['citations']:
-        md_content.append(f"  - {cite}\n")
+    md_content.append(f"**算法名称**: {selected['algorithm_name']}\n\n")
+    md_content.append(f"**算法类型**: {selected['algorithm_type']}\n\n")
+    md_content.append(f"**选择理由**: {selected['selection_rationale']}\n\n")
+
+    # 增强：添加详细的引用块
+    md_content.append("**📖 专家库引用**:\n\n")
+    citations = selected.get('citations', [])
+    if citations:
+        for cite in citations:
+            md_content.append(f"- `{cite}`\n")
+    else:
+        md_content.append("- _(未提供专家库引用)_\n")
     md_content.append("\n")
+
+    # 增强：添加数据来源块
+    md_content.append("**📍 数据来源**:\n\n")
+    md_content.append(f"- **Phase**: {selected['source']}\n")
+
+    # 如果有 source_metadata，显示详细信息
+    if 'source_metadata' in selected:
+        meta = selected['source_metadata']
+        md_content.append(f"- **状态文件**: `{meta.get('state_file', 'N/A')}`\n")
+        md_content.append(f"- **字段路径**: `{meta.get('field_path', 'N/A')}`\n")
+        md_content.append(f"- **时间戳**: {meta.get('timestamp', 'N/A')}\n")
+        md_content.append(f"- **Hash**: `{meta.get('hash', 'N/A')}`\n")
+    else:
+        md_content.append(f"- **引用**: `{selected['reference']}`\n")
+
+    # 增强：添加置信度（如果有）
+    if 'confidence' in selected and selected['confidence'] > 0:
+        md_content.append(f"- **置信度**: {selected['confidence']:.2f}\n")
+
+    md_content.append("\n")
+    md_content.append("**🔗 详细追溯**: 见 [附录A2 - 5.1](#a2-详细引用映射表)\n\n")
+    md_content.append("---\n\n")
 
     md_content.append("### 5.2 算法配置\n\n")
     config = algorithm_selection['sections']['algorithm_configuration']
     md_content.append(f"**数据来源**: {config['source']}\n")
     md_content.append(f"**引用**: `{config['reference']}`\n\n")
+
+    # 增强：显示source_metadata（如果有）
+    if 'source_metadata' in config:
+        meta = config['source_metadata']
+        md_content.append(f"**📍 来源**: `{meta.get('state_file', 'N/A')}::{meta.get('field_path', 'N/A')}`\n\n")
+
     md_content.append("**参数配置**:\n\n")
+    md_content.append("| 参数 | 值 | 理由 | 专家库引用 |\n")
+    md_content.append("|------|---|------|----------|\n")
+
+    # 增强：参数表格中包含专家库引用
+    param_citations = config.get('parameter_citations', {})
     for param_name, param_value in config['parameters'].items():
-        md_content.append(f"- **{param_name}**: {param_value}\n")
         justification = config['parameter_justification'].get(param_name, '')
-        if justification:
-            md_content.append(f"  - 理由: {justification}\n")
+        param_cite = param_citations.get(param_name, '')
+
+        if param_cite:
+            cite_str = f"`{param_cite}`"
+        else:
+            cite_str = "-"
+
+        md_content.append(f"| {param_name} | {param_value} | {justification} | {cite_str} |\n")
     md_content.append("\n")
 
     md_content.append("### 5.3 优化建议\n\n")
@@ -404,6 +446,118 @@ def generate_solution_markdown(
     else:
         md_content.append("✓ 未发现一致性问题\n")
     md_content.append("\n")
+
+    # ====== 新增：附录A1 - 数据来源概览 ======
+    md_content.append("---\n\n")
+    md_content.append("## 附录A1: 数据来源概览\n\n")
+    md_content.append("本方案的所有数据来自以下状态文件，确保完整可追溯。\n\n")
+
+    # Phase 1.5: TenElementModel
+    md_content.append("### Phase 1.5: TenElementModel (十要素建模)\n\n")
+    data_sources = integrated_solution['metadata']['data_sources']
+    tem_source = data_sources.get('ten_element_model', {})
+    md_content.append(f"- **文件路径**: `aps-outputs/states/{tem_source.get('source_file', 'N/A')}`\n")
+    md_content.append(f"- **时间戳**: {tem_source.get('timestamp', 'N/A')}\n")
+    md_content.append(f"- **Hash**: `{tem_source.get('hash', 'N/A')}`\n")
+    md_content.append(f"- **版本**: {tem_source.get('version', 'N/A')}\n")
+    md_content.append(f"- **包含内容**: 10要素完整定义（决策变量、参数、约束、目标等）\n\n")
+
+    # Phase 2: 专家分析
+    md_content.append("### Phase 2: 专家分析结果\n\n")
+    expert_source = data_sources.get('expert_analyses', {})
+    md_content.append(f"- **文件路径**: `aps-outputs/states/{expert_source.get('source_file', 'N/A')}`\n")
+    md_content.append(f"- **时间戳**: {expert_source.get('timestamp', 'N/A')}\n")
+    md_content.append(f"- **Hash**: `{expert_source.get('hash', 'N/A')}`\n")
+    md_content.append(f"- **版本**: {expert_source.get('version', 'N/A')}\n")
+    md_content.append(f"- **包含内容**:\n")
+    md_content.append(f"  - 领域专家分析 (domain_analysis)\n")
+    md_content.append(f"  - 约束专家分析 (constraint_analysis)\n")
+    md_content.append(f"  - 目标专家分析 (objective_analysis)\n")
+    md_content.append(f"  - 算法专家分析 (algorithm_recommendations)\n")
+    md_content.append(f"  - 一致性报告 (consistency_report)\n\n")
+
+    # ====== 新增：附录A2 - 详细引用映射表 ======
+    md_content.append("---\n\n")
+    md_content.append("## 附录A2: 详细引用映射表\n\n")
+    md_content.append("以下表格提供了方案中每个关键决策的完整追溯信息，包括状态文件字段路径和专家库引用。\n\n")
+
+    # 生成引用映射表
+    md_content.append("### 5. 算法选择与配置\n\n")
+    md_content.append("| 项目 | 值 | 状态文件字段路径 | 专家库引用 | 置信度 |\n")
+    md_content.append("|------|---|----------------|-----------|--------|\n")
+
+    # 5.1 算法选择
+    algorithm_selection = integrated_solution['sections']['5_algorithm_selection']
+    selected = algorithm_selection['sections']['selected_algorithm']
+    algo_name = selected.get('algorithm_name', 'N/A')
+    field_path = selected.get('source_metadata', {}).get('field_path', 'N/A') if 'source_metadata' in selected else 'N/A'
+    citations = selected.get('citations', [])
+    cite_str = citations[0] if citations else '-'
+    confidence = selected.get('confidence', 0.0)
+    md_content.append(f"| 算法名称 | {algo_name} | `{field_path}` | `{cite_str}` | {confidence:.2f} |\n")
+
+    # 5.2 算法参数
+    config = algorithm_selection['sections']['algorithm_configuration']
+    param_citations = config.get('parameter_citations', {})
+    for param_name, param_value in config.get('parameters', {}).items():
+        param_field_path = f"{config.get('source_metadata', {}).get('field_path', 'N/A')}.{param_name}"
+        param_cite = param_citations.get(param_name, '-')
+        md_content.append(f"| {param_name} | {param_value} | `{param_field_path}` | `{param_cite}` | - |\n")
+
+    md_content.append("\n")
+
+    # 3. 约束处理策略
+    md_content.append("### 3. 约束处理策略\n\n")
+    md_content.append("| 项目 | 方法/策略 | 状态文件字段路径 | 专家库引用 | 置信度 |\n")
+    md_content.append("|------|----------|----------------|-----------|--------|\n")
+
+    constraint_strategy = integrated_solution['sections']['3_constraint_strategy']
+    methods = constraint_strategy['sections']['handling_methods']
+
+    # 硬约束处理
+    hard_method = methods['hard_constraint_strategy']
+    hard_field = hard_method.get('source_metadata', {}).get('field_path', 'N/A') if 'source_metadata' in hard_method else 'N/A'
+    hard_cites = hard_method.get('citations', [])
+    hard_cite_str = hard_cites[0] if hard_cites else '-'
+    hard_conf = hard_method.get('confidence', 0.0)
+    md_content.append(f"| 硬约束处理 | {hard_method.get('method', 'N/A')} | `{hard_field}` | `{hard_cite_str}` | {hard_conf:.2f} |\n")
+
+    # 软约束处理
+    soft_method = methods['soft_constraint_strategy']
+    soft_field = soft_method.get('source_metadata', {}).get('field_path', 'N/A') if 'source_metadata' in soft_method else 'N/A'
+    soft_cites = soft_method.get('citations', [])
+    soft_cite_str = soft_cites[0] if soft_cites else '-'
+    soft_conf = soft_method.get('confidence', 0.0)
+    md_content.append(f"| 软约束处理 | {soft_method.get('method', 'N/A')} | `{soft_field}` | `{soft_cite_str}` | {soft_conf:.2f} |\n")
+
+    md_content.append("\n")
+
+    # 4. 目标优化策略
+    md_content.append("### 4. 目标优化策略\n\n")
+    md_content.append("| 项目 | 值/方法 | 状态文件字段路径 | 专家库引用 | 置信度 |\n")
+    md_content.append("|------|--------|----------------|-----------|--------|\n")
+
+    objective_strategy = integrated_solution['sections']['4_objective_strategy']
+
+    # 主目标
+    hierarchy = objective_strategy['sections']['objective_hierarchy']
+    primary_obj = hierarchy.get('primary_objective', {})
+    obj_field = hierarchy.get('source_metadata', {}).get('field_path', 'N/A') if 'source_metadata' in hierarchy else 'N/A'
+    md_content.append(f"| 主目标 | {primary_obj.get('name', 'N/A')} | `{obj_field}` | - | - |\n")
+
+    # 多目标处理
+    multi_obj = objective_strategy['sections']['multi_objective_handling']
+    multi_field = multi_obj.get('source_metadata', {}).get('field_path', 'N/A') if 'source_metadata' in multi_obj else 'N/A'
+    multi_cites = multi_obj.get('citations', [])
+    multi_cite_str = multi_cites[0] if multi_cites else '-'
+    multi_conf = multi_obj.get('confidence', 0.0)
+    md_content.append(f"| 多目标方法 | {multi_obj.get('approach', 'N/A')} | `{multi_field}` | `{multi_cite_str}` | {multi_conf:.2f} |\n")
+
+    md_content.append("\n")
+    md_content.append("**说明**: \n")
+    md_content.append("- 置信度范围 0.0-1.0，值越高表示该决策的可信度越高\n")
+    md_content.append("- 状态文件字段路径格式: `state_data.专家分析.具体字段`\n")
+    md_content.append("- 专家库引用格式: `@库名/分类/具体文件.md`\n\n")
 
     # ====== 文档尾部 ======
     md_content.append("---\n\n")

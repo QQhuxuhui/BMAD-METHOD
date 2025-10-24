@@ -162,6 +162,8 @@ def extract_data_sources(phase_1_5_metadata, phase_2_metadata):
 
 ### 步骤3: 融合方案各部分
 
+**重要说明**: 所有融合函数都需要传递 `data_sources` 参数，以便在每个部分中包含完整的来源信息。
+
 #### 3.1 问题定义与建模总结
 
 ```python
@@ -254,12 +256,14 @@ def integrate_domain_adaptation(domain_analysis, ten_element_model):
 #### 3.3 约束处理策略
 
 ```python
-def integrate_constraint_strategy(constraint_analysis, ten_element_model):
+def integrate_constraint_strategy(constraint_analysis, ten_element_model, data_sources):
     """
     融合约束专家分析，生成约束处理策略
 
+    增强: 包含完整的citations和source_metadata
+
     Returns:
-        dict: 约束处理策略
+        dict: 约束处理策略（含引用信息）
     """
     constraint_strategy = {
         "title": "约束处理策略",
@@ -269,7 +273,13 @@ def integrate_constraint_strategy(constraint_analysis, ten_element_model):
                 "hard_constraints": constraint_analysis.get("hard_constraints", []),
                 "soft_constraints": constraint_analysis.get("soft_constraints", []),
                 "source": "Phase 2 - 约束专家分析",
-                "reference": "phase_2_state.constraint_analysis"
+                "reference": "phase_2_state.constraint_analysis",
+                "source_metadata": {
+                    "state_file": data_sources["expert_analyses"]["source_file"],
+                    "field_path": "state_data.constraint_analysis",
+                    "timestamp": data_sources["expert_analyses"]["timestamp"],
+                    "hash": data_sources["expert_analyses"]["hash"]
+                }
             },
             "handling_methods": {
                 "title": "处理方法",
@@ -277,19 +287,32 @@ def integrate_constraint_strategy(constraint_analysis, ten_element_model):
                     "method": constraint_analysis.get("hard_constraint_method", "repair"),
                     "description": "硬约束处理策略",
                     "citations": constraint_analysis.get("hard_constraint_citations", []),
-                    "source": "@约束专家库"
+                    "confidence": constraint_analysis.get("hard_constraint_confidence", 0.0),
+                    "source": "@约束专家库",
+                    "source_metadata": {
+                        "state_file": data_sources["expert_analyses"]["source_file"],
+                        "field_path": "state_data.constraint_analysis.hard_constraint_method",
+                        "expert": "约束专家"
+                    }
                 },
                 "soft_constraint_strategy": {
                     "method": constraint_analysis.get("soft_constraint_method", "penalty"),
                     "description": "软约束处理策略",
                     "citations": constraint_analysis.get("soft_constraint_citations", []),
-                    "source": "@约束专家库"
+                    "confidence": constraint_analysis.get("soft_constraint_confidence", 0.0),
+                    "source": "@约束专家库",
+                    "source_metadata": {
+                        "state_file": data_sources["expert_analyses"]["source_file"],
+                        "field_path": "state_data.constraint_analysis.soft_constraint_method",
+                        "expert": "约束专家"
+                    }
                 }
             },
             "validation_approach": {
                 "title": "验证方法",
                 "content": constraint_analysis.get("validation_methods", []),
-                "source": "Phase 2 - 约束专家分析"
+                "source": "Phase 2 - 约束专家分析",
+                "citations": constraint_analysis.get("validation_citations", [])
             },
             "conflict_resolution": {
                 "title": "冲突解决",
@@ -299,19 +322,21 @@ def integrate_constraint_strategy(constraint_analysis, ten_element_model):
         }
     }
 
-    print("✓ 约束处理策略融合完成")
+    print("✓ 约束处理策略融合完成（含引用信息）")
     return constraint_strategy
 ```
 
 #### 3.4 目标优化策略
 
 ```python
-def integrate_objective_strategy(objective_analysis, ten_element_model):
+def integrate_objective_strategy(objective_analysis, ten_element_model, data_sources):
     """
     融合目标专家分析，生成目标优化策略
 
+    增强: 包含完整的citations和source_metadata
+
     Returns:
-        dict: 目标优化策略
+        dict: 目标优化策略（含引用信息）
     """
     objective_strategy = {
         "title": "目标优化策略",
@@ -321,39 +346,55 @@ def integrate_objective_strategy(objective_analysis, ten_element_model):
                 "primary_objective": objective_analysis.get("primary_objective", {}),
                 "secondary_objectives": objective_analysis.get("secondary_objectives", []),
                 "source": "Phase 2 - 目标专家分析",
-                "reference": "phase_2_state.objective_analysis"
+                "reference": "phase_2_state.objective_analysis",
+                "source_metadata": {
+                    "state_file": data_sources["expert_analyses"]["source_file"],
+                    "field_path": "state_data.objective_analysis.primary_objective",
+                    "timestamp": data_sources["expert_analyses"]["timestamp"],
+                    "hash": data_sources["expert_analyses"]["hash"],
+                    "expert": "目标专家"
+                }
             },
             "multi_objective_handling": {
                 "title": "多目标处理",
                 "approach": objective_analysis.get("multi_objective_approach", "weighted_sum"),
                 "weights": objective_analysis.get("objective_weights", {}),
                 "justification": objective_analysis.get("weight_justification", ""),
+                "confidence": objective_analysis.get("weight_confidence", 0.0),
                 "source": "Phase 2 - 目标专家分析",
-                "citations": objective_analysis.get("objective_citations", [])
+                "citations": objective_analysis.get("objective_citations", []),
+                "source_metadata": {
+                    "state_file": data_sources["expert_analyses"]["source_file"],
+                    "field_path": "state_data.objective_analysis.multi_objective_approach",
+                    "expert": "目标专家"
+                }
             },
             "objective_function_design": {
                 "title": "目标函数设计",
                 "formulation": objective_analysis.get("objective_formulation", ""),
                 "considerations": objective_analysis.get("design_considerations", []),
+                "citations": objective_analysis.get("formulation_citations", []),
                 "source": "Phase 2 - 目标专家分析",
                 "reference": "@目标专家库"
             }
         }
     }
 
-    print("✓ 目标优化策略融合完成")
+    print("✓ 目标优化策略融合完成（含引用信息）")
     return objective_strategy
 ```
 
 #### 3.5 算法选择与配置
 
 ```python
-def integrate_algorithm_selection(algorithm_recommendations, ten_element_model):
+def integrate_algorithm_selection(algorithm_recommendations, ten_element_model, data_sources):
     """
     融合算法专家推荐，生成算法选择与配置方案
 
+    增强: 包含完整的citations和source_metadata
+
     Returns:
-        dict: 算法选择与配置
+        dict: 算法选择与配置（含引用信息）
     """
     algorithm_selection = {
         "title": "算法选择与配置",
@@ -363,20 +404,35 @@ def integrate_algorithm_selection(algorithm_recommendations, ten_element_model):
                 "algorithm_name": algorithm_recommendations.get("selected_algorithm", ""),
                 "algorithm_type": algorithm_recommendations.get("algorithm_type", ""),
                 "selection_rationale": algorithm_recommendations.get("selection_rationale", ""),
+                "confidence": algorithm_recommendations.get("selection_confidence", 0.0),
                 "source": "Phase 2 - 算法专家分析",
                 "reference": "phase_2_state.algorithm_recommendations.selected_algorithm",
-                "citations": algorithm_recommendations.get("algorithm_citations", [])
+                "citations": algorithm_recommendations.get("algorithm_citations", []),
+                "source_metadata": {
+                    "state_file": data_sources["expert_analyses"]["source_file"],
+                    "field_path": "state_data.algorithm_recommendations.selected_algorithm",
+                    "timestamp": data_sources["expert_analyses"]["timestamp"],
+                    "hash": data_sources["expert_analyses"]["hash"],
+                    "expert": "算法专家"
+                }
             },
             "algorithm_configuration": {
                 "title": "算法配置",
                 "parameters": algorithm_recommendations.get("recommended_parameters", {}),
                 "parameter_justification": algorithm_recommendations.get("parameter_justification", {}),
+                "parameter_citations": algorithm_recommendations.get("parameter_citations", {}),
                 "source": "Phase 2 - 算法专家分析",
-                "reference": "@算法专家库"
+                "reference": "@算法专家库",
+                "source_metadata": {
+                    "state_file": data_sources["expert_analyses"]["source_file"],
+                    "field_path": "state_data.algorithm_recommendations.recommended_parameters",
+                    "expert": "算法专家"
+                }
             },
             "optimization_suggestions": {
                 "title": "优化建议",
                 "content": algorithm_recommendations.get("optimization_suggestions", []),
+                "citations": algorithm_recommendations.get("optimization_citations", []),
                 "source": "Phase 2 - 算法专家分析"
             },
             "expected_performance": {
@@ -389,7 +445,7 @@ def integrate_algorithm_selection(algorithm_recommendations, ten_element_model):
         }
     }
 
-    print("✓ 算法选择与配置融合完成")
+    print("✓ 算法选择与配置融合完成（含引用信息）")
     return algorithm_selection
 ```
 
@@ -485,8 +541,10 @@ def generate_integrated_solution(
     """
     将所有部分组合成完整的方案对象
 
+    增强: 包含完整的可追溯性信息
+
     Returns:
-        dict: 完整的集成方案对象
+        dict: 完整的集成方案对象（含引用信息）
     """
     integrated_solution = {
         "metadata": {
@@ -509,22 +567,47 @@ def generate_integrated_solution(
         "references": {
             "ten_element_model": {
                 "source_file": data_sources["ten_element_model"]["source_file"],
-                "hash": data_sources["ten_element_model"]["hash"]
+                "hash": data_sources["ten_element_model"]["hash"],
+                "timestamp": data_sources["ten_element_model"]["timestamp"]
             },
             "expert_analyses": {
                 "source_file": data_sources["expert_analyses"]["source_file"],
-                "hash": data_sources["expert_analyses"]["hash"]
+                "hash": data_sources["expert_analyses"]["hash"],
+                "timestamp": data_sources["expert_analyses"]["timestamp"]
             }
         },
 
         "traceability": {
             "model_to_solution": "TenElementModel → 方案各章节的映射关系",
-            "analyses_to_solution": "专家分析 → 方案各章节的映射关系"
+            "analyses_to_solution": "专家分析 → 方案各章节的映射关系",
+            "complete_chain": [
+                "方案文档",
+                "Phase 2 专家分析 (phase_2_state.yaml)",
+                "Phase 1.5 TenElementModel (phase_1_5_state.yaml)",
+                "Phase 1 需求分析 (phase_1_state.yaml)",
+                "Phase 0 Todo基线 (phase_0_state.yaml)"
+            ]
+        },
+
+        # 新增：引用汇总（用于生成附录）
+        "citations_summary": {
+            "algorithm_citations": algorithm_selection["sections"]["selected_algorithm"].get("citations", []),
+            "constraint_citations": extract_constraint_citations(constraint_strategy),
+            "objective_citations": objective_strategy["sections"]["multi_objective_handling"].get("citations", []),
+            "all_unique_citations": []  # 将在后续步骤中去重汇总
         }
     }
 
-    print("✓ 完整方案对象生成完成")
+    print("✓ 完整方案对象生成完成（含可追溯性信息）")
     return integrated_solution
+
+def extract_constraint_citations(constraint_strategy):
+    """提取约束策略中的所有citations"""
+    citations = []
+    handling = constraint_strategy["sections"]["handling_methods"]
+    citations.extend(handling["hard_constraint_strategy"].get("citations", []))
+    citations.extend(handling["soft_constraint_strategy"].get("citations", []))
+    return citations
 ```
 
 ### 步骤5: 生成方案元数据
