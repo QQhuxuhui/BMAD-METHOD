@@ -254,7 +254,7 @@ def main():
     # 加载工艺路线数据
     process_route = load_process_route("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/工艺路线.csv")
     # 加载并处理排产结果数据
-    result = load_and_process_result("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/aps-outputs/deliverables/results/production_schedule_20251024_133748.csv")
+    result = load_and_process_result("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/aps-outputs/code/data/output/排产结果.csv")
     # 加载产品需求数据并合并
     demand = load_demand_data("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/产品需求.csv")
     # 加载工作日历数据

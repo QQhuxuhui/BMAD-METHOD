@@ -62,7 +62,7 @@ z*/
 
 
 test/bmad
-test/aps-output
+test/aps-outputs/*
 test/.claude
 test/.cursor
 

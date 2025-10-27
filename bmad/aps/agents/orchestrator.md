@@ -34,6 +34,12 @@
 
   <menu-handlers>
       <handlers>
+      <handler type="exec">
+        When menu item has: exec="path/to/file.md"
+        Actually LOAD and EXECUTE the file at that path - do not improvise
+        Read the complete file and follow all instructions within it
+      </handler>
+
   <handler type="workflow">
     When menu item has: workflow="path/to/workflow.yaml"
     1. CRITICAL: Always LOAD {project-root}/bmad/core/tasks/workflow.xml
@@ -43,12 +49,6 @@
     5. Save outputs after completing EACH workflow step (never batch multiple steps together)
     6. If workflow.yaml path is "todo", inform user the workflow hasn't been implemented yet
   </handler>
-      <handler type="exec">
-        When menu item has: exec="path/to/file.md"
-        Actually LOAD and EXECUTE the file at that path - do not improvise
-        Read the complete file and follow all instructions within it
-      </handler>
-
     </handlers>
   </menu-handlers>
 
@@ -69,18 +69,14 @@
   </persona>
   <menu>
     <item cmd="*help">Show numbered menu</item>
+    <item cmd="*check-status" exec="{project-root}/bmad/aps/tasks/check-execution-status.md">🔍 检查当前执行状态和断点位置</item>
+    <item cmd="*resume" exec="{project-root}/bmad/aps/tasks/smart-resume.md">🔄 智能恢复并继续执行</item>
+    <item cmd="*show-progress" exec="{project-root}/bmad/aps/tasks/show-execution-progress.md">📊 显示Todo进度和Phase状态</item>
     <item cmd="*start-scheduling" workflow="{project-root}/bmad/aps/workflows/scheduling-orchestration/workflow.yaml">🚀 启动完整调度求解流程（Phase 0-4）</item>
-    <item cmd="*create-todo" workflow="{project-root}/bmad/aps/workflows/todo-management/workflow.yaml">📋 生成任务清单（Phase 0）</item>
-    <item cmd="*select-mode" workflow="{project-root}/bmad/aps/workflows/interaction-modes/workflow.yaml">🔀 选择交互模式（集中确认 vs 增量确认）</item>
-    <item cmd="*analyze-requirements" workflow="{project-root}/bmad/aps/workflows/phase-1-requirements/workflow.yaml">🔍 需求分析与理解（Phase 1）</item>
-    <item cmd="*build-model" workflow="{project-root}/bmad/aps/workflows/phase-1.5-modeling/workflow.yaml">🏗️ 十要素建模（Phase 1.5）</item>
-    <item cmd="*coordinate-experts" workflow="{project-root}/bmad/aps/workflows/phase-2-coordination/workflow.yaml">🤝 专家协调与分析（Phase 2）</item>
-    <item cmd="*consistency-check" workflow="{project-root}/bmad/aps/workflows/consistency-check/workflow.yaml">✅ 跨专家一致性校验（Phase 2.5）</item>
-    <item cmd="*integrate-solution" workflow="{project-root}/bmad/aps/workflows/phase-3-integration/workflow.yaml">🧩 方案集成与融合（Phase 3）</item>
-    <item cmd="*quality-check" workflow="{project-root}/bmad/aps/workflows/phase-4-quality/workflow.yaml">🛡️ 质量保证与验证（Phase 4）</item>
-    <item cmd="*show-progress" exec="{project-root}/bmad/aps/tasks/show-todo-progress.md">📊 显示Todo进度报告</item>
-    <item cmd="*call-expert" exec="{project-root}/bmad/aps/tasks/call-specialist.md">👥 调用特定专家智能体</item>
-    <item cmd="*capability-gap" exec="{project-root}/bmad/aps/tasks/capability-gap-report.md">⚠️ 输出能力缺口报告</item>
+    <item cmd="*optimize-solution" exec="{project-root}/bmad/aps/tasks/orchestrate-solution-optimization.md">🔧 优化现有方案（我来理解你的需求并调度专家）</item>
+    <item cmd="*generate-code" exec="{project-root}/bmad/aps/tasks/generate-code-from-yaml.md">💻 从方案YAML独立生成代码</item>
+    <item cmd="*verify-states" exec="{project-root}/bmad/aps/tasks/verify-state-integrity.md">🛡️ 验证状态文件完整性</item>
+    <item cmd="*build-model" workflow="{project-root}/bmad/aps/workflows/phase-1.5-modeling/workflow.yaml">🏗️ 单独执行十要素建模</item>
     <item cmd="*exit">Exit with confirmation</item>
   </menu>
 </agent>

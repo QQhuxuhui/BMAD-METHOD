@@ -33,39 +33,50 @@ agent:
     - 检测到能力缺口时，输出"能力缺口报告"并升级裁决
     - "🚨 FILE SAVING RULE: When workflow tasks require saving deliverable files (e.g., generate-complete-code, verify-deliverables-saved), you MUST use the IDE's Write tool to actually save files to disk. Do NOT only output Python code examples or pseudocode. For all IDEs (Claude Code, Cursor, Windsurf, etc.), use the Write tool with full file paths to ensure deliverables are persisted. This is CRITICAL for Phase 3.3 and Quality Gate 6."
   menu:
+    # ═══════════════════════════════════════════════════════════════
+    # 断点恢复核心命令（任务中断后的关键功能）
+    # ═══════════════════════════════════════════════════════════════
+    - description: 🔍 检查当前执行状态和断点位置
+      trigger: check-status
+      exec: "{project-root}/bmad/aps/tasks/check-execution-status.md"
+    - description: 🔄 智能恢复并继续执行
+      trigger: resume
+      exec: "{project-root}/bmad/aps/tasks/smart-resume.md"
+    - description: 📊 显示Todo进度和Phase状态
+      trigger: show-progress
+      exec: "{project-root}/bmad/aps/tasks/show-execution-progress.md"
+
+    # ═══════════════════════════════════════════════════════════════
+    # 主要执行命令
+    # ═══════════════════════════════════════════════════════════════
     - description: 🚀 启动完整调度求解流程（Phase 0-4）
       trigger: start-scheduling
       workflow: "{project-root}/bmad/aps/workflows/scheduling-orchestration/workflow.yaml"
-    - description: 📋 生成任务清单（Phase 0）
-      trigger: create-todo
-      workflow: "{project-root}/bmad/aps/workflows/todo-management/workflow.yaml"
-    - description: 🔀 选择交互模式（集中确认 vs 增量确认）
-      trigger: select-mode
-      workflow: "{project-root}/bmad/aps/workflows/interaction-modes/workflow.yaml"
-    - description: 🔍 需求分析与理解（Phase 1）
-      trigger: analyze-requirements
-      workflow: "{project-root}/bmad/aps/workflows/phase-1-requirements/workflow.yaml"
-    - description: 🏗️ 十要素建模（Phase 1.5）
+
+    - description: 🔧 优化现有方案（我来理解你的需求并调度专家）
+      trigger: optimize-solution
+      exec: "{project-root}/bmad/aps/tasks/orchestrate-solution-optimization.md"
+      user_friendly: true
+      usage_examples:
+        - "我想增加一个约束，确保同一设备不能同时处理多个任务"
+        - "遗传算法跑得太慢了，能不能优化一下参数"
+        - "准时交货的重要性应该更高一些"
+        - "这个方案对我们生鲜配送行业可能不太适用，需要考虑温度控制"
+      hint: |
+        这是用户友好的方案优化命令。您只需用自然语言描述需求，
+        我会自动理解并调用合适的专家（约束、算法、目标、领域）来优化方案。
+        您无需了解专家分工或YAML结构。
+
+    - description: 💻 从方案YAML独立生成代码
+      trigger: generate-code
+      exec: "{project-root}/bmad/aps/tasks/generate-code-from-yaml.md"
+
+    # ═══════════════════════════════════════════════════════════════
+    # 辅助命令
+    # ═══════════════════════════════════════════════════════════════
+    - description: 🛡️ 验证状态文件完整性
+      trigger: verify-states
+      exec: "{project-root}/bmad/aps/tasks/verify-state-integrity.md"
+    - description: 🏗️ 单独执行十要素建模
       trigger: build-model
       workflow: "{project-root}/bmad/aps/workflows/phase-1.5-modeling/workflow.yaml"
-    - description: 🤝 专家协调与分析（Phase 2）
-      trigger: coordinate-experts
-      workflow: "{project-root}/bmad/aps/workflows/phase-2-coordination/workflow.yaml"
-    - description: ✅ 跨专家一致性校验（Phase 2.5）
-      trigger: consistency-check
-      workflow: "{project-root}/bmad/aps/workflows/consistency-check/workflow.yaml"
-    - description: 🧩 方案集成与融合（Phase 3）
-      trigger: integrate-solution
-      workflow: "{project-root}/bmad/aps/workflows/phase-3-integration/workflow.yaml"
-    - description: 🛡️ 质量保证与验证（Phase 4）
-      trigger: quality-check
-      workflow: "{project-root}/bmad/aps/workflows/phase-4-quality/workflow.yaml"
-    - description: 📊 显示Todo进度报告
-      trigger: show-progress
-      exec: "{project-root}/bmad/aps/tasks/show-todo-progress.md"
-    - description: 👥 调用特定专家智能体
-      trigger: call-expert
-      exec: "{project-root}/bmad/aps/tasks/call-specialist.md"
-    - description: ⚠️ 输出能力缺口报告
-      trigger: capability-gap
-      exec: "{project-root}/bmad/aps/tasks/capability-gap-report.md"

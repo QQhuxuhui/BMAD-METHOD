@@ -594,6 +594,20 @@ phases:
 
         critical: true
 
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_1_5"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+                文件路径: {state_folder}/phase_1_5_state_latest.yaml
+
+                TenElementModel是方案生成的核心依赖，必须存在。
+
+                解决方案:
+                - 请从 Phase 1.5 重新执行
+
         inputs:
           - phase_id: "phase_1_5"
           - state_folder: "${config.state_management.state_folder}"
@@ -731,6 +745,28 @@ phases:
         action: "exec"
         target: "bmad/aps/tasks/generate-code-from-solution.md"
         description: "严格按照用户确认的方案生成可执行代码，每个组件都有明确依据"
+
+        critical: true
+
+        pre_condition_check:
+          required_files:
+            - file_path: "${solution_document_path}"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: 方案文档缺失！
+
+                文档路径: ${solution_document_path}
+
+                方案文档是代码生成的核心依据，必须存在。
+
+                可能原因:
+                1. Step 3.3 方案文档保存失败
+                2. 文档被误删除
+                3. 文档路径配置错误
+
+                解决方案:
+                - 请从 Step 3.1 重新执行方案集成流程
+                - 或检查 ${config.docs_folder} 目录权限
 
         inputs:
           - user_approved_solution # 使用确认后的方案
@@ -909,6 +945,20 @@ phases:
 
         critical: true
 
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_1_5"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+                文件路径: {state_folder}/phase_1_5_state_latest.yaml
+
+                TenElementModel是质量验证的核心依赖，必须存在。
+
+                解决方案:
+                - 请从 Phase 1.5 重新执行
+
         inputs:
           - phase_id: "phase_1_5"
           - state_folder: "${config.state_management.state_folder}"
@@ -1019,6 +1069,20 @@ phases:
 
         critical: true
 
+        pre_condition_check:
+          required_files:
+            - phase_id: "phase_0"
+              on_missing: "block_with_error"
+              error_message: |
+                ❌ CRITICAL: Phase 0 状态文件缺失！
+
+                文件路径: {state_folder}/phase_0_state_latest.yaml
+
+                Todo基线是完成度检查的依据，必须存在。
+
+                解决方案:
+                - 请从 Phase 0 重新执行
+
         inputs:
           - phase_id: "phase_0"
           - state_folder: "${config.state_management.state_folder}"
@@ -1065,10 +1129,10 @@ phases:
         name: "💾 保存Phase 4状态 (质量报告)"
         action: "exec"
         target: "bmad/aps/tasks/save-phase-state.md"
-        description: "保存质量报告和交付确认状态（可选）"
+        description: "保存质量报告和交付确认状态"
 
-        mandatory_save: false
-        critical: false
+        mandatory_save: true
+        critical: true
 
         inputs:
           - phase_id: "phase_4"
@@ -1088,6 +1152,12 @@ phases:
           - verification_result
           - file_metadata
           - manifest_updated
+
+        post_action_verify:
+          - check: "verification_result.all_checks_passed == true"
+            on_fail: "block_and_retry"
+            error_message: "Phase 4状态保存失败"
+            max_retries: 3
 
 outputs:
   deliverables:
