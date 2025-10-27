@@ -674,10 +674,77 @@ def verify_file_saved(file_path, min_size=5120):
     return verification_result
 ````
 
+### 步骤4.5: 保存YAML格式的方案数据（新增）
+
+**目的**: 支持独立的代码生成，只需方案文件即可生成代码
+
+```python
+import yaml
+
+def save_solution_data_yaml(integrated_solution, ten_element_model, output_folder, docs_folder, timestamp):
+    """
+    保存方案的结构化数据为YAML格式
+
+    目的: 支持从方案文件独立生成代码
+
+    Returns:
+        dict: YAML文件保存结果
+    """
+    # 准备YAML数据
+    solution_data = {
+        "solution_metadata": integrated_solution.get("metadata", {}),
+        "solution_sections": integrated_solution.get("sections", {}),
+        "ten_element_model": ten_element_model,
+        "references": integrated_solution.get("references", {}),
+        "traceability": integrated_solution.get("traceability", {}),
+        "citations_summary": integrated_solution.get("citations_summary", {})
+    }
+
+    # 生成文件路径
+    yaml_filename = f"solution_data_{timestamp}.yaml"
+    yaml_path = f"{output_folder}/{docs_folder}/{yaml_filename}"
+
+    # 序列化为YAML
+    yaml_content = yaml.dump(solution_data, allow_unicode=True, sort_keys=False, default_flow_style=False)
+
+    print(f"✓ YAML数据已准备: {len(yaml_content)} bytes")
+
+    # 🚨 使用Write工具保存YAML文件
+    # IDE Tool: Write
+    # File Path: {yaml_path}
+    # Content: {yaml_content}
+
+    # 验证YAML文件
+    if os.path.exists(yaml_path):
+        yaml_size = os.path.getsize(yaml_path)
+        print(f"✓ YAML文件已保存: {yaml_path} ({yaml_size} bytes)")
+
+        return {
+            "yaml_saved": True,
+            "yaml_path": yaml_path,
+            "yaml_size": yaml_size
+        }
+    else:
+        print(f"✗ YAML文件保存失败: {yaml_path}")
+        return {
+            "yaml_saved": False,
+            "yaml_path": yaml_path,
+            "error": "文件未创建"
+        }
+```
+
+**使用IDE Write工具保存YAML文件**：
+
+```
+IDE Tool: Write
+File Path: {output_folder}/docs/solution_data_{timestamp}.yaml
+Content: {yaml_content}
+```
+
 ### 步骤5: 生成文件元数据
 
 ```python
-def generate_file_metadata(file_path, verification_result):
+def generate_file_metadata(file_path, verification_result, yaml_result=None):
     """
     生成文件元数据
 
@@ -688,19 +755,36 @@ def generate_file_metadata(file_path, verification_result):
     import hashlib
 
     file_metadata = {
-        "file_path": file_path,
-        "file_name": os.path.basename(file_path),
-        "file_size": verification_result["file_size"],
-        "saved_at": datetime.now().isoformat(),
-        "format": "markdown",
-        "verification_passed": verification_result["file_saved"]
+        "markdown_file": {
+            "file_path": file_path,
+            "file_name": os.path.basename(file_path),
+            "file_size": verification_result["file_size"],
+            "saved_at": datetime.now().isoformat(),
+            "format": "markdown",
+            "verification_passed": verification_result["file_saved"]
+        }
     }
 
-    # 计算文件hash
+    # 计算Markdown文件hash
     if verification_result["file_saved"]:
         with open(file_path, 'rb') as f:
             file_hash = hashlib.md5(f.read()).hexdigest()
-        file_metadata["hash"] = file_hash
+        file_metadata["markdown_file"]["hash"] = file_hash
+
+    # 添加YAML文件元数据（如果有）
+    if yaml_result and yaml_result.get("yaml_saved"):
+        file_metadata["yaml_file"] = {
+            "file_path": yaml_result["yaml_path"],
+            "file_name": os.path.basename(yaml_result["yaml_path"]),
+            "file_size": yaml_result["yaml_size"],
+            "format": "yaml",
+            "purpose": "结构化数据，支持独立代码生成"
+        }
+
+        # 计算YAML文件hash
+        with open(yaml_result["yaml_path"], 'rb') as f:
+            yaml_hash = hashlib.md5(f.read()).hexdigest()
+        file_metadata["yaml_file"]["hash"] = yaml_hash
 
     return file_metadata
 ```
@@ -711,8 +795,14 @@ def generate_file_metadata(file_path, verification_result):
 outputs:
   solution_document_path:
     type: string
-    description: 方案文档的完整路径
+    description: 方案文档的完整路径（Markdown格式）
     example: 'aps-outputs/docs/solution_document_20251024_143530.md'
+
+  solution_data_path:
+    type: string
+    description: 方案数据的完整路径（YAML格式，新增）
+    example: 'aps-outputs/docs/solution_data_20251024_143530.yaml'
+    purpose: 支持独立代码生成，包含完整的方案对象和TenElementModel
 
   solution_document_content:
     type: string
@@ -720,7 +810,7 @@ outputs:
 
   verification_result:
     type: object
-    description: 文件保存验证结果
+    description: Markdown文件保存验证结果
     structure:
       file_saved: boolean
       file_exists: boolean
@@ -729,16 +819,32 @@ outputs:
       markdown_valid: boolean
       issues: array
 
+  yaml_save_result:
+    type: object
+    description: YAML文件保存结果（新增）
+    structure:
+      yaml_saved: boolean
+      yaml_path: string
+      yaml_size: integer
+
   file_metadata:
     type: object
-    description: 文件元数据
+    description: 文件元数据（包含Markdown和YAML）
     structure:
-      file_path: string
-      file_name: string
-      file_size: integer
-      saved_at: string (ISO8601)
-      format: string
-      hash: string (MD5)
+      markdown_file:
+        file_path: string
+        file_name: string
+        file_size: integer
+        saved_at: string (ISO8601)
+        format: string
+        hash: string (MD5)
+      yaml_file:
+        file_path: string
+        file_name: string
+        file_size: integer
+        format: string
+        purpose: string
+        hash: string (MD5)
 ```
 
 ## 质量检查
@@ -747,10 +853,14 @@ outputs:
 - [ ] Markdown文档包含所有6个核心章节
 - [ ] 数据来源已标注（文件名、时间戳、hash）
 - [ ] 所有引用都清晰可见
-- [ ] 文件已使用Write工具保存
-- [ ] 文件大小 >= 5KB
-- [ ] 文件可读且格式正确
-- [ ] 验证结果显示file_saved = true
+- [ ] Markdown文件已使用Write工具保存
+- [ ] Markdown文件大小 >= 5KB
+- [ ] Markdown文件可读且格式正确
+- [ ] Markdown验证结果显示file_saved = true
+- [ ] YAML文件已使用Write工具保存（新增）
+- [ ] YAML文件包含完整的方案对象和TenElementModel（新增）
+- [ ] YAML文件可被解析（新增）
+- [ ] YAML验证结果显示yaml_saved = true（新增）
 
 ## 引用
 
