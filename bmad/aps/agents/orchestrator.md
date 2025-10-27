@@ -73,6 +73,7 @@
     <item cmd="*resume" exec="{project-root}/bmad/aps/tasks/smart-resume.md">🔄 智能恢复并继续执行</item>
     <item cmd="*show-progress" exec="{project-root}/bmad/aps/tasks/show-execution-progress.md">📊 显示Todo进度和Phase状态</item>
     <item cmd="*start-scheduling" workflow="{project-root}/bmad/aps/workflows/scheduling-orchestration/workflow.yaml">🚀 启动完整调度求解流程（Phase 0-4）</item>
+    <item cmd="*optimize-solution" exec="{project-root}/bmad/aps/tasks/orchestrate-solution-optimization.md">🔧 优化现有方案（我来理解你的需求并调度专家）</item>
     <item cmd="*generate-code" exec="{project-root}/bmad/aps/tasks/generate-code-from-yaml.md">💻 从方案YAML独立生成代码</item>
     <item cmd="*verify-states" exec="{project-root}/bmad/aps/tasks/verify-state-integrity.md">🛡️ 验证状态文件完整性</item>
     <item cmd="*build-model" workflow="{project-root}/bmad/aps/workflows/phase-1.5-modeling/workflow.yaml">🏗️ 单独执行十要素建模</item>

@@ -52,6 +52,21 @@ agent:
     - description: 🚀 启动完整调度求解流程（Phase 0-4）
       trigger: start-scheduling
       workflow: "{project-root}/bmad/aps/workflows/scheduling-orchestration/workflow.yaml"
+
+    - description: 🔧 优化现有方案（我来理解你的需求并调度专家）
+      trigger: optimize-solution
+      exec: "{project-root}/bmad/aps/tasks/orchestrate-solution-optimization.md"
+      user_friendly: true
+      usage_examples:
+        - "我想增加一个约束，确保同一设备不能同时处理多个任务"
+        - "遗传算法跑得太慢了，能不能优化一下参数"
+        - "准时交货的重要性应该更高一些"
+        - "这个方案对我们生鲜配送行业可能不太适用，需要考虑温度控制"
+      hint: |
+        这是用户友好的方案优化命令。您只需用自然语言描述需求，
+        我会自动理解并调用合适的专家（约束、算法、目标、领域）来优化方案。
+        您无需了解专家分工或YAML结构。
+
     - description: 💻 从方案YAML独立生成代码
       trigger: generate-code
       exec: "{project-root}/bmad/aps/tasks/generate-code-from-yaml.md"
