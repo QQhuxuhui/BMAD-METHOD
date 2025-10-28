@@ -709,15 +709,54 @@ phases:
           - include_data_sources: true # 标注数据来源
 
         outputs:
-          - solution_document_path # 方案文档路径
+          - solution_document_path # 方案文档路径 (Markdown)
+          - solution_data_path # 方案数据路径 (YAML)
           - solution_document_content # 方案文档内容
           - verification_result
           - file_metadata
 
         post_action_verify:
-          - check: "verification_result.file_saved == true"
+          # 核心检查1：Markdown文件已保存
+          - check: "verification_result.markdown_file.file_saved == true"
             on_fail: "block_and_retry"
-            error_message: "方案文档保存失败，无法继续"
+            error_message: "方案文档(Markdown)保存失败，无法继续"
+            max_retries: 3
+
+          # 核心检查2：文件名格式正确（防止生成README.md等错误文件）
+          - check: "file_metadata.markdown_file.file_name.startswith('solution_document_')"
+            on_fail: "block_with_error"
+            error_message: |
+              ❌ 方案文档文件名不符合规范！
+
+              要求格式: solution_document_{timestamp}.md
+              实际文件: ${file_metadata.markdown_file.file_name}
+
+              这通常意味着生成了错误的文件（如README.md用户手册）。
+              方案文档必须是独立的设计文档，包含完整的技术方案和追溯信息。
+
+          # 核心检查3：内容结构完整性（最关键！）
+          - check: "verification_result.content_validation.has_required_sections == true"
+            on_fail: "block_with_error"
+            error_message: |
+              ❌ 方案文档缺少必需章节！
+
+              完整方案文档必须包含以下章节:
+              - 1. 问题定义与建模
+              - 2. 领域适配方案
+              - 3. 约束处理策略
+              - 4. 目标优化策略
+              - 5. 算法选择与配置
+              - 6. 实现路线图
+              - 附录: TenElementModel完整定义
+
+              缺失的章节: ${verification_result.content_validation.missing_sections}
+
+              说明: 方案文档不是用户手册，而是完整的技术设计文档。
+
+          # 核心检查4：YAML数据文件已保存
+          - check: "verification_result.yaml_file.yaml_saved == true"
+            on_fail: "block_and_retry"
+            error_message: "方案数据(YAML)保存失败，无法继续"
             max_retries: 3
 
       - step_id: "3.4"
@@ -738,6 +777,44 @@ phases:
           - user_approved_solution # 用户确认后的方案
           - user_feedback # 用户反馈意见
           - approval_timestamp # 确认时间戳
+
+      - step_id: "3.4.5"
+        name: "🔍 方案文档完整性终极验证"
+        action: "exec"
+        target: "bmad/aps/tasks/verify-solution-documents-exist.md"
+        description: "代码生成前的最后一道防线，确保方案文档完整存在"
+
+        critical: true
+        blocking: true
+
+        inputs:
+          - solution_document_path: "${solution_document_path}"
+          - solution_data_path: "${solution_data_path}"
+          - output_folder: "${config.output_folder}"
+
+        outputs:
+          - final_verification
+
+        verification_gate:
+          critical: true
+          checks:
+            - "final_verification.markdown_exists == true"
+            - "final_verification.yaml_exists == true"
+            - "final_verification.has_all_sections == true"
+            - "final_verification.all_checks_passed == true"
+          on_fail: "block_with_error"
+          error_message: |
+            ❌ 方案文档验证失败，无法进入代码生成阶段！
+
+            请确保以下文件存在且完整：
+            1. solution_document_*.md (包含6个技术章节 + 附录)
+            2. solution_data_*.yaml (包含完整方案对象)
+
+            阻断问题: ${final_verification.blocking_issues}
+
+            解决方案:
+            - 重新执行 Step 3.3 (保存方案交付物)
+            - 或从 Phase 3 开始重新执行
 
       # ====== 阶段2: 代码生成 (Step 3.5 - 3.7) ======
       - step_id: "3.5"

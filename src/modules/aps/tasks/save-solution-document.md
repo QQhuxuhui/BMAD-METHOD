@@ -4,6 +4,56 @@
 **版本**: V4.3
 **用途**: Phase 3 Step 3.3 - 将完整方案保存为Markdown文档，作为独立交付物
 
+---
+
+## 🚨🚨🚨 CRITICAL WARNING - 必读 🚨🚨🚨
+
+### ⚠️ 此任务必须生成两个特定文件
+
+**1. ✅ `solution_document_{timestamp}.md` - 完整方案文档（6章节+附录）**
+   - **文件名格式**: `solution_document_YYYYMMDD_HHMMSS.md`
+   - **不是** `README.md`（那是用户手册）
+   - **不是** `user_manual.md`
+   - **不是** `documentation.md`
+   - **必须是** `solution_document_` 开头的时间戳文件
+
+**2. ✅ `solution_data_{timestamp}.yaml` - 结构化方案数据**
+   - **文件名格式**: `solution_data_YYYYMMDD_HHMMSS.yaml`
+   - 包含完整的 TenElementModel 和 integrated_solution
+   - 支持独立的代码生成流程
+
+### ❌ 严禁的行为
+
+- **❌ 不要生成 README.md 作为替代**
+- **❌ 不要跳过方案文档生成步骤**
+- **❌ 不要在本任务完成前生成代码**
+- **❌ 不要只输出 Markdown 内容而不保存文件**
+
+### ✅ 执行顺序（强制）
+
+```
+1. 生成完整的方案文档内容（包含全部6个章节和附录）
+2. 使用 Write 工具保存 solution_document_{timestamp}.md
+3. 验证 Markdown 文件已成功保存
+4. 验证文件包含所有必需章节
+5. 使用 Write 工具保存 solution_data_{timestamp}.yaml
+6. 验证 YAML 文件已成功保存
+7. 返回验证结果（包含 content_validation）
+```
+
+### 🔒 阻断机制
+
+如果以上文件未正确保存，**Phase 3 将无法继续到代码生成阶段**。
+
+Workflow 的 post_action_verify 会检查：
+- ✓ 文件名是否以 `solution_document_` 开头
+- ✓ 文件是否包含全部 7 个必需章节
+- ✓ YAML 文件是否成功保存
+
+**任何检查失败都会阻断流程！**
+
+---
+
 ## 输入
 
 ```yaml
@@ -612,16 +662,25 @@ def generate_solution_markdown(
 ```python
 import os
 
-def verify_file_saved(file_path, min_size=5120):
+def verify_file_saved(file_path, min_size=1024):
     """
-    验证文件已成功保存
+    验证文件已成功保存（增强版：包含内容结构验证）
 
     Args:
         file_path: 文件路径
-        min_size: 最小文件大小（bytes），默认5KB
+        min_size: 最小文件大小（bytes），默认1KB（仅用于防止空文件）
 
     Returns:
         dict: 验证结果
+            - file_saved: 总体是否通过
+            - file_exists: 文件是否存在
+            - file_size: 文件大小
+            - file_readable: 文件是否可读
+            - markdown_valid: Markdown格式是否有效
+            - content_validation: 内容结构验证结果（新增）
+                - has_required_sections: 是否包含所有必需章节
+                - missing_sections: 缺失的章节列表
+            - issues: 问题列表
     """
     verification_result = {
         "file_saved": False,
@@ -629,6 +688,10 @@ def verify_file_saved(file_path, min_size=5120):
         "file_size": 0,
         "file_readable": False,
         "markdown_valid": False,
+        "content_validation": {
+            "has_required_sections": False,
+            "missing_sections": []
+        },
         "issues": []
     }
 
@@ -639,13 +702,22 @@ def verify_file_saved(file_path, min_size=5120):
 
     verification_result["file_exists"] = True
 
-    # 检查文件大小
+    # 检查文件名格式（防止生成README.md等错误文件）
+    filename = os.path.basename(file_path)
+    if not filename.startswith("solution_document_"):
+        verification_result["issues"].append(
+            f"文件名不符合规范: {filename} (应为 solution_document_{{timestamp}}.md)"
+        )
+        # 文件名错误是严重问题，直接返回
+        return verification_result
+
+    # 检查文件大小（仅用于防止空文件）
     file_size = os.path.getsize(file_path)
     verification_result["file_size"] = file_size
 
     if file_size < min_size:
         verification_result["issues"].append(
-            f"文件太小: {file_size} bytes (最小要求: {min_size} bytes)"
+            f"文件太小: {file_size} bytes (最小要求: {min_size} bytes，可能是空文件)"
         )
         return verification_result
 
@@ -664,11 +736,38 @@ def verify_file_saved(file_path, min_size=5120):
     else:
         verification_result["issues"].append("Markdown格式可能不正确")
 
-    # 全部通过
+    # ✅ 核心新增：验证内容结构完整性
+    required_sections = [
+        "## 1. 问题定义与建模",
+        "## 2. 领域适配方案",
+        "## 3. 约束处理策略",
+        "## 4. 目标优化策略",
+        "## 5. 算法选择与配置",
+        "## 6. 实现路线图",
+        "## 7. 附录: TenElementModel完整定义"
+    ]
+
+    missing_sections = []
+    for section in required_sections:
+        if section not in content:
+            missing_sections.append(section)
+
+    if missing_sections:
+        verification_result["content_validation"]["missing_sections"] = missing_sections
+        verification_result["issues"].append(
+            f"缺少必需章节: {', '.join(missing_sections)}"
+        )
+        verification_result["issues"].append(
+            "提示: 方案文档不是用户手册(README.md)，而是包含6个技术章节的完整设计文档"
+        )
+    else:
+        verification_result["content_validation"]["has_required_sections"] = True
+
+    # 全部通过的条件（移除文件大小检查）
     if (verification_result["file_exists"] and
         verification_result["file_readable"] and
         verification_result["markdown_valid"] and
-        file_size >= min_size):
+        verification_result["content_validation"]["has_required_sections"]):
         verification_result["file_saved"] = True
 
     return verification_result
@@ -810,22 +909,29 @@ outputs:
 
   verification_result:
     type: object
-    description: Markdown文件保存验证结果
+    description: 文件保存验证结果（包含Markdown和YAML）
     structure:
-      file_saved: boolean
-      file_exists: boolean
-      file_size: integer
-      file_readable: boolean
-      markdown_valid: boolean
-      issues: array
+      markdown_file:
+        file_saved: boolean # 总体是否通过所有检查
+        file_exists: boolean
+        file_size: integer
+        file_readable: boolean
+        markdown_valid: boolean
+        content_validation: # ✅ 新增：内容结构验证
+          has_required_sections: boolean
+          missing_sections: array # 缺失的章节列表
+        issues: array
+      yaml_file:
+        yaml_saved: boolean
+        yaml_path: string
+        yaml_size: integer
+        error: string (如果失败)
 
   yaml_save_result:
     type: object
-    description: YAML文件保存结果（新增）
-    structure:
-      yaml_saved: boolean
-      yaml_path: string
-      yaml_size: integer
+    description: YAML文件保存结果（已合并到verification_result中）
+    deprecated: true
+    note: 使用 verification_result.yaml_file 代替
 
   file_metadata:
     type: object
@@ -849,18 +955,37 @@ outputs:
 
 ## 质量检查
 
+### 🔴 P0 - 关键检查（阻断级别）
+
+- [ ] **文件名格式正确**: solution_document_{timestamp}.md （不是README.md）
+- [ ] **包含所有7个必需章节**:
+  - [ ] 1. 问题定义与建模
+  - [ ] 2. 领域适配方案
+  - [ ] 3. 约束处理策略
+  - [ ] 4. 目标优化策略
+  - [ ] 5. 算法选择与配置
+  - [ ] 6. 实现路线图
+  - [ ] 7. 附录: TenElementModel完整定义
+- [ ] **content_validation.has_required_sections = true**
+- [ ] **Markdown文件已使用Write工具保存**
+- [ ] **YAML文件已使用Write工具保存**
+
+### 🟡 P1 - 重要检查
+
 - [ ] 输出目录已创建
-- [ ] Markdown文档包含所有6个核心章节
 - [ ] 数据来源已标注（文件名、时间戳、hash）
 - [ ] 所有引用都清晰可见
-- [ ] Markdown文件已使用Write工具保存
-- [ ] Markdown文件大小 >= 5KB
 - [ ] Markdown文件可读且格式正确
-- [ ] Markdown验证结果显示file_saved = true
-- [ ] YAML文件已使用Write工具保存（新增）
-- [ ] YAML文件包含完整的方案对象和TenElementModel（新增）
-- [ ] YAML文件可被解析（新增）
-- [ ] YAML验证结果显示yaml_saved = true（新增）
+- [ ] Markdown验证结果显示 markdown_file.file_saved = true
+- [ ] YAML文件包含完整的方案对象和TenElementModel
+- [ ] YAML文件可被解析
+- [ ] YAML验证结果显示 yaml_file.yaml_saved = true
+
+### 🟢 P2 - 可选检查
+
+- [ ] Markdown文件大小合理（通常 > 10KB）
+- [ ] 包含图表或表格
+- [ ] 包含追溯性映射表（附录A2）
 
 ## 引用
 
