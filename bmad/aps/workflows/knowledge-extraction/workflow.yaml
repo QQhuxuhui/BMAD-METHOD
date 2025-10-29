@@ -1,0 +1,67 @@
+workflow_id: "aps-knowledge-extraction"
+workflow_name: "知识提取工作流"
+version: "4.3"
+description: |
+  从代码、文档、论文中提取调度知识。
+
+  使用场景：
+  1. 从多种知识源中提取结构化知识
+  2. 用户手动调用（bmad extension-guide → *extract-knowledge）
+
+  前置条件：
+  - 需要提供知识源（代码/文档/论文）
+  - 无需Phase状态文件（独立工作流）
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "extension-guide"
+  estimated_time: "20-30分钟"
+
+config:
+  support_multiple_sources: true
+  generate_structured_knowledge: true
+
+steps:
+  - step_id: "extract-1"
+    name: "识别知识源类型"
+    action: "exec"
+    target: "bmad/aps/tasks/identify-knowledge-source-type.md"
+    inputs:
+      - knowledge_source
+    outputs:
+      - source_type
+
+  - step_id: "extract-2"
+    name: "提取核心知识"
+    action: "exec"
+    target: "bmad/aps/tasks/extract-core-knowledge.md"
+    inputs:
+      - knowledge_source
+      - source_type
+    outputs:
+      - core_knowledge
+
+  - step_id: "extract-3"
+    name: "结构化知识"
+    action: "exec"
+    target: "bmad/aps/tasks/structure-knowledge.md"
+    inputs:
+      - core_knowledge
+    outputs:
+      - structured_knowledge
+
+  - step_id: "extract-4"
+    name: "生成知识模块"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-knowledge-module.md"
+    inputs:
+      - structured_knowledge
+    outputs:
+      - knowledge_module
+
+outputs:
+  primary:
+    - structured_knowledge
+    - knowledge_module

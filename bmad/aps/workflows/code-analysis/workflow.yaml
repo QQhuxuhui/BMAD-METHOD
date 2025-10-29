@@ -1,0 +1,66 @@
+workflow_id: "aps-code-analysis"
+workflow_name: "代码分析与知识提取工作流"
+version: "4.3"
+description: |
+  分析现有代码，提取算法知识。
+
+  使用场景：
+  1. 从现有调度系统代码中提取算法知识
+  2. 用户手动调用（bmad extension-guide → *analyze-code）
+
+  前置条件：
+  - 需要提供源代码文件路径或代码内容
+  - 无需Phase状态文件（独立工作流）
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "extension-guide"
+  estimated_time: "15-20分钟"
+
+config:
+  extract_algorithm_knowledge: true
+  generate_templates: true
+
+steps:
+  - step_id: "analyze-1"
+    name: "代码解析"
+    action: "exec"
+    target: "bmad/aps/tasks/parse-source-code.md"
+    inputs:
+      - source_code
+    outputs:
+      - parsed_code
+
+  - step_id: "analyze-2"
+    name: "算法识别"
+    action: "exec"
+    target: "bmad/aps/tasks/identify-algorithm-patterns.md"
+    inputs:
+      - parsed_code
+    outputs:
+      - identified_patterns
+
+  - step_id: "analyze-3"
+    name: "知识提取"
+    action: "exec"
+    target: "bmad/aps/tasks/extract-algorithm-knowledge.md"
+    inputs:
+      - identified_patterns
+    outputs:
+      - extracted_knowledge
+
+  - step_id: "analyze-4"
+    name: "生成知识模板"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-knowledge-template.md"
+    inputs:
+      - extracted_knowledge
+    outputs:
+      - knowledge_template
+
+outputs:
+  primary:
+    - extracted_knowledge
+    - knowledge_template

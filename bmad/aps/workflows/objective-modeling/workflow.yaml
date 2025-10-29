@@ -1,0 +1,73 @@
+workflow_id: "aps-objective-modeling"
+workflow_name: "目标建模与代码生成工作流"
+version: "4.3"
+description: |
+  将优化目标转化为可执行代码。
+
+  使用场景：
+  1. 在目标识别后，生成目标函数代码
+  2. 用户手动调用（bmad objective-expert → *model-objectives）
+
+  前置条件：
+  - 建议先完成目标识别（objective-identification workflow）
+  - 或已有明确的目标定义
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "objective-expert"
+  estimated_time: "8-12分钟"
+
+config:
+  use_objective_library: true
+  support_multi_objective: true
+
+steps:
+  - step_id: "obj-model-1"
+    name: "加载目标分析"
+    action: "exec"
+    target: "bmad/aps/tasks/load-objective-analysis.md"
+
+    pre_condition_check:
+      optional: true
+      fallback_mode:
+        description: "如果目标分析结果不存在，可从用户输入开始"
+        action: "request_user_input"
+
+    outputs:
+      - objective_model
+
+  - step_id: "obj-model-2"
+    name: "选择聚合方法"
+    action: "exec"
+    target: "bmad/aps/tasks/select-aggregation-method.md"
+    inputs:
+      - objective_model
+    outputs:
+      - aggregation_method
+
+  - step_id: "obj-model-3"
+    name: "生成目标函数代码"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-objective-code.md"
+    inputs:
+      - objective_model
+      - aggregation_method
+    outputs:
+      - objective_code
+
+  - step_id: "obj-model-4"
+    name: "生成评估代码"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-evaluation-code.md"
+    inputs:
+      - objective_model
+    outputs:
+      - evaluation_code
+
+outputs:
+  primary:
+    - objective_code
+    - evaluation_code
+    - aggregation_method

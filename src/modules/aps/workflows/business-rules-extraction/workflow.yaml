@@ -1,0 +1,73 @@
+workflow_id: "aps-business-rules-extraction"
+workflow_name: "业务规则提取与建模工作流"
+version: "4.3"
+description: |
+  从领域知识中提取业务规则并转化为约束条件。
+
+  使用场景：
+  1. 在领域识别后，提取业务规则
+  2. 用户手动调用（bmad domain-expert → *extract-rules）
+
+  前置条件：
+  - 建议先完成领域识别（domain-identification workflow）
+  - 或已有明确的领域知识
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "domain-expert"
+  estimated_time: "8-12分钟"
+
+config:
+  use_domain_library: true
+  extract_implicit_rules: true
+
+steps:
+  - step_id: "rule-1"
+    name: "加载领域分析"
+    action: "exec"
+    target: "bmad/aps/tasks/load-domain-analysis.md"
+
+    pre_condition_check:
+      optional: true
+      fallback_mode:
+        description: "如果领域分析结果不存在，可从用户输入开始"
+        action: "request_user_input"
+
+    outputs:
+      - domain_analysis
+
+  - step_id: "rule-2"
+    name: "业务规则识别"
+    action: "exec"
+    target: "bmad/aps/tasks/identify-business-rules.md"
+    inputs:
+      - domain_analysis
+      - user_request
+    outputs:
+      - identified_rules
+
+  - step_id: "rule-3"
+    name: "规则形式化"
+    action: "exec"
+    target: "bmad/aps/tasks/formalize-business-rules.md"
+    inputs:
+      - identified_rules
+    outputs:
+      - formalized_rules
+
+  - step_id: "rule-4"
+    name: "用户确认规则"
+    action: "human_confirmation"
+    trigger_level: "P1"
+    template: "@交互对话模板库/业务规则确认模板.md"
+    inputs:
+      - formalized_rules
+    outputs:
+      - confirmed_rules
+
+outputs:
+  primary:
+    - confirmed_rules
+    - formalized_rules

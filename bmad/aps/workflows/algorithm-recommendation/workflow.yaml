@@ -1,0 +1,318 @@
+workflow_id: "aps-algorithm-recommendation"
+workflow_name: "算法推荐工作流"
+version: "4.3"
+description: |
+  基于问题特征推荐最适合的调度算法。
+
+  使用场景：
+  1. 在主workflow Phase 2中被自动调用（Orchestrator直接调用agent）
+  2. 用户手动调用（bmad algorithm-expert → *recommend-algorithm）
+
+  前置条件：
+  - 必须先完成Phase 1.5（十要素建模）
+  - 建议完成Phase 2专家分析（领域、约束、目标）以获得更精准推荐
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "algorithm-expert"
+  estimated_time: "5-8分钟"
+
+config:
+  confidence_threshold: 0.70
+  require_user_confirmation: true
+  use_algorithm_library: true
+  provide_alternatives: true
+
+steps:
+  - step_id: "algorithm-1"
+    name: "加载TenElementModel"
+    description: "从Phase 1.5加载十要素模型"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_1_5"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+            算法推荐需要基于TenElementModel进行特征提取。
+
+            解决方案：
+            1. 返回主workflow：bmad aps → *start-scheduling
+            2. 完成 Phase 0-1.5 后再使用本专家
+
+    inputs:
+      - phase_id: "phase_1_5"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+      - format: "${config.state_management.state_format}"
+    outputs:
+      - state_data # 包含ten_element_model, model_baseline等
+      - metadata
+      - load_success
+      - file_metadata
+
+  - step_id: "algorithm-2"
+    name: "加载专家分析结果"
+    description: "加载领域、约束、目标专家的分析结果"
+    action: "exec"
+    target: "bmad/aps/tasks/load-expert-analyses.md"
+    inputs:
+      - state_folder: "${config.state_management.state_folder}"
+    outputs:
+      - domain_analysis
+      - constraint_analysis
+      - objective_analysis
+
+  - step_id: "algorithm-3"
+    name: "问题特征提取"
+    description: "提取影响算法选择的关键特征"
+    action: "exec"
+    target: "bmad/aps/tasks/extract-problem-features.md"
+    inputs:
+      - ten_element_model
+      - domain_analysis
+      - constraint_analysis
+      - objective_analysis
+    feature_extraction:
+      problem_size:
+        - variable_count: "决策变量数量"
+        - constraint_count: "约束数量"
+        - data_scale: "数据规模"
+      problem_structure:
+        - constraint_complexity: "约束复杂度"
+        - objective_count: "目标数量"
+        - coupling_degree: "耦合程度"
+        - nonlinearity: "非线性程度"
+      problem_nature:
+        - is_np_hard: "是否NP-hard"
+        - is_dynamic: "是否动态"
+        - has_uncertainty: "是否含不确定性"
+        - time_sensitivity: "时间敏感度"
+    outputs:
+      - problem_features
+      - feature_scores
+
+  - step_id: "algorithm-4"
+    name: "算法候选匹配"
+    description: "基于算法库匹配候选算法"
+    action: "exec"
+    target: "bmad/aps/tasks/match-candidate-algorithms.md"
+    inputs:
+      - problem_features
+    critical_action:
+      - load_resource: "@专家库/调度算法专家库/README.md"
+    matching_strategy:
+      algorithm_categories:
+        exact:
+          - branch_and_bound: "分支定界"
+          - dynamic_programming: "动态规划"
+          - constraint_programming: "约束规划"
+        heuristic:
+          - greedy: "贪心算法"
+          - local_search: "局部搜索"
+          - construction: "构造式启发"
+        meta_heuristic:
+          - genetic_algorithm: "遗传算法"
+          - simulated_annealing: "模拟退火"
+          - particle_swarm: "粒子群"
+          - tabu_search: "禁忌搜索"
+          - ant_colony: "蚁群算法"
+        hybrid:
+          - matheuristic: "数学启发"
+          - decomposition: "分解算法"
+      matching_rules:
+        - if_small_scale_and_exact_required: "exact"
+        - if_large_scale: "heuristic or meta_heuristic"
+        - if_real_time: "heuristic"
+        - if_high_quality_required: "meta_heuristic or hybrid"
+    outputs:
+      - candidate_algorithms
+      - matching_scores
+
+  - step_id: "algorithm-5"
+    name: "算法性能预测"
+    description: "预测各候选算法的性能"
+    action: "exec"
+    target: "bmad/aps/tasks/predict-algorithm-performance.md"
+    inputs:
+      - candidate_algorithms
+      - problem_features
+    prediction_dimensions:
+      - time_complexity: "时间复杂度"
+      - space_complexity: "空间复杂度"
+      - solution_quality: "解质量预期"
+      - convergence_speed: "收敛速度"
+      - robustness: "鲁棒性"
+    outputs:
+      - performance_predictions
+      - complexity_analysis
+
+  - step_id: "algorithm-6"
+    name: "算法排序与推荐"
+    description: "综合评分，生成推荐列表"
+    action: "exec"
+    target: "bmad/aps/tasks/rank-algorithms.md"
+    inputs:
+      - candidate_algorithms
+      - matching_scores
+      - performance_predictions
+    ranking_criteria:
+      - applicability: 0.35
+      - expected_quality: 0.30
+      - computational_efficiency: 0.20
+      - implementation_difficulty: 0.10
+      - library_availability: 0.05
+    outputs:
+      - ranked_algorithms
+      - top_recommendation
+      - alternative_recommendations
+
+  - step_id: "algorithm-7"
+    name: "参数配置建议"
+    description: "为推荐算法提供参数配置建议"
+    action: "exec"
+    target: "bmad/aps/tasks/suggest-algorithm-parameters.md"
+    inputs:
+      - top_recommendation
+      - problem_features
+    parameter_sources:
+      - default_params: "算法库默认参数"
+      - tuned_params: "基于问题特征的调优参数"
+      - literature_params: "文献推荐参数"
+    outputs:
+      - parameter_suggestions
+      - tuning_guidelines
+
+  - step_id: "algorithm-8"
+    name: "生成算法推荐报告"
+    description: "输出详细的算法推荐报告"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-algorithm-recommendation-report.md"
+    inputs:
+      - ranked_algorithms
+      - top_recommendation
+      - alternative_recommendations
+      - performance_predictions
+      - parameter_suggestions
+    report_sections:
+      - executive_summary
+      - problem_feature_analysis
+      - top_recommendation_details
+      - alternative_options
+      - performance_comparison
+      - parameter_configuration
+      - implementation_guidance
+      - reference_citations
+    outputs:
+      - algorithm_recommendation_report
+      - recommendation_metadata
+
+  - step_id: "algorithm-9"
+    name: "用户确认算法选择"
+    description: "展示算法推荐，获取用户确认"
+    action: "conditional_human_confirmation"
+    condition: "has_multiple_top_candidates OR user_expertise_low"
+    trigger_level: "P0"
+    confirmation_type: "algorithm_selection"
+    template: "@交互对话模板库/算法确认模板.md"
+    inputs:
+      - top_recommendation
+      - alternative_recommendations
+      - performance_predictions
+      - parameter_suggestions
+      - algorithm_recommendation_report
+    presentation_format:
+      show_top_3: true
+      show_tradeoffs: true
+      show_performance_chart: true
+      show_complexity: true
+      interactive_selection: true
+    outputs:
+      - selected_algorithm
+      - selected_parameters
+      - user_justification
+
+  - step_id: "algorithm-10"
+    name: "固化算法选择"
+    description: "固化最终的算法选择和配置"
+    action: "exec"
+    target: "bmad/aps/tasks/finalize-algorithm-selection.md"
+    inputs:
+      - selected_algorithm
+      - selected_parameters
+    outputs:
+      - final_algorithm_selection
+      - algorithm_baseline
+
+outputs:
+  primary:
+    - final_algorithm_selection
+    - selected_parameters
+    - algorithm_baseline
+
+  documentation:
+    - algorithm_recommendation_report
+    - performance_predictions
+    - complexity_analysis
+
+  metadata:
+    - ranked_algorithms
+    - matching_scores
+    - user_justification
+
+validation:
+  post_workflow_checks:
+    - algorithm_selected: true
+    - parameters_configured: true
+    - all_citations_present: true
+    - user_confirmed: true
+
+  quality_gates:
+    - name: "Algorithm Applicability"
+      check: "matching_scores[selected_algorithm] >= 0.70"
+      severity: "critical"
+
+    - name: "Parameter Completeness"
+      check: "selected_parameters complete"
+      severity: "high"
+
+    - name: "Citation Compliance"
+      check: "algorithm cite from library"
+      severity: "critical"
+
+error_handling:
+  on_no_suitable_algorithm:
+    action: "submit_capability_gap_report"
+    template: "@交互对话模板库/能力缺口模板.md"
+
+  on_multiple_top_candidates:
+    action: "human_confirmation"
+    trigger_level: "P1"
+
+  on_parameter_uncertainty:
+    action: "request_expert_guidance"
+    trigger_level: "P2"
+
+integration:
+  upstream_phase: "phase-1.5"
+  downstream_phases: ["phase-3"]
+  provides_to_phases:
+    - algorithm_selection
+    - parameter_configuration
+    - performance_baseline
+
+metrics:
+  track:
+    - candidate_count
+    - top_recommendation_score
+    - user_selected_alternative
+    - parameter_tuning_required
+    - recommendation_confidence
