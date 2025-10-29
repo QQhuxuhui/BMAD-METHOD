@@ -5,6 +5,17 @@ const yaml = require('js-yaml');
 const { XmlHandler } = require('../../../../tools/cli/lib/xml-handler');
 
 /**
+ * Helper function to resolve path with {project-root} placeholder
+ * @param {string} pathStr - Path string that may contain {project-root} placeholder
+ * @returns {string} - Resolved path with placeholder removed
+ */
+function resolvePath(pathStr) {
+  if (!pathStr) return pathStr;
+  // Remove {project-root} placeholder - config paths should be relative to project root
+  return pathStr.replace(/\{project-root\}\/?/g, '');
+}
+
+/**
  * APS Module Installer
  * Custom installer that copies files from bmad/aps/ (where they currently reside)
  * and generates config.yaml based on user's configuration choices
@@ -135,11 +146,11 @@ async function generateConfigYaml(targetDir, userConfig, logger) {
     todo_tracking_enabled: userConfig.enable_todo_tracking !== false,
     human_in_loop_enabled: userConfig.enable_human_in_loop !== false,
 
-    // Output Paths
+    // Output Paths (resolve placeholders)
     output_folder: userConfig.output_folder || 'aps-outputs',
-    models_folder: userConfig.models_output_location || 'aps-outputs/models',
+    models_folder: resolvePath(userConfig.models_output_location) || 'aps-outputs/models',
     workflows_folder: 'workflows',
-    reports_folder: userConfig.reports_output_location || 'aps-outputs/reports',
+    reports_folder: resolvePath(userConfig.reports_output_location) || 'aps-outputs/reports',
 
     // Quality Gates
     quality_gates: {
@@ -241,8 +252,8 @@ async function createOutputDirectories(projectRoot, userConfig, logger) {
   logger.log(chalk.cyan('  Creating output directories...'));
 
   const outputDirs = [
-    userConfig.models_output_location || 'aps-outputs/models',
-    userConfig.reports_output_location || 'aps-outputs/reports',
+    resolvePath(userConfig.models_output_location) || 'aps-outputs/models',
+    resolvePath(userConfig.reports_output_location) || 'aps-outputs/reports',
     'aps-outputs/workflows',
   ];
 
