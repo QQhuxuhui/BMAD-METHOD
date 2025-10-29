@@ -410,6 +410,7 @@ def verify_file_saved_immediately(file_path, min_size=50):
 ```
 
 **🚨 强制要求**：
+
 - 必须使用 `save_state_with_retry()` 函数，不允许直接保存文件
 - 验证失败必须重试，所有重试失败必须阻断流程
 - 不允许跳过验证步骤

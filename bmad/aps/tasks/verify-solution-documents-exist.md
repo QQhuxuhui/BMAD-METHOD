@@ -265,11 +265,11 @@ outputs:
 verification_gate:
   critical: true
   checks:
-    - "final_verification.markdown_exists == true"
-    - "final_verification.yaml_exists == true"
-    - "final_verification.has_all_sections == true"
-    - "final_verification.all_checks_passed == true"
-  on_fail: "block_with_error"
+    - 'final_verification.markdown_exists == true'
+    - 'final_verification.yaml_exists == true'
+    - 'final_verification.has_all_sections == true'
+    - 'final_verification.all_checks_passed == true'
+  on_fail: 'block_with_error'
   error_message: |
     ❌ 方案文档验证失败，无法进入代码生成阶段！
 

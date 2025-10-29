@@ -22,6 +22,7 @@ Phase名称: Phase 2 - 专家协调
 **适用场景**: 专家用户，需求清晰
 
 **流程图**:
+
 ```
 TenElementModel (Phase 1.5)
          ↓
@@ -43,13 +44,15 @@ TenElementModel (Phase 1.5)
 **执行者**: Domain Expert
 
 **输入**:
+
 ```yaml
 inputs:
-  - ten_element_model: object  # 来自 Phase 1.5
-  - requirement_analysis: object  # 来自 Phase 1
+  - ten_element_model: object # 来自 Phase 1.5
+  - requirement_analysis: object # 来自 Phase 1
 ```
 
 **处理过程**:
+
 ```python
 def domain_expert_analyze(tem, req_analysis):
     """
@@ -100,57 +103,58 @@ def domain_expert_analyze(tem, req_analysis):
 ```
 
 **输出示例**:
+
 ```yaml
 domain_analysis:
-  identified_domain: "物流配送 - 冷链配送"
+  identified_domain: '物流配送 - 冷链配送'
   confidence: 0.95
 
   domain_template:
-    name: "冷链配送领域模板"
-    path: "@专家库/领域库/vehicle/冷链配送.md"
+    name: '冷链配送领域模板'
+    path: '@专家库/领域库/vehicle/冷链配送.md'
 
   domain_features:
-    - "货物温度敏感"
-    - "时效性要求高"
-    - "专用车辆（冷藏车）"
-    - "成本结构特殊（冷链加成）"
+    - '货物温度敏感'
+    - '时效性要求高'
+    - '专用车辆（冷藏车）'
+    - '成本结构特殊（冷链加成）'
 
   domain_rules:
-    - rule_id: "DR1"
-      name: "冷链温度控制规则"
-      description: "全程温度监控，温度异常处理"
-      type: "hard_requirement"
+    - rule_id: 'DR1'
+      name: '冷链温度控制规则'
+      description: '全程温度监控，温度异常处理'
+      type: 'hard_requirement'
 
-    - rule_id: "DR2"
-      name: "货物装载顺序规则"
-      description: "先装后卸原则，温度敏感商品优先"
-      type: "best_practice"
+    - rule_id: 'DR2'
+      name: '货物装载顺序规则'
+      description: '先装后卸原则，温度敏感商品优先'
+      type: 'best_practice'
 
-    - rule_id: "DR3"
-      name: "配送时间优化规则"
-      description: "最小化在途时间，保证新鲜度"
-      type: "objective_enhancement"
+    - rule_id: 'DR3'
+      name: '配送时间优化规则'
+      description: '最小化在途时间，保证新鲜度'
+      type: 'objective_enhancement'
 
   adaptation_score: 0.92
 
 recommendations:
-  - rec_id: "R1"
-    type: "constraint_enhancement"
-    description: "建议增加装载顺序约束"
-    target_element: "constraints"
-    priority: "medium"
+  - rec_id: 'R1'
+    type: 'constraint_enhancement'
+    description: '建议增加装载顺序约束'
+    target_element: 'constraints'
+    priority: 'medium'
 
-  - rec_id: "R2"
-    type: "objective_adjustment"
-    description: "建议在目标函数中增加新鲜度指标"
-    target_element: "objectives.secondary"
-    priority: "low"
+  - rec_id: 'R2'
+    type: 'objective_adjustment'
+    description: '建议在目标函数中增加新鲜度指标'
+    target_element: 'objectives.secondary'
+    priority: 'low'
 
-  - rec_id: "R3"
-    type: "parameter_adjustment"
-    description: "建议服务时间增加温度检查时间"
-    target_element: "time_model.service_time"
-    priority: "low"
+  - rec_id: 'R3'
+    type: 'parameter_adjustment'
+    description: '建议服务时间增加温度检查时间'
+    target_element: 'time_model.service_time'
+    priority: 'low'
 ```
 
 ---
@@ -160,13 +164,15 @@ recommendations:
 **执行者**: Constraint Expert
 
 **输入**:
+
 ```yaml
 inputs:
   - ten_element_model: object
-  - domain_analysis: object  # 可选，如果并行则未获得
+  - domain_analysis: object # 可选，如果并行则未获得
 ```
 
 **处理过程**:
+
 ```python
 def constraint_expert_analyze(tem, domain_analysis=None):
     """
@@ -235,23 +241,24 @@ def constraint_expert_analyze(tem, domain_analysis=None):
 ```
 
 **输出示例**:
+
 ```yaml
 constraint_analysis:
-  - constraint_id: "C1"
-    constraint_name: "车辆容量约束"
-    constraint_type: "capacity"
-    hardness: "hard"
+  - constraint_id: 'C1'
+    constraint_name: '车辆容量约束'
+    constraint_type: 'capacity'
+    hardness: 'hard'
 
     matched_template:
-      name: "车辆容量约束模板"
-      path: "@专家库/约束库/capacity/车辆容量约束.md"
+      name: '车辆容量约束模板'
+      path: '@专家库/约束库/capacity/车辆容量约束.md'
       match_score: 0.98
 
     validation:
       formula_correct: true
       variables_defined: true
       hardness_appropriate: true
-      penalty_appropriate: true  # hard约束无罚值
+      penalty_appropriate: true # hard约束无罚值
 
     code_template:
       validation_function: |
@@ -266,21 +273,21 @@ constraint_analysis:
                 route.pop()
             return route
 
-  - constraint_id: "C2"
-    constraint_name: "客户时间窗约束"
-    constraint_type: "temporal"
-    hardness: "soft"
+  - constraint_id: 'C2'
+    constraint_name: '客户时间窗约束'
+    constraint_type: 'temporal'
+    hardness: 'soft'
 
     matched_template:
-      name: "时间窗约束模板"
-      path: "@专家库/约束库/temporal/时间窗约束.md"
+      name: '时间窗约束模板'
+      path: '@专家库/约束库/temporal/时间窗约束.md'
       match_score: 0.95
 
     validation:
       formula_correct: true
       variables_defined: true
       hardness_appropriate: true
-      penalty_appropriate: true  # soft约束有罚值10000
+      penalty_appropriate: true # soft约束有罚值10000
 
     code_template:
       validation_function: |
@@ -305,11 +312,11 @@ consistency_check:
   conflicts: []
 
 recommendations:
-  - rec_id: "CR1"
-    type: "constraint_refinement"
-    target: "C2"
-    description: "建议将客户时间窗约束分为硬时间窗（承诺）和软时间窗（偏好）"
-    priority: "low"
+  - rec_id: 'CR1'
+    type: 'constraint_refinement'
+    target: 'C2'
+    description: '建议将客户时间窗约束分为硬时间窗（承诺）和软时间窗（偏好）'
+    priority: 'low'
 ```
 
 ---
@@ -319,16 +326,17 @@ recommendations:
 **执行者**: Objective Expert
 
 **输出示例**:
+
 ```yaml
 objective_analysis:
   primary_objective:
-    objective_id: "O1"
-    objective_name: "总成本最小化"
-    objective_type: "cost"
+    objective_id: 'O1'
+    objective_name: '总成本最小化'
+    objective_type: 'cost'
 
     matched_template:
-      name: "成本最小化目标模板"
-      path: "@专家库/目标库/cost/成本最小化.md"
+      name: '成本最小化目标模板'
+      path: '@专家库/目标库/cost/成本最小化.md'
 
     validation:
       formula_correct: true
@@ -336,17 +344,17 @@ objective_analysis:
       all_costs_included: true
 
     recommendations:
-      - "建议在成本函数中明确区分固定成本和变动成本"
-      - "建议考虑冷链设备折旧成本"
+      - '建议在成本函数中明确区分固定成本和变动成本'
+      - '建议考虑冷链设备折旧成本'
 
   secondary_objective:
-    objective_id: "O2"
-    objective_name: "客户满意度最大化"
-    objective_type: "quality"
+    objective_id: 'O2'
+    objective_name: '客户满意度最大化'
+    objective_type: 'quality'
 
     matched_template:
-      name: "满意度优化模板"
-      path: "@专家库/目标库/quality/满意度优化.md"
+      name: '满意度优化模板'
+      path: '@专家库/目标库/quality/满意度优化.md'
 
     validation:
       formula_correct: true
@@ -354,17 +362,17 @@ objective_analysis:
       weight_appropriate: true
 
   multi_objective_analysis:
-    method: "weighted_sum"
+    method: 'weighted_sum'
     weight_sum: 1.0
-    weight_appropriateness: "合理"
+    weight_appropriateness: '合理'
     potential_conflicts:
-      - conflict: "成本与准时率可能冲突"
-        resolution: "通过权重平衡"
+      - conflict: '成本与准时率可能冲突'
+        resolution: '通过权重平衡'
 
   recommendations:
-    - rec_id: "OR1"
-      description: "建议增加新鲜度作为独立评价指标"
-      priority: "medium"
+    - rec_id: 'OR1'
+      description: '建议增加新鲜度作为独立评价指标'
+      priority: 'medium'
 ```
 
 ---
@@ -374,76 +382,77 @@ objective_analysis:
 **执行者**: Algorithm Expert
 
 **输出示例**:
+
 ```yaml
 algorithm_analysis:
   problem_characteristics:
-    problem_type: "车辆路径问题 (VRPTW)"
-    scale: "中等规模"
-    variables_count: 1200  # 12车 × 100客户
-    constraints_complexity: "高（4类约束）"
-    time_sensitivity: "中（10分钟求解）"
+    problem_type: '车辆路径问题 (VRPTW)'
+    scale: '中等规模'
+    variables_count: 1200 # 12车 × 100客户
+    constraints_complexity: '高（4类约束）'
+    time_sensitivity: '中（10分钟求解）'
 
   algorithm_recommendation:
     primary_algorithm:
-      name: "遗传算法 (Genetic Algorithm)"
-      type: "meta-heuristic"
-      path: "@专家库/算法库/meta-heuristic/遗传算法.md"
+      name: '遗传算法 (Genetic Algorithm)'
+      type: 'meta-heuristic'
+      path: '@专家库/算法库/meta-heuristic/遗传算法.md'
       confidence: 0.93
 
       reasons:
-        - "适合中等规模问题"
-        - "能处理多约束"
-        - "解质量稳定"
-        - "有丰富的VRPTW应用案例"
+        - '适合中等规模问题'
+        - '能处理多约束'
+        - '解质量稳定'
+        - '有丰富的VRPTW应用案例'
 
       configuration:
         population_size: 100
         crossover_rate: 0.8
-        crossover_operator: "Order Crossover (OX)"
+        crossover_operator: 'Order Crossover (OX)'
         mutation_rate: 0.05
-        mutation_operator: "Swap + Inversion"
-        selection: "Tournament (size=3)"
+        mutation_operator: 'Swap + Inversion'
+        selection: 'Tournament (size=3)'
         max_generations: 500
         elite_ratio: 0.1
 
       initialization:
-        - method: "节约算法 (Clarke-Wright)"
+        - method: '节约算法 (Clarke-Wright)'
           ratio: 0.5
-        - method: "随机生成"
+        - method: '随机生成'
           ratio: 0.5
 
       local_search:
-        - operator: "2-opt"
-          frequency: "每代"
+        - operator: '2-opt'
+          frequency: '每代'
           probability: 0.3
-        - operator: "Or-opt"
-          frequency: "每10代"
+        - operator: 'Or-opt'
+          frequency: '每10代'
           probability: 0.2
-        - operator: "客户重分配"
-          frequency: "每20代"
+        - operator: '客户重分配'
+          frequency: '每20代'
           probability: 0.1
 
     alternative_algorithms:
-      - name: "禁忌搜索 (Tabu Search)"
+      - name: '禁忌搜索 (Tabu Search)'
         confidence: 0.85
-        pros: ["更快收敛", "局部搜索能力强"]
-        cons: ["参数敏感", "可能陷入局部最优"]
+        pros: ['更快收敛', '局部搜索能力强']
+        cons: ['参数敏感', '可能陷入局部最优']
 
   complexity_analysis:
-    time_complexity: "O(G × P × N²)"
+    time_complexity: 'O(G × P × N²)'
     # G=代数, P=种群, N=客户数
-    space_complexity: "O(P × N)"
-    estimated_runtime: "8-10分钟"
+    space_complexity: 'O(P × N)'
+    estimated_runtime: '8-10分钟'
 
   performance_prediction:
-    solution_quality: "预计达到最优解的95%"
-    convergence_speed: "预计500代收敛"
-    success_rate: "92%"
+    solution_quality: '预计达到最优解的95%'
+    convergence_speed: '预计500代收敛'
+    success_rate: '92%'
 
   implementation_notes:
-    - "需要实现修复算子处理容量约束违反"
-    - "时间窗约束使用罚函数处理"
-    - "建议使用并行评估加速"
+    - '需要实现修复算子处理容量约束违反'
+    - '时间窗约束使用罚函数处理'
+    - '建议使用并行评估加速'
 ```
 
 ---
@@ -453,6 +462,7 @@ algorithm_analysis:
 **执行者**: Orchestrator
 
 **输入**:
+
 ```yaml
 inputs:
   - domain_analysis: object
@@ -462,6 +472,7 @@ inputs:
 ```
 
 **处理过程**:
+
 ```python
 def cross_expert_consistency_check(
     domain_analysis,
@@ -543,44 +554,45 @@ def cross_expert_consistency_check(
 ```
 
 **输出示例**:
+
 ```yaml
 consistency_report:
   summary:
     total_checks: 8
     conflicts_found: 1
     high_severity_conflicts: 0
-    overall_consistency: "high"
+    overall_consistency: 'high'
 
   checks:
-    - check_id: "CC1"
-      name: "领域规则与约束一致性"
-      status: "passed"
+    - check_id: 'CC1'
+      name: '领域规则与约束一致性'
+      status: 'passed'
 
-    - check_id: "CC2"
-      name: "目标与领域规则一致性"
-      status: "passed"
+    - check_id: 'CC2'
+      name: '目标与领域规则一致性'
+      status: 'passed'
 
-    - check_id: "CC3"
-      name: "算法与约束复杂度匹配"
-      status: "passed"
+    - check_id: 'CC3'
+      name: '算法与约束复杂度匹配'
+      status: 'passed'
 
-    - check_id: "CC4"
-      name: "算法与时间要求匹配"
-      status: "passed"
+    - check_id: 'CC4'
+      name: '算法与时间要求匹配'
+      status: 'passed'
 
   conflicts:
-    - conflict_id: "CF1"
-      type: "recommendation_conflict"
-      severity: "low"
+    - conflict_id: 'CF1'
+      type: 'recommendation_conflict'
+      severity: 'low'
       description: |
         领域专家建议增加新鲜度指标，但目标专家认为当前
         客户满意度指标已包含，存在冗余。
-      resolution: "保持当前设计，新鲜度隐含在满意度中"
+      resolution: '保持当前设计，新鲜度隐含在满意度中'
 
   recommendations:
-    - rec_id: "CR1"
-      description: "建议在Phase 3集成时优先考虑高优先级建议"
-      priority: "high"
+    - rec_id: 'CR1'
+      description: '建议在Phase 3集成时优先考虑高优先级建议'
+      priority: 'high'
 ```
 
 **冲突处理** (P2 级人机交互):
@@ -598,6 +610,7 @@ consistency_report:
 **严重程度**: 高
 
 **情况说明**:
+
 - 算法专家推荐的遗传算法预计需要 12 分钟运行时间
 - 但系统设定的求解时间限制是 10 分钟
 - 存在 2 分钟的超时风险
@@ -619,6 +632,7 @@ consistency_report:
    - ⚠️ 算法专家置信度较低（85% vs 93%）
 
 ## 您的选择
+
 请选择方案 1、2 或 3，或提供其他想法：
 ```
 
@@ -627,52 +641,53 @@ consistency_report:
 #### 步骤 2.6: 💾 保存 Phase 2 状态
 
 **保存内容**:
+
 ```yaml
 # phase_2_state.yaml
 
 metadata:
-  phase_id: "phase_2"
-  phase_name: "专家协调"
-  created_at: "2025-10-29T10:50:00Z"
-  completed_at: "2025-10-29T11:05:00Z"
-  duration: "15分钟"
-  mode: "mode_a"  # 并行模式
-  depends_on: ["phase_0", "phase_0_5", "phase_1", "phase_1_5"]
+  phase_id: 'phase_2'
+  phase_name: '专家协调'
+  created_at: '2025-10-29T10:50:00Z'
+  completed_at: '2025-10-29T11:05:00Z'
+  duration: '15分钟'
+  mode: 'mode_a' # 并行模式
+  depends_on: ['phase_0', 'phase_0_5', 'phase_1', 'phase_1_5']
 
 # 核心交付物 1: 领域分析
 domain_analysis:
-  identified_domain: "物流配送 - 冷链配送"
-  domain_template: "@专家库/领域库/vehicle/冷链配送.md"
+  identified_domain: '物流配送 - 冷链配送'
+  domain_template: '@专家库/领域库/vehicle/冷链配送.md'
   domain_features: [...]
   domain_rules: [...]
   recommendations: [...]
 
 # 核心交付物 2: 约束分析
 constraint_analysis:
-  - constraint_id: "C1"
-    analysis: {...}
-    code_template: {...}
+  - constraint_id: 'C1'
+    analysis: { ... }
+    code_template: { ... }
   # ... 其他约束
 
 # 核心交付物 3: 目标分析
 objective_analysis:
-  primary_objective: {...}
-  secondary_objective: {...}
-  multi_objective_analysis: {...}
+  primary_objective: { ... }
+  secondary_objective: { ... }
+  multi_objective_analysis: { ... }
   recommendations: [...]
 
 # 核心交付物 4: 算法推荐
 algorithm_recommendations:
   primary_algorithm:
-    name: "遗传算法"
-    configuration: {...}
-    path: "@专家库/算法库/meta-heuristic/遗传算法.md"
+    name: '遗传算法'
+    configuration: { ... }
+    path: '@专家库/算法库/meta-heuristic/遗传算法.md'
   alternative_algorithms: [...]
-  performance_prediction: {...}
+  performance_prediction: { ... }
 
 # 核心交付物 5: 一致性报告
 consistency_report:
-  summary: {...}
+  summary: { ... }
   checks: [...]
   conflicts: [...]
   recommendations: [...]
@@ -686,7 +701,7 @@ verification:
   validation_passed: true
 
 # 依赖信息
-required_by: ["phase_3"]
+required_by: ['phase_3']
 ```
 
 ---
@@ -696,6 +711,7 @@ required_by: ["phase_3"]
 **适用场景**: 业务用户，需要引导
 
 **流程图**:
+
 ```
 TenElementModel (Phase 1.5)
          ↓
@@ -721,6 +737,7 @@ TenElementModel (Phase 1.5)
 ```
 
 **与模式A的差异**:
+
 1. **串行执行**: 一个专家完成后再调用下一个
 2. **增量确认**: 每个专家完成后都需要用户确认
 3. **上下文传递**: 后续专家可以参考前面专家的分析
@@ -730,13 +747,13 @@ TenElementModel (Phase 1.5)
 
 ### 6.4 Phase 2 交付物清单
 
-| 交付物 | 类型 | 格式 | 持久化 | 验证层级 | 依赖者 |
-|--------|------|------|--------|---------|-------|
-| **domain_analysis** | 领域分析报告 | YAML Object | ✅ | L1: 字段完整性<br/>L2: 引用验证<br/>L3: 与TEM一致性 | Phase 3 |
-| **constraint_analysis** | 约束分析报告 | YAML Array | ✅ | L1: 所有约束已分析<br/>L2: 代码模板生成<br/>L3: 一致性检查 | Phase 3 |
-| **objective_analysis** | 目标分析报告 | YAML Object | ✅ | L1: 目标函数验证<br/>L2: 权重检查<br/>L3: 冲突分析 | Phase 3 |
-| **algorithm_recommendations** | 算法推荐报告 | YAML Object | ✅ | L1: 算法配置完整<br/>L2: 引用验证<br/>L3: 性能预测 | Phase 3 |
-| **consistency_report** | 一致性报告 | YAML Object | ✅ | L1: 所有检查执行<br/>L2: 冲突已解决 | Phase 3 |
+| 交付物                        | 类型         | 格式        | 持久化 | 验证层级                                                   | 依赖者  |
+| ----------------------------- | ------------ | ----------- | ------ | ---------------------------------------------------------- | ------- |
+| **domain_analysis**           | 领域分析报告 | YAML Object | ✅     | L1: 字段完整性<br/>L2: 引用验证<br/>L3: 与TEM一致性        | Phase 3 |
+| **constraint_analysis**       | 约束分析报告 | YAML Array  | ✅     | L1: 所有约束已分析<br/>L2: 代码模板生成<br/>L3: 一致性检查 | Phase 3 |
+| **objective_analysis**        | 目标分析报告 | YAML Object | ✅     | L1: 目标函数验证<br/>L2: 权重检查<br/>L3: 冲突分析         | Phase 3 |
+| **algorithm_recommendations** | 算法推荐报告 | YAML Object | ✅     | L1: 算法配置完整<br/>L2: 引用验证<br/>L3: 性能预测         | Phase 3 |
+| **consistency_report**        | 一致性报告   | YAML Object | ✅     | L1: 所有检查执行<br/>L2: 冲突已解决                        | Phase 3 |
 
 ---
 
@@ -758,17 +775,19 @@ Phase名称: Phase 3 - 方案集成
 **执行者**: Orchestrator
 
 **输入**:
+
 ```yaml
 inputs:
-  - ten_element_model: object      # Phase 1.5
-  - domain_analysis: object        # Phase 2.1
-  - constraint_analysis: array     # Phase 2.2
-  - objective_analysis: object     # Phase 2.3
-  - algorithm_recommendations: object  # Phase 2.4
-  - consistency_report: object     # Phase 2.5
+  - ten_element_model: object # Phase 1.5
+  - domain_analysis: object # Phase 2.1
+  - constraint_analysis: array # Phase 2.2
+  - objective_analysis: object # Phase 2.3
+  - algorithm_recommendations: object # Phase 2.4
+  - consistency_report: object # Phase 2.5
 ```
 
 **处理过程**:
+
 ```python
 def integrate_solution(tem, domain, constraints, objectives, algorithm, consistency):
     """
@@ -814,34 +833,35 @@ def integrate_solution(tem, domain, constraints, objectives, algorithm, consiste
 ```
 
 **输出: solution_document.yaml**
+
 ```yaml
 # solution_document.yaml - 完整调度解决方案
 
 metadata:
-  solution_name: "生鲜配送冷链调度优化方案"
-  created_at: "2025-10-29T11:10:00Z"
-  version: "1.0"
-  based_on_tem: "phase_1_5:xyz789"
+  solution_name: '生鲜配送冷链调度优化方案'
+  created_at: '2025-10-29T11:10:00Z'
+  version: '1.0'
+  based_on_tem: 'phase_1_5:xyz789'
 
 # 问题定义
 problem:
-  type: "车辆路径问题 (VRPTW)"
-  domain: "物流配送 - 冷链配送"
+  type: '车辆路径问题 (VRPTW)'
+  domain: '物流配送 - 冷链配送'
   scale:
     customers: 100
     vehicles: 12
-    time_horizon: "1天 (11:00-19:00)"
+    time_horizon: '1天 (11:00-19:00)'
 
 # 完整的 TenElementModel
 ten_element_model:
   decision_variables: [...]
-  parameters: {...}
+  parameters: { ... }
   constraints: [...]
-  objectives: {...}
-  algorithm:  # 已由算法专家填充
+  objectives: { ... }
+  algorithm: # 已由算法专家填充
     primary:
-      name: "遗传算法"
-      type: "meta-heuristic"
+      name: '遗传算法'
+      type: 'meta-heuristic'
       configuration:
         population_size: 100
         crossover_rate: 0.8
@@ -849,62 +869,62 @@ ten_element_model:
         max_generations: 500
         elite_ratio: 0.1
       initialization:
-        - method: "Clarke-Wright"
+        - method: 'Clarke-Wright'
           ratio: 0.5
-        - method: "random"
+        - method: 'random'
           ratio: 0.5
       local_search:
-        - operator: "2-opt"
-          frequency: "every_generation"
-        - operator: "Or-opt"
-          frequency: "every_10_generations"
-      citation: "@专家库/算法库/meta-heuristic/遗传算法.md"
-  time_model: {...}
+        - operator: '2-opt'
+          frequency: 'every_generation'
+        - operator: 'Or-opt'
+          frequency: 'every_10_generations'
+      citation: '@专家库/算法库/meta-heuristic/遗传算法.md'
+  time_model: { ... }
   uncertainty: [...]
-  solver_config: {...}
-  input_data_format: {...}
-  output_format: {...}
+  solver_config: { ... }
+  input_data_format: { ... }
+  output_format: { ... }
 
 # 专家分析摘要
 expert_analyses:
   domain:
-    identified_domain: "物流配送 - 冷链配送"
-    key_features: ["温度敏感", "时效性高", "专用车辆"]
-    citation: "@专家库/领域库/vehicle/冷链配送.md"
+    identified_domain: '物流配送 - 冷链配送'
+    key_features: ['温度敏感', '时效性高', '专用车辆']
+    citation: '@专家库/领域库/vehicle/冷链配送.md'
 
   constraints:
     total_count: 4
     hard_constraints: 3
     soft_constraints: 1
     citations:
-      - "@专家库/约束库/capacity/车辆容量约束.md"
-      - "@专家库/约束库/temporal/时间窗约束.md"
+      - '@专家库/约束库/capacity/车辆容量约束.md'
+      - '@专家库/约束库/temporal/时间窗约束.md'
 
   objectives:
-    primary: "成本最小化 (权重0.7)"
-    secondary: "客户满意度 (权重0.3)"
-    method: "加权求和"
+    primary: '成本最小化 (权重0.7)'
+    secondary: '客户满意度 (权重0.3)'
+    method: '加权求和'
     citations:
-      - "@专家库/目标库/cost/成本最小化.md"
-      - "@专家库/目标库/quality/满意度优化.md"
+      - '@专家库/目标库/cost/成本最小化.md'
+      - '@专家库/目标库/quality/满意度优化.md'
 
   algorithm:
-    recommended: "遗传算法"
+    recommended: '遗传算法'
     confidence: 0.93
-    estimated_quality: "95%最优"
-    estimated_runtime: "8-10分钟"
-    citation: "@专家库/算法库/meta-heuristic/遗传算法.md"
+    estimated_quality: '95%最优'
+    estimated_runtime: '8-10分钟'
+    citation: '@专家库/算法库/meta-heuristic/遗传算法.md'
 
 # 实施计划
 implementation:
-  language: "Python"
+  language: 'Python'
   libraries:
-    - "numpy"
-    - "pandas"
-    - "matplotlib"
-    - "deap"  # 遗传算法库
+    - 'numpy'
+    - 'pandas'
+    - 'matplotlib'
+    - 'deap' # 遗传算法库
   estimated_loc: 800
-  estimated_development_time: "自动生成"
+  estimated_development_time: '自动生成'
 ```
 
 ---
@@ -914,6 +934,7 @@ implementation:
 **执行者**: Orchestrator
 
 **验证内容**:
+
 ```python
 def verify_solution_consistency(solution_document, tem, phase_2_state):
     """
@@ -962,14 +983,16 @@ def verify_solution_consistency(solution_document, tem, phase_2_state):
 **执行者**: Algorithm Expert + Orchestrator
 
 **输入**:
+
 ```yaml
 inputs:
-  - solution_document: object  # 完整方案
+  - solution_document: object # 完整方案
   - ten_element_model: object
-  - constraint_analysis: array  # 包含代码模板
+  - constraint_analysis: array # 包含代码模板
 ```
 
 **代码生成流程**:
+
 ```python
 def generate_code_from_solution(solution, tem, constraint_analysis):
     """
@@ -1047,6 +1070,7 @@ def generate_code_from_solution(solution, tem, constraint_analysis):
 ```
 
 **生成的代码结构**:
+
 ```
 生成的代码/
 ├── vrp_solver.py          # 主求解器（800行）
@@ -1081,6 +1105,7 @@ def generate_code_from_solution(solution, tem, constraint_analysis):
 ```
 
 **代码示例片段** (生成的代码):
+
 ```python
 # vrp_solver.py (部分)
 
@@ -1329,18 +1354,19 @@ if __name__ == "__main__":
 
 **保存的交付物**:
 
-| 文件 | 类型 | 格式 | 大小 | 描述 |
-|------|------|------|------|------|
-| **solution_document.yaml** | 方案文档 | YAML | ~15KB | 完整调度解决方案 |
-| **vrp_solver.py** | 主代码 | Python | ~800行 | 求解器实现 |
-| **test_vrp_solver.py** | 测试代码 | Python | ~200行 | 单元测试 |
-| **requirements.txt** | 依赖 | Text | ~10行 | Python依赖 |
-| **README.md** | 说明文档 | Markdown | ~2KB | 运行说明 |
-| **data/customers.csv** | 示例数据 | CSV | ~5KB | 客户数据模板 |
-| **data/vehicles.json** | 示例数据 | JSON | ~1KB | 车辆数据模板 |
-| **data/distances.npy** | 示例数据 | NumPy | ~40KB | 距离矩阵模板 |
+| 文件                       | 类型     | 格式     | 大小   | 描述             |
+| -------------------------- | -------- | -------- | ------ | ---------------- |
+| **solution_document.yaml** | 方案文档 | YAML     | ~15KB  | 完整调度解决方案 |
+| **vrp_solver.py**          | 主代码   | Python   | ~800行 | 求解器实现       |
+| **test_vrp_solver.py**     | 测试代码 | Python   | ~200行 | 单元测试         |
+| **requirements.txt**       | 依赖     | Text     | ~10行  | Python依赖       |
+| **README.md**              | 说明文档 | Markdown | ~2KB   | 运行说明         |
+| **data/customers.csv**     | 示例数据 | CSV      | ~5KB   | 客户数据模板     |
+| **data/vehicles.json**     | 示例数据 | JSON     | ~1KB   | 车辆数据模板     |
+| **data/distances.npy**     | 示例数据 | NumPy    | ~40KB  | 距离矩阵模板     |
 
 **保存过程**:
+
 ```python
 def save_all_deliverables(solution_doc, generated_code, test_code,
                            requirements, readme, data_templates):
@@ -1414,6 +1440,7 @@ def save_all_deliverables(solution_doc, generated_code, test_code,
 ```
 
 **交付物验证**:
+
 ```python
 def verify_deliverables_saved(saved_files):
     """
@@ -1461,60 +1488,61 @@ def verify_deliverables_saved(saved_files):
 #### 步骤 3.5: 💾 保存 Phase 3 状态
 
 **保存内容**:
+
 ```yaml
 # phase_3_state.yaml
 
 metadata:
-  phase_id: "phase_3"
-  phase_name: "方案集成"
-  created_at: "2025-10-29T11:20:00Z"
-  completed_at: "2025-10-29T11:35:00Z"
-  duration: "15分钟"
-  depends_on: ["phase_0", "phase_0_5", "phase_1", "phase_1_5", "phase_2"]
+  phase_id: 'phase_3'
+  phase_name: '方案集成'
+  created_at: '2025-10-29T11:20:00Z'
+  completed_at: '2025-10-29T11:35:00Z'
+  duration: '15分钟'
+  depends_on: ['phase_0', 'phase_0_5', 'phase_1', 'phase_1_5', 'phase_2']
 
 # 核心交付物 1: 集成的解决方案
 integrated_solution:
-  solution_document_path: "{output_folder}/project_20251029_1120/solution_document.yaml"
-  solution_hash: "sha256:solution123..."
+  solution_document_path: '{output_folder}/project_20251029_1120/solution_document.yaml'
+  solution_hash: 'sha256:solution123...'
 
 # 核心交付物 2: 用户确认的方案
 user_approved_solution:
-  approved_at: "2025-10-29T11:30:00Z"
-  user_comments: "方案合理，请继续生成代码"
+  approved_at: '2025-10-29T11:30:00Z'
+  user_comments: '方案合理，请继续生成代码'
 
 # 核心交付物 3: 生成的代码
 implementation_code:
-  main_code_path: "{output_folder}/project_20251029_1120/vrp_solver.py"
+  main_code_path: '{output_folder}/project_20251029_1120/vrp_solver.py'
   total_lines: 856
-  language: "Python"
-  libraries: ["numpy", "pandas", "deap"]
+  language: 'Python'
+  libraries: ['numpy', 'pandas', 'deap']
 
 # 核心交付物 4: 代码可追溯性映射
 code_traceability:
   constraints:
-    - constraint_id: "C1"
-      code_location: "vrp_solver.py:145-160"
-      function: "validate_vehicle_capacity()"
-    - constraint_id: "C2"
-      code_location: "vrp_solver.py:162-175"
-      function: "validate_time_window()"
+    - constraint_id: 'C1'
+      code_location: 'vrp_solver.py:145-160'
+      function: 'validate_vehicle_capacity()'
+    - constraint_id: 'C2'
+      code_location: 'vrp_solver.py:162-175'
+      function: 'validate_time_window()'
 
   objectives:
-    - objective_id: "O1"
-      code_location: "vrp_solver.py:245-290"
-      function: "calculate_total_cost()"
-    - objective_id: "O2"
-      code_location: "vrp_solver.py:292-320"
-      function: "calculate_customer_satisfaction()"
+    - objective_id: 'O1'
+      code_location: 'vrp_solver.py:245-290'
+      function: 'calculate_total_cost()'
+    - objective_id: 'O2'
+      code_location: 'vrp_solver.py:292-320'
+      function: 'calculate_customer_satisfaction()'
 
   algorithm:
-    algorithm_name: "遗传算法"
-    code_location: "vrp_solver.py:450-650"
+    algorithm_name: '遗传算法'
+    code_location: 'vrp_solver.py:450-650'
     functions:
-      - "genetic_algorithm_vrp()"
-      - "cx_order_crossover()"
-      - "mut_swap_inversion()"
-      - "local_search_2opt()"
+      - 'genetic_algorithm_vrp()'
+      - 'cx_order_crossover()'
+      - 'mut_swap_inversion()'
+      - 'local_search_2opt()'
 
 # 核心交付物 5: 一致性验证结果
 consistency_validation:
@@ -1525,25 +1553,25 @@ consistency_validation:
 
 # 核心交付物 6: 所有保存的文件清单
 saved_files:
-  - file: "{output_folder}/project_20251029_1120/solution_document.yaml"
-    type: "solution_document"
+  - file: '{output_folder}/project_20251029_1120/solution_document.yaml'
+    type: 'solution_document'
     size: 15360
-  - file: "{output_folder}/project_20251029_1120/vrp_solver.py"
-    type: "main_code"
+  - file: '{output_folder}/project_20251029_1120/vrp_solver.py'
+    type: 'main_code'
     size: 34560
     lines: 856
-  - file: "{output_folder}/project_20251029_1120/test_vrp_solver.py"
-    type: "test_code"
+  - file: '{output_folder}/project_20251029_1120/test_vrp_solver.py'
+    type: 'test_code'
     size: 8192
     lines: 203
   # ... 其他文件
 
 # 核心交付物 7: 交付物清单
 deliverable_manifest:
-  manifest_file: "{output_folder}/project_20251029_1120/MANIFEST.json"
+  manifest_file: '{output_folder}/project_20251029_1120/MANIFEST.json'
   total_files: 8
-  total_size: 108032  # bytes
-  project_folder: "{output_folder}/project_20251029_1120"
+  total_size: 108032 # bytes
+  project_folder: '{output_folder}/project_20251029_1120'
 
 # 验证信息
 verification:
@@ -1555,22 +1583,22 @@ verification:
   validation_passed: true
 
 # 依赖信息
-required_by: ["phase_4"]
+required_by: ['phase_4']
 ```
 
 ---
 
 ### 7.2 Phase 3 交付物清单
 
-| 交付物 | 类型 | 格式 | 持久化 | 验证层级 | 依赖者 |
-|--------|------|------|--------|---------|-------|
-| **integrated_solution** | 完整方案 | YAML | ✅ | L1: 结构完整<br/>L2: 与TEM一致<br/>L3: 与Phase2一致 | Phase 4 |
-| **user_approved_solution** | 确认记录 | YAML | ✅ | L1: 用户已确认 | Phase 4 |
-| **implementation_code** | 可执行代码 | Python | ✅ | L1: 语法正确<br/>L2: 可执行<br/>L3: 逻辑完整<br/>L4: 可追溯 | Phase 4 |
-| **code_traceability** | 可追溯性映射 | YAML | ✅ | L1: 所有要素可追溯 | Phase 4 |
-| **consistency_validation** | 一致性验证 | YAML | ✅ | L1: 所有检查通过 | Phase 4 |
-| **saved_files** | 文件清单 | Array | ✅ | L1: 所有文件已保存<br/>L2: 文件完整性 | Phase 4 |
-| **deliverable_manifest** | 交付物清单 | JSON | ✅ | L1: 清单完整 | Phase 4 |
+| 交付物                     | 类型         | 格式   | 持久化 | 验证层级                                                    | 依赖者  |
+| -------------------------- | ------------ | ------ | ------ | ----------------------------------------------------------- | ------- |
+| **integrated_solution**    | 完整方案     | YAML   | ✅     | L1: 结构完整<br/>L2: 与TEM一致<br/>L3: 与Phase2一致         | Phase 4 |
+| **user_approved_solution** | 确认记录     | YAML   | ✅     | L1: 用户已确认                                              | Phase 4 |
+| **implementation_code**    | 可执行代码   | Python | ✅     | L1: 语法正确<br/>L2: 可执行<br/>L3: 逻辑完整<br/>L4: 可追溯 | Phase 4 |
+| **code_traceability**      | 可追溯性映射 | YAML   | ✅     | L1: 所有要素可追溯                                          | Phase 4 |
+| **consistency_validation** | 一致性验证   | YAML   | ✅     | L1: 所有检查通过                                            | Phase 4 |
+| **saved_files**            | 文件清单     | Array  | ✅     | L1: 所有文件已保存<br/>L2: 文件完整性                       | Phase 4 |
+| **deliverable_manifest**   | 交付物清单   | JSON   | ✅     | L1: 清单完整                                                | Phase 4 |
 
 ---
 
@@ -1592,6 +1620,7 @@ Phase名称: Phase 4 - 质量保证
 **执行者**: Quality Evaluator
 
 **输入**:
+
 ```yaml
 inputs:
   - phase_0_state: object
@@ -1603,6 +1632,7 @@ inputs:
 ```
 
 **处理过程**:
+
 ```python
 def execute_quality_gates(all_phase_states):
     """
@@ -1659,6 +1689,7 @@ def execute_quality_gates(all_phase_states):
 #### 门禁 1: 代码语法检查
 
 **检查内容**:
+
 ```python
 def check_code_syntax(phase_3_state):
     """
@@ -1720,22 +1751,23 @@ def check_code_syntax(phase_3_state):
 ```
 
 **输出示例**:
+
 ```yaml
 gate_1:
-  gate_id: "G1"
-  gate_name: "代码语法检查"
+  gate_id: 'G1'
+  gate_name: '代码语法检查'
   passed: true
   score: 1.0
   checks:
-    - check: "syntax_valid"
+    - check: 'syntax_valid'
       passed: true
-      message: "Python语法正确"
-    - check: "imports_valid"
+      message: 'Python语法正确'
+    - check: 'imports_valid'
       passed: true
-      message: "所有导入有效"
-    - check: "function_validate_vehicle_capacity"
+      message: '所有导入有效'
+    - check: 'function_validate_vehicle_capacity'
       passed: true
-      message: "函数validate_vehicle_capacity已定义"
+      message: '函数validate_vehicle_capacity已定义'
     # ... 其他检查
   weight: 0.15
 ```
@@ -1745,6 +1777,7 @@ gate_1:
 #### 门禁 2: 逻辑完整性检查
 
 **检查内容**:
+
 ```python
 def check_logic_completeness(phase_3_state):
     """
@@ -1848,6 +1881,7 @@ def check_logic_completeness(phase_3_state):
 #### 门禁 3: TEM一致性检查
 
 **检查内容**:
+
 ```python
 def check_tem_consistency(phase_1_5_state, phase_2_state, phase_3_state):
     """
@@ -1952,6 +1986,7 @@ def check_tem_consistency(phase_1_5_state, phase_2_state, phase_3_state):
 #### 门禁 4: 引用完整性检查 (Guardrails)
 
 **检查内容**:
+
 ```python
 def check_citation_integrity(all_phase_states):
     """
@@ -2073,6 +2108,7 @@ def check_citation_integrity(all_phase_states):
 ```
 
 **Guardrails 失败处理**:
+
 ```python
 def handle_guardrails_failure(gate_4_result):
     """
@@ -2112,6 +2148,7 @@ def handle_guardrails_failure(gate_4_result):
 #### 门禁 5: 性能基准检查
 
 **检查内容**:
+
 ```python
 def check_performance_baseline(phase_3_state):
     """
@@ -2217,6 +2254,7 @@ def check_performance_baseline(phase_3_state):
 #### 门禁 6: 交付物完整性检查
 
 **检查内容**:
+
 ```python
 def check_deliverables_completeness(phase_3_state):
     """
@@ -2359,6 +2397,7 @@ def check_deliverables_completeness(phase_3_state):
 **执行者**: Quality Evaluator
 
 **处理过程**:
+
 ```python
 def calculate_overall_score(gate_results):
     """
@@ -2380,33 +2419,34 @@ def calculate_overall_score(gate_results):
 ```
 
 **质量等级**:
+
 ```yaml
 quality_levels:
   excellent:
     range: [0.95, 1.0]
-    label: "优秀"
-    color: "green"
+    label: '优秀'
+    color: 'green'
 
   good:
     range: [0.85, 0.95]
-    label: "良好"
-    color: "blue"
+    label: '良好'
+    color: 'blue'
 
   acceptable:
     range: [0.80, 0.85]
-    label: "合格"
-    color: "yellow"
+    label: '合格'
+    color: 'yellow'
 
   poor:
     range: [0.60, 0.80]
-    label: "需改进"
-    color: "orange"
+    label: '需改进'
+    color: 'orange'
 
   fail:
     range: [0.0, 0.60]
-    label: "不合格"
-    color: "red"
-    action: "阻断交付"
+    label: '不合格'
+    color: 'red'
+    action: '阻断交付'
 ```
 
 ---
@@ -2416,6 +2456,7 @@ quality_levels:
 **执行者**: Orchestrator
 
 **处理过程**:
+
 ```python
 def check_todo_completion(all_phase_states):
     """
@@ -2457,6 +2498,7 @@ def check_todo_completion(all_phase_states):
 ```
 
 **输出示例**:
+
 ```yaml
 todo_completion:
   total_tasks: 14
@@ -2475,6 +2517,7 @@ todo_completion:
 **执行者**: Quality Evaluator
 
 **处理过程**:
+
 ```python
 def generate_quality_report(gate_results, overall_score, todo_completion):
     """
@@ -2533,50 +2576,51 @@ def generate_quality_report(gate_results, overall_score, todo_completion):
 ```
 
 **质量报告示例**:
+
 ```yaml
 quality_report:
   quality_assessment:
     overall_score: 0.96
     quality_level:
-      label: "优秀"
+      label: '优秀'
       range: [0.95, 1.0]
-      color: "green"
+      color: 'green'
     pass_decision: true
 
   gate_results:
-    - gate_id: "G1"
-      gate_name: "代码语法检查"
+    - gate_id: 'G1'
+      gate_name: '代码语法检查'
       passed: true
       score: 1.0
       weight: 0.15
 
-    - gate_id: "G2"
-      gate_name: "逻辑完整性检查"
+    - gate_id: 'G2'
+      gate_name: '逻辑完整性检查'
       passed: true
       score: 1.0
       weight: 0.20
 
-    - gate_id: "G3"
-      gate_name: "TEM一致性检查"
+    - gate_id: 'G3'
+      gate_name: 'TEM一致性检查'
       passed: true
       score: 0.95
       weight: 0.25
 
-    - gate_id: "G4"
-      gate_name: "引用完整性检查 (Guardrails)"
+    - gate_id: 'G4'
+      gate_name: '引用完整性检查 (Guardrails)'
       passed: true
       score: 1.0
       weight: 0.20
       critical: true
 
-    - gate_id: "G5"
-      gate_name: "性能基准检查"
+    - gate_id: 'G5'
+      gate_name: '性能基准检查'
       passed: true
       score: 0.90
       weight: 0.10
 
-    - gate_id: "G6"
-      gate_name: "交付物完整性检查"
+    - gate_id: 'G6'
+      gate_name: '交付物完整性检查'
       passed: true
       score: 0.95
       weight: 0.10
@@ -2592,9 +2636,9 @@ quality_report:
   issues: []
 
   recommendations:
-    - "所有质量检查已通过，建议交付"
-    - "代码质量优秀，可直接使用"
-    - "建议保留此项目作为最佳实践案例"
+    - '所有质量检查已通过，建议交付'
+    - '代码质量优秀，可直接使用'
+    - '建议保留此项目作为最佳实践案例'
 
   statistics:
     total_checks: 38
@@ -2602,7 +2646,7 @@ quality_report:
     critical_issues: 0
     warnings: 0
 
-  generated_at: "2025-10-29T11:45:00Z"
+  generated_at: '2025-10-29T11:45:00Z'
 ```
 
 ---
@@ -2610,49 +2654,50 @@ quality_report:
 #### 步骤 4.5: 💾 保存 Phase 4 状态
 
 **保存内容**:
+
 ```yaml
 # phase_4_state.yaml
 
 metadata:
-  phase_id: "phase_4"
-  phase_name: "质量保证"
-  created_at: "2025-10-29T11:35:00Z"
-  completed_at: "2025-10-29T11:45:00Z"
-  duration: "10分钟"
-  depends_on: ["phase_0", "phase_0_5", "phase_1", "phase_1_5", "phase_2", "phase_3"]
+  phase_id: 'phase_4'
+  phase_name: '质量保证'
+  created_at: '2025-10-29T11:35:00Z'
+  completed_at: '2025-10-29T11:45:00Z'
+  duration: '10分钟'
+  depends_on: ['phase_0', 'phase_0_5', 'phase_1', 'phase_1_5', 'phase_2', 'phase_3']
 
 # 核心交付物 1: 质量报告
 quality_report:
   quality_assessment:
     overall_score: 0.96
-    quality_level: "优秀"
+    quality_level: '优秀'
     pass_decision: true
 
-  gate_results: [...]  # 6个门禁结果详情
+  gate_results: [...] # 6个门禁结果详情
   issues: []
   recommendations: [...]
-  statistics: {...}
+  statistics: { ... }
 
   final_decision:
     approved_for_delivery: true
-    approved_at: "2025-10-29T11:45:00Z"
-    approver: "Quality Evaluator"
+    approved_at: '2025-10-29T11:45:00Z'
+    approver: 'Quality Evaluator'
     quality_score: 0.96
 
   project_metadata:
-    project_id: "project_20251029_1120"
-    project_name: "生鲜配送冷链调度优化方案"
-    created_by: "APS调度智能体系统 v1.0"
-    total_duration: "105分钟"
+    project_id: 'project_20251029_1120'
+    project_name: '生鲜配送冷链调度优化方案'
+    created_by: 'APS调度智能体系统 v1.0'
+    total_duration: '105分钟'
 
 # 核心交付物 2: 门禁状态
 gate_status:
-  gate_1_syntax: "passed"
-  gate_2_logic: "passed"
-  gate_3_tem_consistency: "passed"
-  gate_4_guardrails: "passed"
-  gate_5_performance: "passed"
-  gate_6_deliverables: "passed"
+  gate_1_syntax: 'passed'
+  gate_2_logic: 'passed'
+  gate_3_tem_consistency: 'passed'
+  gate_4_guardrails: 'passed'
+  gate_5_performance: 'passed'
+  gate_6_deliverables: 'passed'
   all_gates_passed: true
 
 # 核心交付物 3: Todo完成度状态
@@ -2677,11 +2722,11 @@ verification:
 
 ### 8.2 Phase 4 交付物清单
 
-| 交付物 | 类型 | 格式 | 持久化 | 验证层级 | 说明 |
-|--------|------|------|--------|---------|------|
-| **quality_report** | 质量报告 | YAML | ✅ | L1: 字段完整性<br/>L2: 分数计算正确<br/>L3: 门禁结果有效 | 包含6层门禁结果、问题、建议、统计 |
-| **gate_status** | 门禁状态 | YAML | ✅ | L1: 状态有效 | 各门禁的通过/失败状态 |
-| **todo_completion_status** | Todo完成度 | YAML | ✅ | L1: 完成度统计 | 任务完成情况和偏离度 |
+| 交付物                     | 类型       | 格式 | 持久化 | 验证层级                                                 | 说明                              |
+| -------------------------- | ---------- | ---- | ------ | -------------------------------------------------------- | --------------------------------- |
+| **quality_report**         | 质量报告   | YAML | ✅     | L1: 字段完整性<br/>L2: 分数计算正确<br/>L3: 门禁结果有效 | 包含6层门禁结果、问题、建议、统计 |
+| **gate_status**            | 门禁状态   | YAML | ✅     | L1: 状态有效                                             | 各门禁的通过/失败状态             |
+| **todo_completion_status** | Todo完成度 | YAML | ✅     | L1: 完成度统计                                           | 任务完成情况和偏离度              |
 
 ---
 
@@ -2718,7 +2763,7 @@ Phase_1_5:
     - model_baseline
     - model_hash
   consumed_by: [Phase_2, Phase_3, Phase_4]
-  critical: true  # 核心交付物
+  critical: true # 核心交付物
 
 Phase_2:
   depends_on: [Phase_0, Phase_0_5, Phase_1, Phase_1_5]
@@ -2740,7 +2785,7 @@ Phase_3:
     - saved_files
     - deliverable_manifest
   consumed_by: [Phase_4]
-  critical: true  # 核心交付物
+  critical: true # 核心交付物
 
 Phase_4:
   depends_on: [Phase_0, Phase_0_5, Phase_1, Phase_1_5, Phase_2, Phase_3]
@@ -2748,7 +2793,7 @@ Phase_4:
     - quality_report
     - gate_status
     - todo_completion_status
-  consumed_by: []  # 最终阶段
+  consumed_by: [] # 最终阶段
   critical: true
 ```
 
@@ -2833,7 +2878,7 @@ Phase_4:
 
 ```yaml
 Guardrails核心原则:
-  principle: "所有知识都必须有明确的@专家库引用"
+  principle: '所有知识都必须有明确的@专家库引用'
 
   enforcement_points:
     - Phase 1.5: TenElementModel构建时
@@ -2842,43 +2887,43 @@ Guardrails核心原则:
     - Phase 4: 质量门禁4
 
   citation_format:
-    template: "@专家库/{category}/{subcategory}/{template_name}.md"
+    template: '@专家库/{category}/{subcategory}/{template_name}.md'
 
     examples:
-      - "@专家库/约束库/capacity/车辆容量约束.md"
-      - "@专家库/目标库/cost/成本最小化.md"
-      - "@专家库/算法库/meta-heuristic/遗传算法.md"
-      - "@专家库/领域库/vehicle/冷链配送.md"
+      - '@专家库/约束库/capacity/车辆容量约束.md'
+      - '@专家库/目标库/cost/成本最小化.md'
+      - '@专家库/算法库/meta-heuristic/遗传算法.md'
+      - '@专家库/领域库/vehicle/冷链配送.md'
 
   verification_algorithm:
-    step_1: "提取所有@专家库引用"
-    step_2: "解析引用路径到文件系统路径"
-    step_3: "验证文件存在性"
-    step_4: "验证文件内容匹配"
-    step_5: "记录验证结果"
+    step_1: '提取所有@专家库引用'
+    step_2: '解析引用路径到文件系统路径'
+    step_3: '验证文件存在性'
+    step_4: '验证文件内容匹配'
+    step_5: '记录验证结果'
 
   failure_handling:
     missing_citation:
-      severity: "critical"
-      action: "阻断Phase进行"
-      message: "约束/目标/算法缺少@专家库引用"
+      severity: 'critical'
+      action: '阻断Phase进行'
+      message: '约束/目标/算法缺少@专家库引用'
 
     invalid_path:
-      severity: "critical"
-      action: "阻断Phase进行"
-      message: "引用路径无效或文件不存在"
+      severity: 'critical'
+      action: '阻断Phase进行'
+      message: '引用路径无效或文件不存在'
 
     content_mismatch:
-      severity: "warning"
-      action: "记录警告，继续执行"
-      message: "引用内容与实际使用不完全匹配"
+      severity: 'warning'
+      action: '记录警告，继续执行'
+      message: '引用内容与实际使用不完全匹配'
 
   benefits:
-    - "100%可追溯性"
-    - "知识来源透明"
-    - "支持审计和合规"
-    - "知识质量保证"
-    - "防止幻觉生成"
+    - '100%可追溯性'
+    - '知识来源透明'
+    - '支持审计和合规'
+    - '知识质量保证'
+    - '防止幻觉生成'
 ```
 
 ---
@@ -2955,89 +3000,88 @@ def save_phase_state_with_verification(phase_id, state_data, max_retries=3):
 
 ```yaml
 错误类型与恢复策略:
-
   ValidationError (字段验证错误):
-    severity: "high"
+    severity: 'high'
     recovery:
-      - action: "自动重试"
+      - action: '自动重试'
         max_retries: 3
-        backoff: "指数退避 (1s, 2s, 4s)"
-      - action: "修复数据"
+        backoff: '指数退避 (1s, 2s, 4s)'
+      - action: '修复数据'
         if_possible: true
-      - action: "报告用户"
+      - action: '报告用户'
         if_failed: true
 
     examples:
-      - "必需字段缺失"
-      - "数据类型错误"
-      - "格式不正确"
+      - '必需字段缺失'
+      - '数据类型错误'
+      - '格式不正确'
 
   GuardrailsViolationError (引用完整性错误):
-    severity: "critical"
+    severity: 'critical'
     recovery:
-      - action: "阻断流程"
+      - action: '阻断流程'
         immediate: true
-      - action: "生成详细错误报告"
-      - action: "提示修复方案"
-      - action: "等待用户修复"
+      - action: '生成详细错误报告'
+      - action: '提示修复方案'
+      - action: '等待用户修复'
 
     examples:
-      - "缺少@专家库引用"
-      - "引用路径无效"
-      - "引用文件不存在"
+      - '缺少@专家库引用'
+      - '引用路径无效'
+      - '引用文件不存在'
 
   ConsistencyError (一致性错误):
-    severity: "medium"
+    severity: 'medium'
     recovery:
-      - action: "记录警告"
-      - action: "继续执行"
-      - action: "在质量报告中说明"
+      - action: '记录警告'
+      - action: '继续执行'
+      - action: '在质量报告中说明'
 
     examples:
-      - "TEM与方案不一致"
-      - "约束ID不匹配"
-      - "目标权重和不为1"
+      - 'TEM与方案不一致'
+      - '约束ID不匹配'
+      - '目标权重和不为1'
 
   PerformanceWarning (性能警告):
-    severity: "low"
+    severity: 'low'
     recovery:
-      - action: "记录警告"
-      - action: "继续执行"
-      - action: "建议优化"
+      - action: '记录警告'
+      - action: '继续执行'
+      - action: '建议优化'
 
     examples:
-      - "预计运行时间过长"
-      - "解质量低于预期"
-      - "参数配置不optimal"
+      - '预计运行时间过长'
+      - '解质量低于预期'
+      - '参数配置不optimal'
 
   IOError (文件IO错误):
-    severity: "high"
+    severity: 'high'
     recovery:
-      - action: "自动重试"
+      - action: '自动重试'
         max_retries: 3
-      - action: "检查磁盘空间"
-      - action: "检查文件权限"
-      - action: "切换备用路径"
+      - action: '检查磁盘空间'
+      - action: '检查文件权限'
+      - action: '切换备用路径'
 
     examples:
-      - "磁盘空间不足"
-      - "文件权限不足"
-      - "路径不存在"
+      - '磁盘空间不足'
+      - '文件权限不足'
+      - '路径不存在'
 ```
 
 ---
 
 ## 11. 完整验证矩阵
 
-| Phase | L1 字段完整性 | L2 引用完整性 | L3 逻辑一致性 | L4 代码可追溯性 | L5 性能基准 | L6 交付物完整性 |
-|-------|------------|------------|------------|---------------|-----------|--------------|
-| **Phase 0** | ✅ 必需 | ❌ 不适用 | ❌ 不适用 | ❌ 不适用 | ❌ 不适用 | ❌ 不适用 |
-| **Phase 0.5** | ✅ 必需 | ❌ 不适用 | ✅ 配置一致性 | ❌ 不适用 | ❌ 不适用 | ❌ 不适用 |
-| **Phase 1** | ✅ 必需 | ❌ 不适用 | ✅ 需求一致性 | ❌ 不适用 | ❌ 不适用 | ❌ 不适用 |
-| **Phase 1.5** | ✅ 必需 | ✅ 必需 (Guardrails) | ✅ TEM一致性 | ❌ 不适用 | ❌ 不适用 | ❌ 不适用 |
-| **Phase 2** | ✅ 必需 | ✅ 必需 (Guardrails) | ✅ 跨专家一致性 | ❌ 不适用 | ❌ 不适用 | ❌ 不适用 |
-| **Phase 3** | ✅ 必需 | ✅ 必需 (Guardrails) | ✅ 方案一致性 | ✅ 必需 | ❌ 不适用 | ✅ 文件完整性 |
-| **Phase 4** | ✅ 必需 | ✅ 检查 | ✅ 检查 | ✅ 检查 | ✅ 检查 | ✅ 检查 |
+| Phase         | L1 字段完整性 | L2 引用完整性        | L3 逻辑一致性   | L4 代码可追溯性 | L5 性能基准 | L6 交付物完整性 |
+| ------------- | ------------- | -------------------- | --------------- | --------------- | ----------- | --------------- |
+| **Phase 0**   | ✅ 必需       | ❌ 不适用            | ❌ 不适用       | ❌ 不适用       | ❌ 不适用   | ❌ 不适用       |
+| **Phase 0.5** | ✅ 必需       | ❌ 不适用            | ✅ 配置一致性   | ❌ 不适用       | ❌ 不适用   | ❌ 不适用       |
+| **Phase 1**   | ✅ 必需       | ❌ 不适用            | ✅ 需求一致性   | ❌ 不适用       | ❌ 不适用   | ❌ 不适用       |
+| **Phase 1.5** | ✅ 必需       | ✅ 必需 (Guardrails) | ✅ TEM一致性    | ❌ 不适用       | ❌ 不适用   | ❌ 不适用       |
+| **Phase 2**   | ✅ 必需       | ✅ 必需 (Guardrails) | ✅ 跨专家一致性 | ❌ 不适用       | ❌ 不适用   | ❌ 不适用       |
+| **Phase 3**   | ✅ 必需       | ✅ 必需 (Guardrails) | ✅ 方案一致性   | ✅ 必需         | ❌ 不适用   | ✅ 文件完整性   |
+| **Phase 4**   | ✅ 必需       | ✅ 检查              | ✅ 检查         | ✅ 检查         | ✅ 检查     | ✅ 检查         |
 
 ---
 
@@ -3066,6 +3110,7 @@ def save_phase_state_with_verification(phase_id, state_data, max_retries=3):
 ### 12.3 验证机制完整性
 
 6层验证机制覆盖：
+
 - L1: 字段完整性 (所有Phase)
 - L2: 引用完整性 (Guardrails, Phase 1.5/2/3/4)
 - L3: 逻辑一致性 (Phase 0.5/1/1.5/2/3/4)

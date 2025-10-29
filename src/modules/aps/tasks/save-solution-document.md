@@ -11,16 +11,18 @@
 ### ⚠️ 此任务必须生成两个特定文件
 
 **1. ✅ `solution_document_{timestamp}.md` - 完整方案文档（6章节+附录）**
-   - **文件名格式**: `solution_document_YYYYMMDD_HHMMSS.md`
-   - **不是** `README.md`（那是用户手册）
-   - **不是** `user_manual.md`
-   - **不是** `documentation.md`
-   - **必须是** `solution_document_` 开头的时间戳文件
+
+- **文件名格式**: `solution_document_YYYYMMDD_HHMMSS.md`
+- **不是** `README.md`（那是用户手册）
+- **不是** `user_manual.md`
+- **不是** `documentation.md`
+- **必须是** `solution_document_` 开头的时间戳文件
 
 **2. ✅ `solution_data_{timestamp}.yaml` - 结构化方案数据**
-   - **文件名格式**: `solution_data_YYYYMMDD_HHMMSS.yaml`
-   - 包含完整的 TenElementModel 和 integrated_solution
-   - 支持独立的代码生成流程
+
+- **文件名格式**: `solution_data_YYYYMMDD_HHMMSS.yaml`
+- 包含完整的 TenElementModel 和 integrated_solution
+- 支持独立的代码生成流程
 
 ### ❌ 严禁的行为
 
@@ -46,6 +48,7 @@
 如果以上文件未正确保存，**Phase 3 将无法继续到代码生成阶段**。
 
 Workflow 的 post_action_verify 会检查：
+
 - ✓ 文件名是否以 `solution_document_` 开头
 - ✓ 文件是否包含全部 7 个必需章节
 - ✓ YAML 文件是否成功保存
@@ -1180,6 +1183,7 @@ def verify_yaml_saved_immediately(file_path, min_size=100):
 ```
 
 **🚨 强制要求**：
+
 - 必须使用 `save_solution_data_yaml_with_retry()` 函数，不允许直接保存YAML文件
 - 验证失败必须重试，所有重试失败必须阻断流程
 - 不允许跳过验证步骤
@@ -1301,7 +1305,7 @@ outputs:
 
 ### 🔴 P0 - 关键检查（阻断级别）
 
-- [ ] **文件名格式正确**: solution_document_{timestamp}.md （不是README.md）
+- [ ] **文件名格式正确**: solution*document*{timestamp}.md （不是README.md）
 - [ ] **包含所有7个必需章节**:
   - [ ] 1. 问题定义与建模
   - [ ] 2. 领域适配方案

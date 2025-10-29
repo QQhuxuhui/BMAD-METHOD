@@ -5,6 +5,7 @@
 **Q1: APS与传统优化软件（如Gurobi、CPLEX）有什么区别？**
 
 A:
+
 - **定位不同**: 传统软件是求解器，需要用户手工建模；APS是端到端平台，自动完成建模到代码生成
 - **易用性**: 传统软件需要OR专家；APS只需自然语言描述需求
 - **开发效率**: 传统方式2-4周；APS只需70-130分钟
@@ -14,6 +15,7 @@ A:
 **Q2: APS能保证生成的代码直接可用吗？**
 
 A:
+
 - **92%可用率**: 当前版本基于大量测试，92%的代码可以直接运行
 - **8%需调试**: 主要是特殊业务逻辑、数据格式适配
 - **质量保证**: 通过6层质量门禁验证，包括语法、逻辑、一致性检查
@@ -22,13 +24,15 @@ A:
 **Q3: 如果APS生成的方案不满足需求怎么办？**
 
 A:
-1. **使用优化功能** (*optimize-solution): 自然语言描述优化需求，系统迭代改进
+
+1. **使用优化功能** (\*optimize-solution): 自然语言描述优化需求，系统迭代改进
 2. **调整参数**: 修改TenElementModel中的约束/目标权重
 3. **人工介入**: 在关键决策点(P0-P4)进行人工干预
 
 **Q4: APS支持哪些类型的调度问题？**
 
 A: 目前覆盖：
+
 - **物流配送**: 车辆路径问题(VRP)、时间窗约束(VRPTW)、多配送中心等
 - **生产调度**: 作业车间调度(JSP)、流水线调度、设备维护排程
 - **人员排班**: 护士排班、客服排班、保安巡逻
@@ -44,6 +48,7 @@ A: 目前覆盖：
 **Q5: APS的AI模型是什么？Token消耗如何？**
 
 A:
+
 - **默认模型**: Claude Sonnet 4.5 (Anthropic)
 - **Token优化**: 通过Sidecar模式，平均每次求解8-15K tokens
 - **成本估算**:
@@ -52,15 +57,17 @@ A:
 **Q6: 状态持久化是如何工作的？**
 
 A:
+
 - **自动保存**: 每个Phase完成后自动保存状态文件(YAML格式)
 - **保存位置**: 本地文件系统或云存储(S3/OSS)
 - **验证机制**: 保存后立即验证文件完整性，失败则重试
-- **智能恢复**: *resume命令自动检测断点，加载上下文，继续执行
+- **智能恢复**: \*resume命令自动检测断点，加载上下文，继续执行
 - **保留策略**: 保留最近30天和最新5个版本
 
 **Q7: APS的数据安全如何保障？**
 
 A:
+
 - **数据加密**:
   - 传输加密: TLS 1.3
   - 存储加密: AES-256
@@ -74,6 +81,7 @@ A:
 **Q8: 如何扩展APS的知识库？**
 
 A:
+
 1. **社区贡献** (开源版):
    - Fork仓库，添加新模板
    - Pull Request审核后合并
@@ -94,6 +102,7 @@ A:
 **Q9: 完成一次完整求解需要多长时间？**
 
 A:
+
 - **模式A (集中确认)**: 70-95分钟
   - 适合需求清晰的专家用户
   - 一次性确认完整TenElementModel
@@ -111,6 +120,7 @@ A:
 **Q10: 我没有调度优化背景，能使用APS吗？**
 
 A: 完全可以！
+
 - **自然语言输入**: 用业务语言描述需求，无需懂数学建模
 - **引导式交互**: 系统会在关键点提示和引导
 - **模式B推荐**: 增量确认模式更适合非专家用户
@@ -122,6 +132,7 @@ A: 完全可以！
 **Q11: APS支持实时调度吗？**
 
 A:
+
 - **当前版本**: 主要用于离线优化（批量调度规划）
 - **响应时间**: 70-130分钟完成建模和代码生成
 - **代码可实时**: 生成的代码可部署为实时服务
@@ -130,6 +141,7 @@ A:
 **Q12: 能否将APS集成到现有系统？**
 
 A: 完全支持：
+
 - **数据对接**: 支持多种数据格式(JSON/CSV/Excel/数据库)
 - **集成示例**: 提供ERP、MES、WMS等系统集成案例
 
@@ -243,6 +255,7 @@ class AlgorithmExpert(Agent):
 ### 为什么需要TenElementModel？
 
 调度优化涉及多个专家（算法、约束、目标、领域），如果没有统一的数据模型，会导致：
+
 - 专家之间信息不一致
 - 重复沟通和确认
 - 集成时发现冲突
@@ -254,116 +267,116 @@ class AlgorithmExpert(Agent):
 TenElementModel:
   # 1. 决策变量 (What to decide)
   decision_variables:
-    - name: "vehicle_routes"
-      type: "sequence"
-      domain: "客户集合的排列"
-      size: "12条路径（对应12辆车）"
+    - name: 'vehicle_routes'
+      type: 'sequence'
+      domain: '客户集合的排列'
+      size: '12条路径（对应12辆车）'
 
-    - name: "delivery_time"
-      type: "continuous"
-      domain: "[11:00, 19:00]"
-      size: "100个时间点（对应100个客户）"
+    - name: 'delivery_time'
+      type: 'continuous'
+      domain: '[11:00, 19:00]'
+      size: '100个时间点（对应100个客户）'
 
   # 2. 参数 (Known data)
   parameters:
     vehicles:
       count: 12
-      capacity: 150  # 件/车
-      type: "冷藏车"
+      capacity: 150 # 件/车
+      type: '冷藏车'
 
     customers:
       count: 100
-      demands: "5-20件/客户"
-      time_windows: "11:00-19:00"
+      demands: '5-20件/客户'
+      time_windows: '11:00-19:00'
 
   # 3. 约束 (Constraints)
   constraints:
-    - id: "C1"
-      name: "车辆容量约束"
-      type: "hard_constraint"
-      formula: "∀j: Σ(demand_i) ≤ 150, i∈route_j"
-      citation: "@专家库/约束库/capacity/车辆容量约束.md"
+    - id: 'C1'
+      name: '车辆容量约束'
+      type: 'hard_constraint'
+      formula: '∀j: Σ(demand_i) ≤ 150, i∈route_j'
+      citation: '@专家库/约束库/capacity/车辆容量约束.md'
 
-    - id: "C2"
-      name: "时间窗约束"
-      type: "hard_constraint"
-      formula: "∀i: start_time_i ∈ [11:00, 19:00]"
-      citation: "@专家库/约束库/temporal/时间窗约束.md"
+    - id: 'C2'
+      name: '时间窗约束'
+      type: 'hard_constraint'
+      formula: '∀i: start_time_i ∈ [11:00, 19:00]'
+      citation: '@专家库/约束库/temporal/时间窗约束.md'
 
   # 4. 优化目标 (Objectives)
   objectives:
     primary:
-      name: "总成本最小化"
+      name: '总成本最小化'
       formula: |
         minimize:
           Σ(Fixed_Cost × Vehicles_Used) +
           Σ(Distance × Distance_Rate × 1.3) +
           Σ(Work_Time × Labor_Rate)
       weight: 0.7
-      citation: "@专家库/目标库/cost/成本最小化.md"
+      citation: '@专家库/目标库/cost/成本最小化.md'
 
   # 5. 算法 (Algorithm)
   algorithm:
     primary:
-      name: "遗传算法 (Genetic Algorithm)"
-      type: "meta-heuristic"
+      name: '遗传算法 (Genetic Algorithm)'
+      type: 'meta-heuristic'
       config:
         population_size: 100
         crossover_rate: 0.8
         mutation_rate: 0.05
         max_generations: 500
-      citation: "@专家库/算法库/meta-heuristic/遗传算法.md"
+      citation: '@专家库/算法库/meta-heuristic/遗传算法.md'
 
   # 6. 时间模型 (Time Model)
   time_model:
-    planning_horizon: "1天 (11:00-19:00)"
-    time_granularity: "分钟级"
-    travel_time_calculation: "距离/平均速度(30km/h)"
+    planning_horizon: '1天 (11:00-19:00)'
+    time_granularity: '分钟级'
+    travel_time_calculation: '距离/平均速度(30km/h)'
 
   # 7. 不确定性 (Uncertainty)
   uncertainty:
-    - factor: "客户需求量"
-      type: "deterministic"
-      note: "假设订单确定"
+    - factor: '客户需求量'
+      type: 'deterministic'
+      note: '假设订单确定'
 
-    - factor: "交通状况"
-      type: "stochastic"
-      distribution: "正态分布 N(μ, 0.15μ)"
-      handling: "鲁棒优化 + 15%时间缓冲"
+    - factor: '交通状况'
+      type: 'stochastic'
+      distribution: '正态分布 N(μ, 0.15μ)'
+      handling: '鲁棒优化 + 15%时间缓冲'
 
   # 8. 求解配置 (Solver Configuration)
   solver_config:
-    time_limit: "600秒"
-    optimality_gap: "5%"
+    time_limit: '600秒'
+    optimality_gap: '5%'
     solution_pool_size: 10
     parallel_threads: 4
 
   # 9. 输入数据 (Input Data)
   input_data_format:
     customers:
-      format: "CSV"
+      format: 'CSV'
       fields:
-        - customer_id: "整数"
-        - latitude: "浮点数"
-        - longitude: "浮点数"
-        - demand: "整数"
+        - customer_id: '整数'
+        - latitude: '浮点数'
+        - longitude: '浮点数'
+        - demand: '整数'
 
   # 10. 输出格式 (Output Format)
   output_format:
     solution:
-      format: "JSON"
+      format: 'JSON'
       structure:
-        routes: "List[List[int]]"
-        delivery_times: "List[str]"
-        total_cost: "float"
+        routes: 'List[List[int]]'
+        delivery_times: 'List[str]'
+        total_cost: 'float'
 
 # 元数据
 metadata:
-  created_at: "2025-10-28T10:15:00Z"
-  phase: "phase_1_5"
-  mode: "mode_a"
+  created_at: '2025-10-28T10:15:00Z'
+  phase: 'phase_1_5'
+  mode: 'mode_a'
   user_confirmed: true
-  model_hash: "sha256:abc123..."  # 用于一致性验证
+  model_hash: 'sha256:abc123...' # 用于一致性验证
 ```
 
 ### TenElementModel的价值
