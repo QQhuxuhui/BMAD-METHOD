@@ -165,7 +165,7 @@ class Task:
 
 请生成 {algorithm_name} 类的**完整实现代码**，包括：
 
-1. ****init**方法**: 初始化所有参数和数据结构
+1. \***\*init**方法\*\*: 初始化所有参数和数据结构
 2. **initialize_population方法**: 生成初始种群（不要留TODO）
 3. **evaluate_population方法**: 评估种群适应度（完整实现）
 4. **selection方法**: 选择操作（根据配置的selection_method实现）
