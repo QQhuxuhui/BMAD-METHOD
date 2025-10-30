@@ -1,10 +1,10 @@
 {
   "module": "aps",
   "version": "1.0.0-alpha",
-  "buildTime": "2025-10-30T01:26:57.131Z",
+  "buildTime": "2025-10-30T03:12:18.980Z",
   "source": "src/modules/aps",
   "architecture": "BMAD-METHOD v6 - YAML",
-  "sourceHash": "d03ebb89",
+  "sourceHash": "417b588b",
   "agents": 7,
   "resources": 7
 }
