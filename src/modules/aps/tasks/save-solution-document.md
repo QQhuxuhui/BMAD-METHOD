@@ -11,16 +11,18 @@
 ### ⚠️ 此任务必须生成两个特定文件
 
 **1. ✅ `solution_document_{timestamp}.md` - 完整方案文档（6章节+附录）**
-   - **文件名格式**: `solution_document_YYYYMMDD_HHMMSS.md`
-   - **不是** `README.md`（那是用户手册）
-   - **不是** `user_manual.md`
-   - **不是** `documentation.md`
-   - **必须是** `solution_document_` 开头的时间戳文件
+
+- **文件名格式**: `solution_document_YYYYMMDD_HHMMSS.md`
+- **不是** `README.md`（那是用户手册）
+- **不是** `user_manual.md`
+- **不是** `documentation.md`
+- **必须是** `solution_document_` 开头的时间戳文件
 
 **2. ✅ `solution_data_{timestamp}.yaml` - 结构化方案数据**
-   - **文件名格式**: `solution_data_YYYYMMDD_HHMMSS.yaml`
-   - 包含完整的 TenElementModel 和 integrated_solution
-   - 支持独立的代码生成流程
+
+- **文件名格式**: `solution_data_YYYYMMDD_HHMMSS.yaml`
+- 包含完整的 TenElementModel 和 integrated_solution
+- 支持独立的代码生成流程
 
 ### ❌ 严禁的行为
 
@@ -46,6 +48,7 @@
 如果以上文件未正确保存，**Phase 3 将无法继续到代码生成阶段**。
 
 Workflow 的 post_action_verify 会检查：
+
 - ✓ 文件名是否以 `solution_document_` 开头
 - ✓ 文件是否包含全部 7 个必需章节
 - ✓ YAML 文件是否成功保存
@@ -657,7 +660,211 @@ def generate_solution_markdown(
 
 ````
 
-### 步骤4: 验证文件已保存
+### 步骤3.5: 🚨 使用Write工具保存Markdown文件（带自动重试）
+
+**CRITICAL STEP - 必须实际执行文件写入 + 验证 + 失败重试**
+
+此步骤AI必须调用IDE的Write工具，并在保存后立即验证，失败则自动重试。
+
+**完整保存流程（包含重试逻辑）**：
+
+```python
+def save_solution_document_with_retry(file_path, markdown_content, max_retries=3):
+    """
+    保存方案文档Markdown文件，失败时自动重试
+
+    这是方案文档保存的最严格验证机制（7层验证）
+
+    Args:
+        file_path: Markdown文件路径
+        markdown_content: Markdown内容
+        max_retries: 最大重试次数（默认3次）
+
+    Returns:
+        dict: 保存结果
+
+    Raises:
+        RuntimeError: 所有重试均失败
+    """
+    import time
+    import os
+
+    retry_delays = [1, 5, 10]  # 指数退避：1秒，5秒，10秒
+
+    for attempt in range(max_retries):
+        try:
+            print(f"🔄 尝试保存Markdown文件 (第 {attempt + 1}/{max_retries} 次)...")
+
+            # 1. 🚨 调用Write工具保存文件
+            # IDE Tool: Write
+            #   file_path: {file_path}
+            #   content: {markdown_content}
+            # 注意：实际执行时，AI必须调用IDE的Write工具，而非Python代码
+
+            # 模拟保存操作（实际中由IDE工具完成）
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(markdown_content)
+
+            print(f"✓ Markdown文件写入完成: {file_path}")
+
+            # 2. 立即验证文件已成功保存（7层验证）
+            verification = verify_markdown_saved_immediately(file_path)
+
+            if verification["all_checks_passed"]:
+                print(f"✅ Markdown保存成功并验证通过 (尝试 {attempt + 1} 次)")
+                return {
+                    "success": True,
+                    "file_path": file_path,
+                    "attempts": attempt + 1,
+                    "verification": verification
+                }
+            else:
+                # 验证失败，准备重试
+                failed_checks = [k for k, v in verification["checks"].items() if not v]
+                print(f"⚠ Markdown验证失败: {failed_checks}")
+                raise ValueError(f"Markdown验证失败: {failed_checks}")
+
+        except Exception as e:
+            print(f"❌ Markdown保存失败 (尝试 {attempt + 1}/{max_retries}): {e}")
+
+            if attempt < max_retries - 1:
+                # 还有重试机会
+                delay = retry_delays[attempt]
+                print(f"⏳ {delay}秒后重试...")
+                time.sleep(delay)
+            else:
+                # 所有重试均失败
+                error_message = f"""
+❌ CRITICAL ERROR: 方案文档(Markdown)保存失败！
+
+文件路径: {file_path}
+尝试次数: {max_retries}
+最后错误: {e}
+
+可能原因:
+1. 磁盘空间不足
+2. 文件权限问题
+3. 目录不存在或不可写
+4. 文件系统故障
+5. 内容生成不完整（缺少必需章节）
+
+建议操作:
+1. 检查磁盘剩余空间: df -h
+2. 检查目录权限: ls -la {os.path.dirname(file_path)}
+3. 检查目录是否存在: ls -d {os.path.dirname(file_path)}
+4. 验证Markdown内容是否包含所有7个必需章节
+
+⛔ 流程已阻断，无法继续执行。请解决上述问题后重新开始。
+"""
+                raise RuntimeError(error_message)
+
+    # 不应该到达这里
+    raise RuntimeError("Markdown保存逻辑错误")
+
+
+def verify_markdown_saved_immediately(file_path, min_size=1024):
+    """
+    保存Markdown后立即验证文件（用于重试逻辑）
+
+    7层验证（方案文档最严格）:
+    L1: 文件存在 (exists)
+    L2: 是否为文件 (is_file)
+    L3: 文件名格式 (filename_valid) - 防止生成README.md
+    L4: 文件大小 (size_valid, min=1024) - 比Phase状态更严格
+    L5: 文件可读 (readable)
+    L6: Markdown格式 (markdown_valid)
+    L7: 内容结构 (has_all_sections) - 7个必需章节
+
+    Args:
+        file_path: Markdown文件路径
+        min_size: 最小文件大小（默认1KB）
+
+    Returns:
+        dict: 验证结果
+    """
+    verification = {
+        "file_path": file_path,
+        "checks": {},
+        "all_checks_passed": False
+    }
+
+    try:
+        # L1: 检查文件存在
+        if not os.path.exists(file_path):
+            verification["checks"]["exists"] = False
+            return verification
+        verification["checks"]["exists"] = True
+
+        # L2: 检查是否为文件
+        if not os.path.isfile(file_path):
+            verification["checks"]["is_file"] = False
+            return verification
+        verification["checks"]["is_file"] = True
+
+        # L3: 检查文件名格式（防止生成README.md等错误文件）
+        filename = os.path.basename(file_path)
+        if not filename.startswith("solution_document_"):
+            verification["checks"]["filename_valid"] = False
+            verification["filename_error"] = f"文件名不符合规范: {filename}"
+            return verification
+        verification["checks"]["filename_valid"] = True
+
+        # L4: 检查文件大小
+        file_size = os.path.getsize(file_path)
+        if file_size < min_size:
+            verification["checks"]["size_valid"] = False
+            verification["file_size"] = file_size
+            return verification
+        verification["checks"]["size_valid"] = True
+        verification["file_size"] = file_size
+
+        # L5: 检查文件可读
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        if not content:
+            verification["checks"]["readable"] = False
+            return verification
+        verification["checks"]["readable"] = True
+
+        # L6: 检查Markdown格式
+        if not (content.startswith("# ") and "##" in content):
+            verification["checks"]["markdown_valid"] = False
+            return verification
+        verification["checks"]["markdown_valid"] = True
+
+        # L7: 检查内容结构（7个必需章节）
+        required_sections = [
+            "## 1. 问题定义与建模",
+            "## 2. 领域适配方案",
+            "## 3. 约束处理策略",
+            "## 4. 目标优化策略",
+            "## 5. 算法选择与配置",
+            "## 6. 实现路线图",
+            "## 7. 附录: TenElementModel完整定义"
+        ]
+
+        missing_sections = []
+        for section in required_sections:
+            if section not in content:
+                missing_sections.append(section)
+
+        if missing_sections:
+            verification["checks"]["has_all_sections"] = False
+            verification["missing_sections"] = missing_sections
+            return verification
+        verification["checks"]["has_all_sections"] = True
+
+        # 所有检查通过
+        verification["all_checks_passed"] = True
+        return verification
+
+    except Exception as e:
+        verification["checks"]["exception"] = str(e)
+        verification["all_checks_passed"] = False
+        return verification
+```
+
+### 步骤4: 验证文件已保存（外部验证接口）
 
 ```python
 import os
@@ -773,22 +980,39 @@ def verify_file_saved(file_path, min_size=1024):
     return verification_result
 ````
 
-### 步骤4.5: 保存YAML格式的方案数据（新增）
+### 步骤4.5: 🚨 保存YAML格式的方案数据（带自动重试）
 
 **目的**: 支持独立的代码生成，只需方案文件即可生成代码
 
+**CRITICAL**: 此步骤必须包含自动重试机制，确保YAML文件100%可靠保存
+
 ```python
 import yaml
+import time
+import os
 
-def save_solution_data_yaml(integrated_solution, ten_element_model, output_folder, docs_folder, timestamp):
+def save_solution_data_yaml_with_retry(integrated_solution, ten_element_model, output_folder, docs_folder, timestamp, max_retries=3):
     """
-    保存方案的结构化数据为YAML格式
+    保存方案的结构化数据为YAML格式，失败时自动重试
 
-    目的: 支持从方案文件独立生成代码
+    这是方案数据YAML保存机制（5层验证）
+
+    Args:
+        integrated_solution: 完整方案对象
+        ten_element_model: TenElementModel对象
+        output_folder: 输出目录
+        docs_folder: 文档子目录
+        timestamp: 时间戳
+        max_retries: 最大重试次数（默认3次）
 
     Returns:
         dict: YAML文件保存结果
+
+    Raises:
+        RuntimeError: 所有重试均失败
     """
+    retry_delays = [1, 5, 10]  # 指数退避：1秒，5秒，10秒
+
     # 准备YAML数据
     solution_data = {
         "solution_metadata": integrated_solution.get("metadata", {}),
@@ -805,40 +1029,164 @@ def save_solution_data_yaml(integrated_solution, ten_element_model, output_folde
 
     # 序列化为YAML
     yaml_content = yaml.dump(solution_data, allow_unicode=True, sort_keys=False, default_flow_style=False)
-
     print(f"✓ YAML数据已准备: {len(yaml_content)} bytes")
 
-    # 🚨 使用Write工具保存YAML文件
-    # IDE Tool: Write
-    # File Path: {yaml_path}
-    # Content: {yaml_content}
+    for attempt in range(max_retries):
+        try:
+            print(f"🔄 尝试保存YAML文件 (第 {attempt + 1}/{max_retries} 次)...")
 
-    # 验证YAML文件
-    if os.path.exists(yaml_path):
-        yaml_size = os.path.getsize(yaml_path)
-        print(f"✓ YAML文件已保存: {yaml_path} ({yaml_size} bytes)")
+            # 1. 🚨 调用Write工具保存YAML文件
+            # IDE Tool: Write
+            #   file_path: {yaml_path}
+            #   content: {yaml_content}
+            # 注意：实际执行时，AI必须调用IDE的Write工具，而非Python代码
 
-        return {
-            "yaml_saved": True,
-            "yaml_path": yaml_path,
-            "yaml_size": yaml_size
-        }
-    else:
-        print(f"✗ YAML文件保存失败: {yaml_path}")
-        return {
-            "yaml_saved": False,
-            "yaml_path": yaml_path,
-            "error": "文件未创建"
-        }
+            # 模拟保存操作（实际中由IDE工具完成）
+            with open(yaml_path, 'w', encoding='utf-8') as f:
+                f.write(yaml_content)
+
+            print(f"✓ YAML文件写入完成: {yaml_path}")
+
+            # 2. 立即验证文件已成功保存（5层验证）
+            verification = verify_yaml_saved_immediately(yaml_path)
+
+            if verification["all_checks_passed"]:
+                yaml_size = os.path.getsize(yaml_path)
+                print(f"✅ YAML保存成功并验证通过 (尝试 {attempt + 1} 次)")
+                return {
+                    "yaml_saved": True,
+                    "yaml_path": yaml_path,
+                    "yaml_size": yaml_size,
+                    "attempts": attempt + 1,
+                    "verification": verification
+                }
+            else:
+                # 验证失败，准备重试
+                failed_checks = [k for k, v in verification["checks"].items() if not v]
+                print(f"⚠ YAML验证失败: {failed_checks}")
+                raise ValueError(f"YAML验证失败: {failed_checks}")
+
+        except Exception as e:
+            print(f"❌ YAML保存失败 (尝试 {attempt + 1}/{max_retries}): {e}")
+
+            if attempt < max_retries - 1:
+                # 还有重试机会
+                delay = retry_delays[attempt]
+                print(f"⏳ {delay}秒后重试...")
+                time.sleep(delay)
+            else:
+                # 所有重试均失败
+                error_message = f"""
+❌ CRITICAL ERROR: 方案数据(YAML)保存失败！
+
+文件路径: {yaml_path}
+尝试次数: {max_retries}
+最后错误: {e}
+
+可能原因:
+1. 磁盘空间不足
+2. 文件权限问题
+3. 目录不存在或不可写
+4. 文件系统故障
+5. YAML序列化失败
+
+建议操作:
+1. 检查磁盘剩余空间: df -h
+2. 检查目录权限: ls -la {os.path.dirname(yaml_path)}
+3. 检查目录是否存在: ls -d {os.path.dirname(yaml_path)}
+4. 验证solution_data对象是否完整
+
+⛔ 流程已阻断，无法继续执行。请解决上述问题后重新开始。
+"""
+                raise RuntimeError(error_message)
+
+    # 不应该到达这里
+    raise RuntimeError("YAML保存逻辑错误")
+
+
+def verify_yaml_saved_immediately(file_path, min_size=100):
+    """
+    保存YAML后立即验证文件（用于重试逻辑）
+
+    5层验证（YAML数据文件）:
+    L1: 文件存在 (exists)
+    L2: 文件大小 (size_valid, min=100)
+    L3: 文件可读 (readable)
+    L4: YAML格式 (yaml_valid)
+    L5: 必需键存在 (has_required_keys)
+
+    Args:
+        file_path: YAML文件路径
+        min_size: 最小文件大小（默认100 bytes）
+
+    Returns:
+        dict: 验证结果
+    """
+    verification = {
+        "file_path": file_path,
+        "checks": {},
+        "all_checks_passed": False
+    }
+
+    try:
+        # L1: 检查文件存在
+        if not os.path.exists(file_path):
+            verification["checks"]["exists"] = False
+            return verification
+        verification["checks"]["exists"] = True
+
+        # L2: 检查文件大小
+        file_size = os.path.getsize(file_path)
+        if file_size < min_size:
+            verification["checks"]["size_valid"] = False
+            verification["file_size"] = file_size
+            return verification
+        verification["checks"]["size_valid"] = True
+        verification["file_size"] = file_size
+
+        # L3: 检查文件可读
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+        if not content:
+            verification["checks"]["readable"] = False
+            return verification
+        verification["checks"]["readable"] = True
+
+        # L4: 检查YAML格式
+        yaml_data = yaml.safe_load(content)
+        if not isinstance(yaml_data, dict):
+            verification["checks"]["yaml_valid"] = False
+            return verification
+        verification["checks"]["yaml_valid"] = True
+
+        # L5: 检查必需键存在
+        required_keys = ["solution_metadata", "solution_sections", "ten_element_model"]
+        missing_keys = []
+        for key in required_keys:
+            if key not in yaml_data:
+                missing_keys.append(key)
+
+        if missing_keys:
+            verification["checks"]["has_required_keys"] = False
+            verification["missing_keys"] = missing_keys
+            return verification
+        verification["checks"]["has_required_keys"] = True
+
+        # 所有检查通过
+        verification["all_checks_passed"] = True
+        return verification
+
+    except Exception as e:
+        verification["checks"]["exception"] = str(e)
+        verification["all_checks_passed"] = False
+        return verification
 ```
 
-**使用IDE Write工具保存YAML文件**：
+**🚨 强制要求**：
 
-```
-IDE Tool: Write
-File Path: {output_folder}/docs/solution_data_{timestamp}.yaml
-Content: {yaml_content}
-```
+- 必须使用 `save_solution_data_yaml_with_retry()` 函数，不允许直接保存YAML文件
+- 验证失败必须重试，所有重试失败必须阻断流程
+- 不允许跳过验证步骤
 
 ### 步骤5: 生成文件元数据
 
@@ -957,7 +1305,7 @@ outputs:
 
 ### 🔴 P0 - 关键检查（阻断级别）
 
-- [ ] **文件名格式正确**: solution_document_{timestamp}.md （不是README.md）
+- [ ] **文件名格式正确**: solution*document*{timestamp}.md （不是README.md）
 - [ ] **包含所有7个必需章节**:
   - [ ] 1. 问题定义与建模
   - [ ] 2. 领域适配方案

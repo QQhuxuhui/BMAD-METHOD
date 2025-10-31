@@ -1,0 +1,289 @@
+workflow_id: "aps-domain-identification"
+workflow_name: "领域识别与分类工作流"
+version: "4.3"
+description: |
+  识别调度问题所属的业务领域，提取领域特征和业务规则。
+
+  使用场景：
+  1. 在主workflow Phase 2中被自动调用（Orchestrator直接调用agent）
+  2. 用户手动调用（bmad domain-expert → *identify-domain）
+
+  前置条件：
+  - 必须先完成Phase 1.5（十要素建模）
+  - TenElementModel文件必须存在于 aps-outputs/states/
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "domain-expert"
+  estimated_time: "5-8分钟"
+
+config:
+  confidence_threshold: 0.70
+  require_user_confirmation: true
+  use_domain_library: true
+
+steps:
+  - step_id: "domain-1"
+    name: "加载TenElementModel"
+    description: "从Phase 1.5加载十要素模型，作为领域识别的输入"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_1_5"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+            此workflow需要先完成十要素建模。
+
+            解决方案：
+            1. 返回主workflow执行完整流程：
+               bmad aps
+               选择 *start-scheduling
+               完成 Phase 0-1.5
+
+            2. 或单独运行建模workflow：
+               bmad orchestrator
+               选择 workflows/phase-1.5-modeling
+
+            3. 然后再运行本workflow
+
+    inputs:
+      - phase_id: "phase_1_5"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+      - format: "${config.state_management.state_format}"
+    outputs:
+      - state_data # 包含ten_element_model, model_baseline等
+      - metadata
+      - load_success
+      - file_metadata
+
+  - step_id: "domain-2"
+    name: "领域特征提取"
+    description: "从TenElementModel和用户需求中提取领域相关特征"
+    action: "exec"
+    target: "bmad/aps/tasks/extract-domain-features.md"
+    inputs:
+      - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+      - user_request
+    extraction_strategy:
+      industry_keywords: "识别行业关键词(物流/制造/服务/项目/供应链)"
+      resource_types: "识别资源类型(车辆/机器/人员/空间/时间)"
+      entity_patterns: "识别实体模式(订单/任务/项目/客户/设备)"
+      temporal_patterns: "识别时间模式(实时/周期/批次/连续)"
+      spatial_patterns: "识别空间模式(单点/多点/路径/区域/网络)"
+    outputs:
+      - domain_features
+      - feature_confidence
+
+  - step_id: "domain-3"
+    name: "领域分类与匹配"
+    description: "基于领域库进行领域分类和匹配"
+    action: "exec"
+    target: "bmad/aps/tasks/classify-domain.md"
+    inputs:
+      - domain_features
+    critical_action:
+      - load_resource: "@专家库/领域应用专家库/README.md"
+    classification_strategy:
+      primary_domains:
+        - logistics: "物流配送领域"
+        - manufacturing: "生产制造领域"
+        - service: "服务调度领域"
+        - project: "项目管理领域"
+        - supply_chain: "供应链管理领域"
+      sub_domains:
+        logistics: ["vehicle_routing", "warehouse", "last_mile", "cold_chain"]
+        manufacturing: ["job_shop", "flow_shop", "assembly_line", "flexible_manufacturing"]
+        service: ["workforce", "appointment", "field_service", "resource_booking"]
+        project: ["RCPSP", "multi_project", "resource_leveling"]
+        supply_chain: ["inventory", "production_distribution", "network_design"]
+    outputs:
+      - primary_domain
+      - sub_domain
+      - domain_confidence
+      - alternative_domains
+
+  - step_id: "domain-4"
+    name: "业务规则识别"
+    description: "识别领域特定的业务规则和约束"
+    action: "exec"
+    target: "bmad/aps/tasks/identify-business-rules.md"
+    inputs:
+      - primary_domain
+      - sub_domain
+      - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+    rule_categories:
+      operational_rules: "运营规则(工作时间/班次/SLA)"
+      regulatory_rules: "监管规则(安全/合规/认证)"
+      business_logic: "业务逻辑(优先级/配额/策略)"
+      industry_standards: "行业标准(最佳实践/KPI)"
+    outputs:
+      - business_rules
+      - rule_sources
+      - rule_priorities
+
+  - step_id: "domain-5"
+    name: "领域适配建议"
+    description: "基于领域知识提供适配建议"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-domain-recommendations.md"
+    inputs:
+      - primary_domain
+      - sub_domain
+      - business_rules
+    recommendation_types:
+      - algorithm_preferences: "领域适用的算法偏好"
+      - constraint_patterns: "领域常见约束模式"
+      - objective_priorities: "领域典型目标优先级"
+      - data_structures: "领域推荐的数据结构"
+      - best_practices: "领域最佳实践"
+    outputs:
+      - domain_recommendations
+      - adaptation_strategy
+
+  - step_id: "domain-6"
+    name: "领域分析验证"
+    description: "验证领域识别结果的完整性和一致性"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-domain-analysis.md"
+    inputs:
+      - primary_domain
+      - business_rules
+      - domain_recommendations
+    validation_checks:
+      - domain_coverage: "领域覆盖完整性"
+      - rule_consistency: "业务规则一致性"
+      - recommendation_relevance: "建议相关性"
+      - citation_completeness: "引用完整性"
+    outputs:
+      - validation_report
+      - issues_found
+
+  - step_id: "domain-7"
+    name: "用户确认领域分析"
+    description: "展示领域识别结果，获取用户确认"
+    action: "conditional_human_confirmation"
+    condition: "domain_confidence < 0.85 OR has_alternative_domains"
+    trigger_level: "P0"
+    confirmation_type: "domain_classification"
+    template: "@交互对话模板库/领域确认模板.md"
+    inputs:
+      - primary_domain
+      - sub_domain
+      - business_rules
+      - domain_recommendations
+      - alternative_domains
+      - validation_report
+    presentation_format:
+      show_confidence_scores: true
+      show_business_rules: true
+      show_alternatives: true
+      show_recommendations: true
+    outputs:
+      - confirmed_domain
+      - confirmed_sub_domain
+      - confirmed_rules
+      - user_feedback
+
+  - step_id: "domain-8"
+    name: "整合用户反馈"
+    description: "根据用户确认调整领域分析结果"
+    action: "exec"
+    target: "bmad/aps/tasks/integrate-domain-feedback.md"
+    inputs:
+      - primary_domain
+      - user_feedback
+      - confirmed_domain
+    outputs:
+      - final_domain_analysis
+
+  - step_id: "domain-9"
+    name: "生成领域分析报告"
+    description: "输出结构化的领域分析报告"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-domain-report.md"
+    inputs:
+      - final_domain_analysis
+      - business_rules
+      - domain_recommendations
+    report_sections:
+      - domain_classification
+      - business_rules_summary
+      - adaptation_recommendations
+      - industry_best_practices
+      - reference_citations
+    outputs:
+      - domain_analysis_report
+      - domain_metadata
+
+outputs:
+  primary:
+    - final_domain_analysis
+    - business_rules
+    - domain_recommendations
+
+  documentation:
+    - domain_analysis_report
+    - validation_report
+
+  metadata:
+    - domain_confidence
+    - confirmed_domain
+    - rule_sources
+
+validation:
+  post_workflow_checks:
+    - domain_identified: true
+    - business_rules_extracted: true
+    - all_citations_present: true
+    - user_confirmed: true
+
+  quality_gates:
+    - name: "Domain Confidence"
+      check: "domain_confidence >= 0.70"
+      severity: "high"
+
+    - name: "Business Rules Completeness"
+      check: "business_rules.length > 0"
+      severity: "critical"
+
+    - name: "Citation Compliance"
+      check: "all recommendations cite domain library"
+      severity: "critical"
+
+error_handling:
+  on_low_confidence:
+    action: "request_clarification"
+    trigger_level: "P1"
+
+  on_unknown_domain:
+    action: "submit_capability_gap_report"
+    template: "@交互对话模板库/能力缺口模板.md"
+
+  on_rule_conflict:
+    action: "human_confirmation"
+    trigger_level: "P2"
+
+integration:
+  upstream_phase: "phase-1.5"
+  downstream_phases: ["phase-2", "phase-3"]
+  provides_to_phases:
+    - domain_context
+    - business_rules_baseline
+    - adaptation_strategy
+
+metrics:
+  track:
+    - domain_confidence_score
+    - business_rules_count
+    - user_confirmation_required
+    - time_to_classification

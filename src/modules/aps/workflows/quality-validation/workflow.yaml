@@ -1,0 +1,114 @@
+workflow_id: "aps-quality-validation"
+workflow_name: "质量验证工作流"
+version: "4.3"
+description: |
+  全面验证调度方案和代码的质量。
+
+  使用场景：
+  1. 在主workflow Phase 4中被自动调用
+  2. 用户手动调用（bmad quality-evaluator → *validate-all）
+
+  前置条件：
+  - 必须先完成Phase 3（方案集成）
+  - integrated_solution文件必须存在
+  - 建议已完成代码生成
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "quality-evaluator"
+  estimated_time: "15-20分钟"
+
+config:
+  use_quality_library: true
+  run_all_checks: true
+
+steps:
+  - step_id: "quality-1"
+    name: "加载方案和代码"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_3"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 3 方案文件缺失！
+
+            质量验证需要基于完整的调度方案和代码。
+
+            解决方案：
+            1. 返回主workflow：bmad aps → *start-scheduling
+            2. 完成 Phase 0-3 后再进行质量验证
+
+    inputs:
+      - phase_id: "phase_3"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+      - format: "${config.state_management.state_format}"
+    outputs:
+      - state_data # 包含integrated_solution等
+      - metadata
+      - load_success
+      - file_metadata
+
+  - step_id: "quality-2"
+    name: "语法验证"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-syntax.md"
+    inputs:
+      - solution_and_code
+    outputs:
+      - syntax_report
+
+  - step_id: "quality-3"
+    name: "逻辑验证"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-logic.md"
+    inputs:
+      - solution_and_code
+    outputs:
+      - logic_report
+
+  - step_id: "quality-4"
+    name: "一致性验证"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-consistency.md"
+    inputs:
+      - solution_and_code
+    outputs:
+      - consistency_report
+
+  - step_id: "quality-5"
+    name: "性能基准测试"
+    action: "exec"
+    target: "bmad/aps/tasks/benchmark-performance.md"
+    inputs:
+      - solution_and_code
+    outputs:
+      - benchmark_report
+
+  - step_id: "quality-6"
+    name: "生成质量报告"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-quality-report.md"
+    inputs:
+      - syntax_report
+      - logic_report
+      - consistency_report
+      - benchmark_report
+    outputs:
+      - quality_report
+
+outputs:
+  primary:
+    - quality_report
+    - syntax_report
+    - logic_report
+    - consistency_report
+    - benchmark_report

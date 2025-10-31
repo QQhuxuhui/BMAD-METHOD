@@ -1,0 +1,96 @@
+workflow_id: "aps-domain-adaptation"
+workflow_name: "领域适配工作流"
+version: "4.3"
+description: |
+  将通用解决方案适配到特定领域场景。
+
+  使用场景：
+  1. 在Phase 3完成后，进行领域特定适配
+  2. 用户手动调用（bmad domain-expert → *adapt-solution）
+
+  前置条件：
+  - 必须先完成Phase 3（方案集成）
+  - integrated_solution文件必须存在
+  - 建议完成领域识别
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "domain-expert"
+  estimated_time: "10-15分钟"
+
+config:
+  use_domain_library: true
+  generate_domain_code: true
+
+steps:
+  - step_id: "adapt-1"
+    name: "加载通用方案"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_3"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 3 方案文件缺失！
+
+            领域适配需要基于完整的调度方案。
+
+            解决方案：
+            1. 返回主workflow：bmad aps → *start-scheduling
+            2. 完成 Phase 0-3 后再进行领域适配
+
+    inputs:
+      - phase_id: "phase_3"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+      - format: "${config.state_management.state_format}"
+    outputs:
+      - state_data # 包含integrated_solution等
+      - metadata
+      - load_success
+      - file_metadata
+
+  - step_id: "adapt-2"
+    name: "加载领域分析"
+    action: "exec"
+    target: "bmad/aps/tasks/load-domain-analysis.md"
+
+    pre_condition_check:
+      optional: true
+      fallback_mode:
+        description: "如果领域分析结果不存在，可从用户输入开始"
+        action: "request_user_input"
+
+    outputs:
+      - domain_analysis
+
+  - step_id: "adapt-3"
+    name: "应用领域适配规则"
+    action: "exec"
+    target: "bmad/aps/tasks/apply-domain-adaptation.md"
+    inputs:
+      - generic_solution
+      - domain_analysis
+    outputs:
+      - adapted_solution
+
+  - step_id: "adapt-4"
+    name: "生成领域特定代码"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-domain-specific-code.md"
+    inputs:
+      - adapted_solution
+    outputs:
+      - domain_specific_code
+
+outputs:
+  primary:
+    - adapted_solution
+    - domain_specific_code

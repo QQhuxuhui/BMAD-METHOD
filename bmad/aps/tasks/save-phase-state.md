@@ -241,41 +241,186 @@ def serialize_state_data(state_data, format='yaml'):
         raise RuntimeError(f"序列化失败: {e}")
 ```
 
-### 步骤6: 🚨 使用Write工具保存文件
+### 步骤6: 🚨 使用Write工具保存文件（带自动重试）
 
-**CRITICAL STEP - 必须实际执行文件写入**
+**CRITICAL STEP - 必须实际执行文件写入 + 验证 + 失败重试**
 
-此步骤AI必须调用IDE的Write工具，格式如下：
+此步骤AI必须调用IDE的Write工具，并在保存后立即验证，失败则自动重试。
 
-```
-IDE Tool: Write
-File Path: {state_folder}/{phase_id}_state_{timestamp}.yaml
-Content: [序列化后的完整状态数据]
-```
-
-**示例执行步骤**：
+**完整保存流程（包含重试逻辑）**：
 
 ```python
-# 1. 准备文件路径
-file_path = f"{state_folder}/{phase_id}_state_{timestamp}.yaml"
+def save_state_with_retry(file_path, content, max_retries=3):
+    """
+    保存状态文件，失败时自动重试
 
-# 2. 准备内容
-content = serialize_state_data(complete_state, format='yaml')
+    Args:
+        file_path: 文件路径
+        content: 文件内容
+        max_retries: 最大重试次数（默认3次）
 
-# 3. 🚨 调用Write工具（伪代码，实际使用IDE工具）
-# Write Tool:
-#   file_path: {file_path}
-#   content: {content}
+    Returns:
+        dict: 保存结果
 
-# 4. 等待Write工具返回成功确认
+    Raises:
+        RuntimeError: 所有重试均失败
+    """
+    import time
+
+    retry_delays = [1, 5, 10]  # 指数退避：1秒，5秒，10秒
+
+    for attempt in range(max_retries):
+        try:
+            print(f"🔄 尝试保存文件 (第 {attempt + 1}/{max_retries} 次)...")
+
+            # 1. 🚨 调用Write工具保存文件
+            # IDE Tool: Write
+            #   file_path: {file_path}
+            #   content: {content}
+            # 注意：实际执行时，AI必须调用IDE的Write工具，而非Python代码
+
+            # 模拟保存操作（实际中由IDE工具完成）
+            with open(file_path, 'w', encoding='utf-8') as f:
+                f.write(content)
+
+            print(f"✓ 文件写入完成: {file_path}")
+
+            # 2. 立即验证文件已成功保存
+            verification = verify_file_saved_immediately(file_path)
+
+            if verification["all_checks_passed"]:
+                print(f"✅ 保存成功并验证通过 (尝试 {attempt + 1} 次)")
+                return {
+                    "success": True,
+                    "file_path": file_path,
+                    "attempts": attempt + 1,
+                    "verification": verification
+                }
+            else:
+                # 验证失败，准备重试
+                failed_checks = [k for k, v in verification["checks"].items() if not v]
+                print(f"⚠ 验证失败: {failed_checks}")
+                raise ValueError(f"验证失败: {failed_checks}")
+
+        except Exception as e:
+            print(f"❌ 保存失败 (尝试 {attempt + 1}/{max_retries}): {e}")
+
+            if attempt < max_retries - 1:
+                # 还有重试机会
+                delay = retry_delays[attempt]
+                print(f"⏳ {delay}秒后重试...")
+                time.sleep(delay)
+            else:
+                # 所有重试均失败
+                error_message = f"""
+❌ CRITICAL ERROR: 状态文件保存失败！
+
+文件路径: {file_path}
+尝试次数: {max_retries}
+最后错误: {e}
+
+可能原因:
+1. 磁盘空间不足
+2. 文件权限问题
+3. 目录不存在或不可写
+4. 文件系统故障
+
+建议操作:
+1. 检查磁盘剩余空间: df -h
+2. 检查目录权限: ls -la {os.path.dirname(file_path)}
+3. 检查目录是否存在: ls -d {os.path.dirname(file_path)}
+4. 尝试手动创建测试文件: touch {file_path}_test
+
+⛔ 流程已阻断，无法继续执行。请解决上述问题后重新开始。
+"""
+                raise RuntimeError(error_message)
+
+    # 不应该到达这里
+    raise RuntimeError("保存逻辑错误")
+
+
+def verify_file_saved_immediately(file_path, min_size=50):
+    """
+    保存后立即验证文件（用于重试逻辑）
+
+    Args:
+        file_path: 文件路径
+        min_size: 最小文件大小
+
+    Returns:
+        dict: 验证结果
+    """
+    verification = {
+        "file_path": file_path,
+        "checks": {},
+        "all_checks_passed": False
+    }
+
+    try:
+        # 检查1: 文件存在
+        if not os.path.exists(file_path):
+            verification["checks"]["exists"] = False
+            return verification
+        verification["checks"]["exists"] = True
+
+        # 检查2: 是否为文件
+        if not os.path.isfile(file_path):
+            verification["checks"]["is_file"] = False
+            return verification
+        verification["checks"]["is_file"] = True
+
+        # 检查3: 文件大小
+        file_size = os.path.getsize(file_path)
+        if file_size < min_size:
+            verification["checks"]["size_valid"] = False
+            verification["file_size"] = file_size
+            return verification
+        verification["checks"]["size_valid"] = True
+        verification["file_size"] = file_size
+
+        # 检查4: 文件可读
+        with open(file_path, 'r', encoding='utf-8') as f:
+            first_char = f.read(1)
+            if not first_char:
+                verification["checks"]["readable"] = False
+                return verification
+        verification["checks"]["readable"] = True
+
+        # 检查5: 格式验证
+        with open(file_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        if file_path.endswith('.yaml') or file_path.endswith('.yml'):
+            import yaml
+            yaml.safe_load(content)
+        elif file_path.endswith('.json'):
+            import json
+            json.loads(content)
+
+        verification["checks"]["format_valid"] = True
+
+        # 所有检查通过
+        verification["all_checks_passed"] = True
+        return verification
+
+    except Exception as e:
+        verification["checks"]["exception"] = str(e)
+        verification["all_checks_passed"] = False
+        return verification
 ```
 
-### 步骤7: 验证文件已成功保存
+**🚨 强制要求**：
+
+- 必须使用 `save_state_with_retry()` 函数，不允许直接保存文件
+- 验证失败必须重试，所有重试失败必须阻断流程
+- 不允许跳过验证步骤
+
+### 步骤7: 验证结果确认
 
 ```python
 def verify_file_saved(file_path, min_size=50):
     """
-    验证文件已成功保存并符合要求
+    验证文件已成功保存并符合要求（外部验证接口）
 
     Args:
         file_path: 文件路径
@@ -284,63 +429,17 @@ def verify_file_saved(file_path, min_size=50):
     Returns:
         dict: 验证结果
 
-    Raises:
-        FileNotFoundError: 文件不存在
-        ValueError: 文件大小不符合要求
-        IOError: 文件不可读
+    Note:
+        此函数是公共接口，调用 verify_file_saved_immediately() 进行实际验证
+        区别在于此函数可以抛出异常，而 immediately 版本返回结果字典
     """
-    verification = {
-        "file_path": file_path,
-        "checks": {}
-    }
+    verification = verify_file_saved_immediately(file_path, min_size)
 
-    # 检查1: 文件是否存在
-    if not os.path.exists(file_path):
-        raise FileNotFoundError(f"❌ 文件保存失败: {file_path} 不存在")
-    verification["checks"]["exists"] = True
+    if not verification["all_checks_passed"]:
+        failed_checks = [k for k, v in verification["checks"].items() if not v]
+        raise RuntimeError(f"文件验证失败: {failed_checks}")
 
-    # 检查2: 是否为文件（非目录）
-    if not os.path.isfile(file_path):
-        raise ValueError(f"❌ 路径不是文件: {file_path}")
-    verification["checks"]["is_file"] = True
-
-    # 检查3: 文件大小
-    file_size = os.path.getsize(file_path)
-    if file_size < min_size:
-        raise ValueError(
-            f"❌ 文件大小异常: {file_size} bytes < 最小要求 {min_size} bytes"
-        )
-    verification["checks"]["size_valid"] = True
-    verification["file_size"] = file_size
-
-    # 检查4: 文件可读性
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            first_char = f.read(1)
-            if not first_char:
-                raise ValueError("文件为空")
-    except Exception as e:
-        raise IOError(f"❌ 文件不可读: {e}")
-    verification["checks"]["readable"] = True
-
-    # 检查5: 内容格式验证
-    try:
-        with open(file_path, 'r', encoding='utf-8') as f:
-            content = f.read()
-
-        # 根据文件扩展名验证格式
-        if file_path.endswith('.yaml') or file_path.endswith('.yml'):
-            yaml.safe_load(content)
-        elif file_path.endswith('.json'):
-            json.loads(content)
-
-        verification["checks"]["format_valid"] = True
-    except Exception as e:
-        raise ValueError(f"❌ 文件格式验证失败: {e}")
-
-    verification["all_checks_passed"] = all(verification["checks"].values())
-
-    print(f"✓ 文件验证通过: {file_path} ({file_size} bytes)")
+    print(f"✓ 文件验证通过: {file_path} ({verification.get('file_size', 0)} bytes)")
     return verification
 ```
 

@@ -1,0 +1,300 @@
+workflow_id: "aps-objective-identification"
+workflow_name: "目标识别与分类工作流"
+version: "4.3"
+description: |
+  识别调度问题的优化目标，进行分类和建模准备。
+
+  使用场景：
+  1. 在主workflow Phase 2中被自动调用（Orchestrator直接调用agent）
+  2. 用户手动调用（bmad objective-expert → *identify-objectives）
+
+  前置条件：
+  - 必须先完成Phase 1.5（十要素建模）
+  - TenElementModel文件必须存在
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "objective-expert"
+  estimated_time: "8-12分钟"
+
+config:
+  confidence_threshold: 0.70
+  require_user_confirmation: true
+  use_objective_library: true
+  support_multi_objective: true
+
+steps:
+  - step_id: "objective-1"
+    name: "加载TenElementModel"
+    description: "从Phase 1.5加载十要素模型"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_1_5"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+            目标识别需要基于TenElementModel进行分析。
+
+            解决方案：
+            1. 返回主workflow：bmad aps → *start-scheduling
+            2. 完成 Phase 0-1.5 后再使用本专家
+
+    inputs:
+      - phase_id: "phase_1_5"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+      - format: "${config.state_management.state_format}"
+    outputs:
+      - state_data # 包含ten_element_model, model_baseline等
+      - metadata
+      - load_success
+      - file_metadata
+
+  - step_id: "objective-2"
+    name: "加载领域分析结果（如有）"
+    description: "加载领域专家的分析，了解领域典型目标"
+    action: "exec"
+    target: "bmad/aps/tasks/load-domain-analysis.md"
+    inputs:
+      - state_folder: "${config.state_management.state_folder}"
+    optional: true
+    outputs:
+      - domain_analysis
+      - domain_typical_objectives
+
+  - step_id: "objective-3"
+    name: "目标提取"
+    description: "从需求、TenElementModel和领域知识中提取目标"
+    action: "exec"
+    target: "bmad/aps/tasks/extract-objectives.md"
+    inputs:
+      - ten_element_model
+      - user_request
+      - domain_typical_objectives
+    extraction_sources:
+      explicit_objectives: "用户明确提到的目标"
+      implicit_objectives: "从业务需求推导的目标"
+      domain_objectives: "领域典型目标"
+      kpi_objectives: "从KPI转化的目标"
+    outputs:
+      - raw_objectives
+      - objective_sources
+
+  - step_id: "objective-4"
+    name: "目标分类"
+    description: "基于目标库进行分类"
+    action: "exec"
+    target: "bmad/aps/tasks/classify-objectives.md"
+    inputs:
+      - raw_objectives
+    critical_action:
+      - load_resource: "@专家库/目标函数专家库/README.md"
+    objective_taxonomy:
+      by_type:
+        - time: "时间目标(最小化完成时间/延迟)"
+        - cost: "成本目标(最小化运营成本)"
+        - quality: "质量目标(最大化质量/满意度)"
+        - resource: "资源目标(最大化利用率/负载均衡)"
+        - sustainability: "可持续性目标(最小化碳排放/能耗)"
+        - robustness: "鲁棒性目标(最小化风险/方差)"
+      by_priority:
+        - primary: "主要目标"
+        - secondary: "次要目标"
+        - auxiliary: "辅助目标"
+      by_nature:
+        - minimization: "最小化目标"
+        - maximization: "最大化目标"
+        - target: "目标值目标"
+    outputs:
+      - classified_objectives
+      - objective_types
+      - priority_classification
+
+  - step_id: "objective-5"
+    name: "目标形式化"
+    description: "将目标转化为数学优化函数"
+    action: "exec"
+    target: "bmad/aps/tasks/formalize-objectives.md"
+    inputs:
+      - classified_objectives
+      - ten_element_model
+    formalization_strategy:
+      use_standard_notation: true
+      cite_objective_patterns: true
+      provide_evaluation_method: true
+    outputs:
+      - formalized_objectives
+      - objective_functions
+      - formalization_notes
+
+  - step_id: "objective-6"
+    name: "多目标冲突分析"
+    description: "检测目标之间的冲突和权衡关系"
+    action: "exec"
+    target: "bmad/aps/tasks/analyze-objective-conflicts.md"
+    inputs:
+      - formalized_objectives
+    conflict_analysis:
+      - pairwise_correlation: "成对相关性分析"
+      - tradeoff_detection: "权衡关系检测"
+      - pareto_frontier_estimate: "帕累托前沿估计"
+    outputs:
+      - conflict_analysis
+      - conflicting_pairs
+      - tradeoff_curves
+
+  - step_id: "objective-7"
+    name: "目标权重设计"
+    description: "为多目标问题设计权重方案"
+    action: "exec"
+    target: "bmad/aps/tasks/design-objective-weights.md"
+    inputs:
+      - classified_objectives
+      - priority_classification
+      - conflict_analysis
+    weight_strategies:
+      - equal_weights: "等权重"
+      - priority_based: "基于优先级"
+      - ahp_method: "层次分析法"
+      - user_specified: "用户指定"
+    outputs:
+      - weight_schemes
+      - recommended_weights
+      - weight_justification
+
+  - step_id: "objective-8"
+    name: "用户确认目标和权重"
+    description: "展示目标分析结果，获取用户确认"
+    action: "conditional_human_confirmation"
+    condition: "is_multi_objective OR has_conflicts"
+    trigger_level: "P0"
+    confirmation_type: "objective_verification"
+    template: "@交互对话模板库/目标权重模板.md"
+    inputs:
+      - classified_objectives
+      - formalized_objectives
+      - conflict_analysis
+      - weight_schemes
+      - recommended_weights
+    presentation_format:
+      group_by_type: true
+      show_formalization: true
+      show_conflicts: true
+      show_tradeoffs: true
+      interactive_weight_adjustment: true
+    outputs:
+      - confirmed_objectives
+      - confirmed_weights
+      - user_preferences
+
+  - step_id: "objective-9"
+    name: "整合用户反馈"
+    description: "根据用户确认调整目标模型"
+    action: "exec"
+    target: "bmad/aps/tasks/integrate-objective-feedback.md"
+    inputs:
+      - formalized_objectives
+      - confirmed_weights
+      - user_preferences
+    outputs:
+      - final_objective_model
+
+  - step_id: "objective-10"
+    name: "生成目标分析报告"
+    description: "输出结构化的目标分析报告"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-objective-report.md"
+    inputs:
+      - final_objective_model
+      - conflict_analysis
+      - weight_justification
+    report_sections:
+      - objective_inventory
+      - priority_breakdown
+      - formalization_summary
+      - conflict_assessment
+      - weight_scheme
+      - evaluation_strategy
+      - reference_citations
+    outputs:
+      - objective_analysis_report
+      - objective_metadata
+
+outputs:
+  primary:
+    - final_objective_model
+    - confirmed_weights
+    - formalized_objectives
+
+  documentation:
+    - objective_analysis_report
+    - conflict_analysis
+    - weight_justification
+
+  metadata:
+    - objective_types
+    - is_multi_objective
+    - conflicting_pairs
+
+validation:
+  post_workflow_checks:
+    - all_objectives_classified: true
+    - all_objectives_formalized: true
+    - weights_sum_to_one: true
+    - all_citations_present: true
+    - user_confirmed: true
+
+  quality_gates:
+    - name: "Objective Completeness"
+      check: "final_objective_model.length > 0"
+      severity: "critical"
+
+    - name: "Weight Normalization"
+      check: "sum(confirmed_weights) == 1.0"
+      severity: "critical"
+
+    - name: "Formalization Quality"
+      check: "all objectives have mathematical function"
+      severity: "high"
+
+    - name: "Citation Compliance"
+      check: "all objective patterns cite library"
+      severity: "critical"
+
+error_handling:
+  on_conflicting_objectives:
+    action: "highlight_and_request_priority"
+    trigger_level: "P1"
+
+  on_unknown_objective_type:
+    action: "submit_capability_gap_report"
+    template: "@交互对话模板库/能力缺口模板.md"
+
+  on_weight_inconsistency:
+    action: "request_user_adjustment"
+    trigger_level: "P0"
+
+integration:
+  upstream_phase: "phase-1.5"
+  downstream_phases: ["phase-2", "phase-3"]
+  provides_to_phases:
+    - objective_model
+    - weight_scheme
+    - evaluation_strategy
+
+metrics:
+  track:
+    - total_objectives_count
+    - is_multi_objective
+    - conflicts_detected_count
+    - weight_adjustment_count
+    - user_confirmation_time

@@ -1,0 +1,72 @@
+workflow_id: "aps-module-integration"
+workflow_name: "模块集成工作流"
+version: "4.3"
+description: |
+  将新知识模块集成到专家库。
+
+  使用场景：
+  1. 在模板生成后，集成新知识模块到专家库
+  2. 用户手动调用（bmad extension-guide → *integrate-module）
+
+  前置条件：
+  - 建议先完成模板生成（template-generation workflow）
+  - 或已有准备好的知识模块
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "extension-guide"
+  estimated_time: "10-15分钟"
+
+config:
+  validate_integration: true
+  update_index: true
+
+steps:
+  - step_id: "integrate-1"
+    name: "加载知识模块"
+    action: "exec"
+    target: "bmad/aps/tasks/load-knowledge-module.md"
+
+    pre_condition_check:
+      optional: true
+      fallback_mode:
+        description: "如果知识模块不存在，可从用户输入开始"
+        action: "request_user_input"
+
+    outputs:
+      - knowledge_module
+
+  - step_id: "integrate-2"
+    name: "选择目标专家库"
+    action: "exec"
+    target: "bmad/aps/tasks/select-target-library.md"
+    inputs:
+      - knowledge_module
+    outputs:
+      - target_library
+
+  - step_id: "integrate-3"
+    name: "集成到专家库"
+    action: "exec"
+    target: "bmad/aps/tasks/integrate-to-library.md"
+    inputs:
+      - knowledge_module
+      - target_library
+    outputs:
+      - integration_result
+
+  - step_id: "integrate-4"
+    name: "更新索引"
+    action: "exec"
+    target: "bmad/aps/tasks/update-library-index.md"
+    inputs:
+      - integration_result
+    outputs:
+      - updated_index
+
+outputs:
+  primary:
+    - integration_result
+    - updated_index

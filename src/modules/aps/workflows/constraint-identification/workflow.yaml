@@ -1,0 +1,297 @@
+workflow_id: "aps-constraint-identification"
+workflow_name: "约束识别与分类工作流"
+version: "4.3"
+description: |
+  识别调度问题的约束条件，进行分类和建模准备。
+
+  使用场景：
+  1. 在主workflow Phase 2中被自动调用（Orchestrator直接调用agent）
+  2. 用户手动调用（bmad constraint-expert → *identify-constraints）
+
+  前置条件：
+  - 必须先完成Phase 1.5（十要素建模）
+  - TenElementModel文件必须存在
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "constraint-expert"
+  estimated_time: "10-15分钟"
+
+config:
+  confidence_threshold: 0.70
+  require_user_confirmation: true
+  use_constraint_library: true
+  distinguish_hard_soft: true
+
+steps:
+  - step_id: "constraint-1"
+    name: "加载TenElementModel"
+    description: "从Phase 1.5加载十要素模型"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_1_5"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+            约束识别需要基于TenElementModel进行分析。
+
+            解决方案：
+            1. 返回主workflow：bmad aps → *start-scheduling
+            2. 完成 Phase 0-1.5 后再使用本专家
+
+    inputs:
+      - phase_id: "phase_1_5"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+      - format: "${config.state_management.state_format}"
+    outputs:
+      - state_data # 包含ten_element_model, model_baseline等
+      - metadata
+      - load_success
+      - file_metadata
+
+  - step_id: "constraint-2"
+    name: "加载领域分析结果（如有）"
+    description: "加载领域专家的分析结果，用于约束识别"
+    action: "exec"
+    target: "bmad/aps/tasks/load-domain-analysis.md"
+    inputs:
+      - state_folder: "${config.state_management.state_folder}"
+    optional: true
+    outputs:
+      - domain_analysis
+      - business_rules
+
+  - step_id: "constraint-3"
+    name: "约束提取"
+    description: "从需求、TenElementModel和业务规则中提取约束"
+    action: "exec"
+    target: "bmad/aps/tasks/extract-constraints.md"
+    inputs:
+      - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+      - user_request
+      - business_rules
+    extraction_sources:
+      explicit_constraints: "用户明确提到的约束"
+      implicit_constraints: "从业务规则推导的约束"
+      domain_constraints: "领域特定的约束"
+      technical_constraints: "技术实现的约束"
+    outputs:
+      - raw_constraints
+      - constraint_sources
+
+  - step_id: "constraint-4"
+    name: "约束分类"
+    description: "基于约束库进行分类"
+    action: "exec"
+    target: "bmad/aps/tasks/classify-constraints.md"
+    inputs:
+      - raw_constraints
+    critical_action:
+      - load_resource: "@专家库/约束模式专家库/README.md"
+    constraint_taxonomy:
+      by_type:
+        - capacity: "容量约束"
+        - time: "时间约束"
+        - precedence: "优先级约束"
+        - resource: "资源约束"
+        - spatial: "空间约束"
+        - logical: "逻辑约束"
+        - coupling: "耦合约束"
+      by_hardness:
+        - hard: "硬约束(必须满足)"
+        - soft: "软约束(尽量满足)"
+        - preference: "偏好(优化方向)"
+      by_scope:
+        - global: "全局约束"
+        - local: "局部约束"
+        - pairwise: "成对约束"
+    outputs:
+      - classified_constraints
+      - constraint_types
+      - hardness_classification
+
+  - step_id: "constraint-5"
+    name: "约束形式化"
+    description: "将约束转化为数学表达式"
+    action: "exec"
+    target: "bmad/aps/tasks/formalize-constraints.md"
+    inputs:
+      - classified_constraints
+      - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+    formalization_strategy:
+      use_standard_notation: true
+      cite_constraint_patterns: true
+      provide_pseudo_code: true
+    outputs:
+      - formalized_constraints
+      - constraint_expressions
+      - formalization_notes
+
+  - step_id: "constraint-6"
+    name: "约束复杂度分析"
+    description: "评估约束的复杂度和验证成本"
+    action: "exec"
+    target: "bmad/aps/tasks/analyze-constraint-complexity.md"
+    inputs:
+      - formalized_constraints
+    complexity_dimensions:
+      - computational: "计算复杂度"
+      - coupling_degree: "耦合程度"
+      - nonlinearity: "非线性程度"
+      - dynamic_degree: "动态变化程度"
+    outputs:
+      - complexity_analysis
+      - verification_cost_estimate
+
+  - step_id: "constraint-7"
+    name: "约束一致性检查"
+    description: "检查约束之间是否有冲突"
+    action: "exec"
+    target: "bmad/aps/tasks/check-constraint-consistency.md"
+    inputs:
+      - formalized_constraints
+    consistency_checks:
+      - mutual_exclusivity: "互斥性检查"
+      - logical_contradiction: "逻辑矛盾检查"
+      - infeasibility_detection: "不可行性检测"
+    outputs:
+      - consistency_report
+      - conflicts_found
+      - conflict_severity
+
+  - step_id: "constraint-8"
+    name: "用户确认约束"
+    description: "展示约束分析结果，获取用户确认"
+    action: "conditional_human_confirmation"
+    condition: "has_conflicts OR confidence < 0.75"
+    trigger_level: "P0"
+    confirmation_type: "constraint_verification"
+    template: "@交互对话模板库/约束确认模板.md"
+    inputs:
+      - classified_constraints
+      - formalized_constraints
+      - hardness_classification
+      - complexity_analysis
+      - conflicts_found
+    presentation_format:
+      group_by_type: true
+      show_formalization: true
+      highlight_conflicts: true
+      show_complexity: true
+    outputs:
+      - confirmed_constraints
+      - user_adjustments
+      - resolved_conflicts
+
+  - step_id: "constraint-9"
+    name: "整合用户反馈"
+    description: "根据用户确认调整约束模型"
+    action: "exec"
+    target: "bmad/aps/tasks/integrate-constraint-feedback.md"
+    inputs:
+      - formalized_constraints
+      - user_adjustments
+      - resolved_conflicts
+    outputs:
+      - final_constraint_model
+
+  - step_id: "constraint-10"
+    name: "生成约束分析报告"
+    description: "输出结构化的约束分析报告"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-constraint-report.md"
+    inputs:
+      - final_constraint_model
+      - complexity_analysis
+      - consistency_report
+    report_sections:
+      - constraint_inventory
+      - hardness_breakdown
+      - formalization_summary
+      - complexity_assessment
+      - verification_strategy
+      - reference_citations
+    outputs:
+      - constraint_analysis_report
+      - constraint_metadata
+
+outputs:
+  primary:
+    - final_constraint_model
+    - hardness_classification
+    - formalized_constraints
+
+  documentation:
+    - constraint_analysis_report
+    - consistency_report
+    - complexity_analysis
+
+  metadata:
+    - constraint_types
+    - verification_cost_estimate
+    - conflicts_found
+
+validation:
+  post_workflow_checks:
+    - all_constraints_classified: true
+    - all_constraints_formalized: true
+    - no_unresolved_conflicts: true
+    - all_citations_present: true
+    - user_confirmed: true
+
+  quality_gates:
+    - name: "Constraint Completeness"
+      check: "final_constraint_model.length >= raw_constraints.length"
+      severity: "critical"
+
+    - name: "Hard/Soft Classification"
+      check: "all constraints have hardness label"
+      severity: "critical"
+
+    - name: "Formalization Quality"
+      check: "all constraints have mathematical expression"
+      severity: "high"
+
+    - name: "Citation Compliance"
+      check: "all constraint patterns cite library"
+      severity: "critical"
+
+error_handling:
+  on_conflict_detected:
+    action: "human_confirmation"
+    trigger_level: "P2"
+
+  on_unknown_constraint_type:
+    action: "submit_capability_gap_report"
+    template: "@交互对话模板库/能力缺口模板.md"
+
+  on_infeasibility:
+    action: "alert_and_request_relaxation"
+    trigger_level: "P1"
+
+integration:
+  upstream_phase: "phase-1.5"
+  downstream_phases: ["phase-2", "phase-3"]
+  provides_to_phases:
+    - constraint_model
+    - verification_strategy
+    - complexity_baseline
+
+metrics:
+  track:
+    - total_constraints_count
+    - hard_constraints_count
+    - soft_constraints_count
+    - conflicts_detected_count
+    - complexity_score
+    - user_adjustments_count

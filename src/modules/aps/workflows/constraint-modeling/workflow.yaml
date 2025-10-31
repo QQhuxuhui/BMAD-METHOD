@@ -1,0 +1,73 @@
+workflow_id: "aps-constraint-modeling"
+workflow_name: "约束建模与代码生成工作流"
+version: "4.3"
+description: |
+  将约束转化为可执行代码。
+
+  使用场景：
+  1. 在约束识别后，生成约束验证代码
+  2. 用户手动调用（bmad constraint-expert → *model-constraints）
+
+  前置条件：
+  - 建议先完成约束识别（constraint-identification workflow）
+  - 或已有明确的约束定义
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "constraint-expert"
+  estimated_time: "10-15分钟"
+
+config:
+  use_constraint_library: true
+  generate_verification_code: true
+
+steps:
+  - step_id: "model-1"
+    name: "加载约束分析"
+    action: "exec"
+    target: "bmad/aps/tasks/load-constraint-analysis.md"
+
+    pre_condition_check:
+      optional: true
+      fallback_mode:
+        description: "如果约束分析结果不存在，可从用户输入开始"
+        action: "request_user_input"
+
+    outputs:
+      - constraint_model
+
+  - step_id: "model-2"
+    name: "选择建模范式"
+    action: "exec"
+    target: "bmad/aps/tasks/select-modeling-paradigm.md"
+    inputs:
+      - constraint_model
+    outputs:
+      - selected_paradigm
+
+  - step_id: "model-3"
+    name: "生成约束代码"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-constraint-code.md"
+    inputs:
+      - constraint_model
+      - selected_paradigm
+    outputs:
+      - constraint_code
+
+  - step_id: "model-4"
+    name: "生成验证代码"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-verification-code.md"
+    inputs:
+      - constraint_model
+    outputs:
+      - verification_code
+
+outputs:
+  primary:
+    - constraint_code
+    - verification_code
+    - selected_paradigm

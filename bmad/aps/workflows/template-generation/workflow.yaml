@@ -1,0 +1,72 @@
+workflow_id: "aps-template-generation"
+workflow_name: "知识模板生成工作流"
+version: "4.3"
+description: |
+  从提取的知识生成标准化模板。
+
+  使用场景：
+  1. 在知识提取后，生成标准化模板
+  2. 用户手动调用（bmad extension-guide → *generate-template）
+
+  前置条件：
+  - 建议先完成知识提取（knowledge-extraction workflow）
+  - 或已有明确的知识内容
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "extension-guide"
+  estimated_time: "15-20分钟"
+
+config:
+  use_standard_templates: true
+  validate_templates: true
+
+steps:
+  - step_id: "template-1"
+    name: "加载知识"
+    action: "exec"
+    target: "bmad/aps/tasks/load-extracted-knowledge.md"
+
+    pre_condition_check:
+      optional: true
+      fallback_mode:
+        description: "如果提取的知识不存在，可从用户输入开始"
+        action: "request_user_input"
+
+    outputs:
+      - extracted_knowledge
+
+  - step_id: "template-2"
+    name: "选择模板类型"
+    action: "exec"
+    target: "bmad/aps/tasks/select-template-type.md"
+    inputs:
+      - extracted_knowledge
+    outputs:
+      - template_type
+
+  - step_id: "template-3"
+    name: "生成模板内容"
+    action: "exec"
+    target: "bmad/aps/tasks/generate-template-content.md"
+    inputs:
+      - extracted_knowledge
+      - template_type
+    outputs:
+      - template_content
+
+  - step_id: "template-4"
+    name: "验证模板"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-template.md"
+    inputs:
+      - template_content
+    outputs:
+      - validated_template
+
+outputs:
+  primary:
+    - validated_template
+    - template_type

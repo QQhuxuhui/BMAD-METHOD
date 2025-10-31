@@ -13,6 +13,7 @@
 **文件**: `src/modules/aps/workflows/scheduling-orchestration/workflow.yaml`
 
 **修复内容**:
+
 - 添加了4层验证机制，从原来的单一检查扩展到:
   1. ✅ Markdown文件已保存检查
   2. ✅ 文件名格式验证 (必须是 `solution_document_*.md`)
@@ -30,21 +31,23 @@
 **文件**: `src/modules/aps/workflows/scheduling-orchestration/workflow.yaml`
 
 **修复内容**:
+
 - 在用户确认方案(Step 3.4)和代码生成(Step 3.5)之间新增验证步骤
 - 作为最后一道防线，确保方案文档完整存在
 
 **验证门禁位置**: Lines 781-817
 
 **检查项**:
+
 ```yaml
 verification_gate:
   critical: true
   checks:
-    - "final_verification.markdown_exists == true"
-    - "final_verification.yaml_exists == true"
-    - "final_verification.has_all_sections == true"
-    - "final_verification.all_checks_passed == true"
-  on_fail: "block_with_error"
+    - 'final_verification.markdown_exists == true'
+    - 'final_verification.yaml_exists == true'
+    - 'final_verification.has_all_sections == true'
+    - 'final_verification.all_checks_passed == true'
+  on_fail: 'block_with_error'
 ```
 
 **效果**: 代码生成前强制验证文档完整性
@@ -56,6 +59,7 @@ verification_gate:
 **文件**: `src/modules/aps/tasks/save-solution-document.md`
 
 **修复内容**:
+
 - 添加了🚨🚨🚨 CRITICAL WARNING章节 (lines 9-54)
 - 明确禁止生成README.md作为替代
 - 强制要求生成两个特定文件:
@@ -63,6 +67,7 @@ verification_gate:
   2. `solution_data_{timestamp}.yaml` (结构化数据)
 
 **增强的验证逻辑**:
+
 ```python
 def verify_file_saved(file_path, min_size=1024):
     # 文件名格式检查
@@ -134,6 +139,7 @@ def generate_final_verification(markdown_result, yaml_result):
 添加`resolvePath()`辅助函数到两个位置:
 
 **位置1: generateConfigYaml (lines 123-128)**
+
 ```javascript
 const resolvePath = (pathStr) => {
   if (!pathStr) return pathStr;
@@ -147,6 +153,7 @@ reports_folder: resolvePath(userConfig.reports_output_location) || 'aps-outputs/
 ```
 
 **位置2: createOutputDirectories (lines 250-255)**
+
 ```javascript
 const resolvePath = (pathStr) => {
   if (!pathStr) return pathStr;
@@ -162,6 +169,7 @@ const outputDirs = [
 ```
 
 **验证结果**:
+
 - ✅ test目录下不再有`{project-root}`目录
 - ✅ 重新安装不会创建错误的目录
 
@@ -201,18 +209,20 @@ const outputDirs = [
 ## 📊 修复效果对比
 
 ### 修复前
-| 问题 | 表现 | 影响 |
-|------|------|------|
-| 弱验证 | 只检查file_saved | AI生成README.md通过验证 |
-| 跳过方案 | 直接进入代码生成 | 缺少设计文档，无法追溯 |
-| 占位符泄漏 | 创建{project-root}目录 | 目录结构混乱 |
+
+| 问题       | 表现                   | 影响                    |
+| ---------- | ---------------------- | ----------------------- |
+| 弱验证     | 只检查file_saved       | AI生成README.md通过验证 |
+| 跳过方案   | 直接进入代码生成       | 缺少设计文档，无法追溯  |
+| 占位符泄漏 | 创建{project-root}目录 | 目录结构混乱            |
 
 ### 修复后
-| 增强 | 实现 | 效果 |
-|------|------|------|
-| 强验证 | 4层检查 + 内容结构验证 | 强制生成正确的方案文档 |
-| 阻断机制 | 三层防御 | 无法跳过方案文档生成 |
-| 占位符处理 | resolvePath辅助函数 | 正确的目录结构 |
+
+| 增强       | 实现                   | 效果                   |
+| ---------- | ---------------------- | ---------------------- |
+| 强验证     | 4层检查 + 内容结构验证 | 强制生成正确的方案文档 |
+| 阻断机制   | 三层防御               | 无法跳过方案文档生成   |
+| 占位符处理 | resolvePath辅助函数    | 正确的目录结构         |
 
 ---
 

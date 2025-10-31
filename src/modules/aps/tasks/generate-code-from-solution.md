@@ -1,8 +1,27 @@
 # Task: Generate Code From Solution
 
 **任务ID**: `generate-code-from-solution`
-**版本**: V4.3
+**版本**: V4.4 (重大更新)
 **用途**: Phase 3 Step 3.5 - 严格按照用户确认的方案生成可执行代码
+
+## 🔥 V4.4 重大更新说明
+
+**更新日期**: 2025-01-21
+
+**核心变更**:
+
+1. ❌ **移除TODO生成**: 不再生成任何TODO标记
+2. ✅ **专家库解析**: 新增步骤0.1，解析专家库提取伪代码
+3. ✅ **公式转代码**: 新增步骤0.2，将数学公式转为Python实现
+4. ✅ **AI代码生成**: 步骤3.5改用AI根据专家库伪代码生成完整算法
+5. ✅ **完整性验证**: 生成的代码100%完整，可直接运行
+
+**依赖新任务**:
+
+- expert-library-parser.md
+- formula-to-code-converter.md
+- ai-code-generator.md
+- validate-code-completeness.md
 
 ## 输入
 
@@ -104,6 +123,73 @@ output_scope:
 ```
 
 ## 处理逻辑
+
+### 步骤0.1: 解析专家库指导（新增）
+
+**目的**: 从专家库中提取伪代码、框架代码和实现指导
+
+```python
+# 调用 expert-library-parser.md
+from expert_library_parser import parse_expert_libraries
+
+def extract_expert_guidance(user_approved_solution, ten_element_model):
+    """
+    解析专家库，提取算法、约束、目标的实现指导
+
+    Returns:
+        expert_guidance: 结构化的专家库指导信息
+    """
+    # 从方案中提取专家库引用
+    algorithm_citation = user_approved_solution['sections']['5_algorithm_selection']['sections']['selected_algorithm'].get('citations', [])[0]
+
+    constraint_citations = []
+    for constraint in ten_element_model.get('constraints', []):
+        if 'citation' in constraint:
+            constraint_citations.append(constraint['citation'])
+
+    objective_citations = []
+    for objective in ten_element_model.get('objectives', []):
+        if 'citation' in objective:
+            objective_citations.append(objective['citation'])
+
+    # 调用专家库解析器
+    expert_guidance = parse_expert_libraries(
+        algorithm_citation,
+        constraint_citations,
+        objective_citations
+    )
+
+    print("✓ 专家库解析完成")
+    return expert_guidance
+```
+
+### 步骤0.2: 转换数学公式为代码（新增）
+
+**目的**: 将TenElementModel中的约束公式和目标函数转换为Python代码
+
+```python
+# 调用 formula-to-code-converter.md
+from formula_to_code_converter import convert_formulas_to_code
+
+def generate_formula_implementations(ten_element_model, expert_guidance):
+    """
+    将数学公式转换为Python实现代码
+
+    Returns:
+        generated_formulas: 包含约束和目标函数的完整代码
+    """
+    # 调用公式转换器
+    generated_formulas = convert_formulas_to_code(
+        ten_element_model,
+        expert_guidance
+    )
+
+    print("✓ 公式转代码转换完成")
+    print(f"  - 约束代码: {len(generated_formulas['constraints'])} 个")
+    print(f"  - 目标代码: {len(generated_formulas['objectives'])} 个")
+
+    return generated_formulas
+```
 
 ### 步骤1: 验证输入数据
 
@@ -316,18 +402,21 @@ def generate_data_models(ten_element_model, problem_definition, solution_documen
     return "\n".join(code_lines)
 ```
 
-#### 3.3 生成约束验证函数
+#### 3.3 生成约束验证函数（修改：使用已转换的代码）
 
 ```python
 def generate_constraint_functions(
     ten_element_model,
     constraint_strategy,
-    solution_document_path
+    solution_document_path,
+    generated_formulas  # 新增参数：来自步骤0.2
 ):
     """
     基于约束处理策略生成约束验证函数
 
     方案依据: solution_document Section 3 - 约束处理策略
+
+    ⚠️ 重要变更: 不再生成TODO，直接使用formula-to-code-converter转换的完整代码
     """
     code_lines = []
 
@@ -336,77 +425,35 @@ def generate_constraint_functions(
     code_lines.append('')
     code_lines.append(f'方案依据: {solution_document_path} Section 3')
     code_lines.append('约束策略: 硬约束-repair方法, 软约束-penalty方法')
+    code_lines.append('代码来源: formula-to-code-converter (完整实现)')
     code_lines.append('"""')
     code_lines.append('')
 
-    # 硬约束验证
-    hard_constraints = constraint_strategy['sections']['constraint_classification']['hard_constraints']
-
-    for hc in hard_constraints:
-        func_name = f"validate_{hc.get('name', 'constraint').replace(' ', '_').lower()}"
-        code_lines.append(f"def {func_name}(solution):")
-        code_lines.append(f'    """')
-        code_lines.append(f"    验证约束: {hc.get('description', '')}")
-        code_lines.append(f'    ')
-        code_lines.append(f"    方案依据: solution_document Section 3.1 - 硬约束")
-        code_lines.append(f"    处理策略: solution_document Section 3.2 - repair方法")
-
-        # 获取引用
-        citations = constraint_strategy['sections']['handling_methods']['hard_constraint_strategy'].get('citations', [])
-        if citations:
-            code_lines.append(f"    引用: {citations[0]}")
-
-        code_lines.append(f'    ')
-        code_lines.append(f"    Args:")
-        code_lines.append(f"        solution: 待验证的解")
-        code_lines.append(f'    ')
-        code_lines.append(f"    Returns:")
-        code_lines.append(f"        bool: 约束是否满足")
-        code_lines.append(f'    """')
-        code_lines.append(f"    # TODO: 实现约束验证逻辑")
-        code_lines.append(f"    pass")
+    # 使用已转换的约束代码（无TODO）
+    for constraint_code in generated_formulas['constraints']:
+        code_lines.append(constraint_code['code'])
         code_lines.append('')
 
-    # 软约束评估
-    soft_constraints = constraint_strategy['sections']['constraint_classification']['soft_constraints']
-
-    for sc in soft_constraints:
-        func_name = f"evaluate_{sc.get('name', 'constraint').replace(' ', '_').lower()}_penalty"
-        code_lines.append(f"def {func_name}(solution):")
-        code_lines.append(f'    """')
-        code_lines.append(f"    评估软约束违反惩罚: {sc.get('description', '')}")
-        code_lines.append(f'    ')
-        code_lines.append(f"    方案依据: solution_document Section 3.1 - 软约束")
-        code_lines.append(f"    处理策略: solution_document Section 3.2 - penalty方法")
-
-        # 获取引用
-        citations = constraint_strategy['sections']['handling_methods']['soft_constraint_strategy'].get('citations', [])
-        if citations:
-            code_lines.append(f"    引用: {citations[0]}")
-
-        code_lines.append(f'    ')
-        code_lines.append(f"    Returns:")
-        code_lines.append(f"        float: 惩罚值")
-        code_lines.append(f'    """')
-        code_lines.append(f"    # TODO: 实现惩罚计算逻辑")
-        code_lines.append(f"    return 0.0")
-        code_lines.append('')
+    print(f"✓ 约束函数代码已集成: {len(generated_formulas['constraints'])} 个（完整实现，无TODO）")
 
     return "\n".join(code_lines)
 ```
 
-#### 3.4 生成目标函数
+#### 3.4 生成目标函数（修改：使用已转换的代码）
 
 ```python
 def generate_objective_functions(
     ten_element_model,
     objective_strategy,
-    solution_document_path
+    solution_document_path,
+    generated_formulas  # 新增参数：来自步骤0.2
 ):
     """
     基于目标优化策略生成目标函数
 
     方案依据: solution_document Section 4 - 目标优化策略
+
+    ⚠️ 重要变更: 不再生成TODO，直接使用formula-to-code-converter转换的完整代码
     """
     code_lines = []
 
@@ -415,131 +462,63 @@ def generate_objective_functions(
     code_lines.append('')
     code_lines.append(f'方案依据: {solution_document_path} Section 4')
     code_lines.append('TenElementModel: Element 4 - objectives')
+    code_lines.append('代码来源: formula-to-code-converter (完整实现)')
     code_lines.append('"""')
     code_lines.append('')
 
-    # 主目标函数
-    primary_obj = objective_strategy['sections']['objective_hierarchy']['primary_objective']
-
-    code_lines.append(f"def calculate_primary_objective(solution):")
-    code_lines.append(f'    """')
-    code_lines.append(f"    计算主目标: {primary_obj.get('name', '')}")
-    code_lines.append(f"    {primary_obj.get('description', '')}")
-    code_lines.append(f'    ')
-    code_lines.append(f"    方案依据: solution_document Section 4.1 - 主目标")
-    code_lines.append(f"    TenElementModel: objectives.{primary_obj.get('name', '')}")
-    code_lines.append(f'    ')
-    code_lines.append(f"    Returns:")
-    code_lines.append(f"        float: 目标值")
-    code_lines.append(f'    """')
-    code_lines.append(f"    # TODO: 实现主目标计算")
-    code_lines.append(f"    pass")
-    code_lines.append('')
-
-    # 次要目标函数
-    secondary_objs = objective_strategy['sections']['objective_hierarchy']['secondary_objectives']
-
-    for sec_obj in secondary_objs:
-        func_name = f"calculate_{sec_obj.get('name', 'objective').replace(' ', '_').lower()}"
-        code_lines.append(f"def {func_name}(solution):")
-        code_lines.append(f'    """')
-        code_lines.append(f"    计算次要目标: {sec_obj.get('name', '')}")
-        code_lines.append(f'    ')
-        code_lines.append(f"    方案依据: solution_document Section 4.1 - 次要目标")
-        code_lines.append(f'    """')
-        code_lines.append(f"    # TODO: 实现次要目标计算")
-        code_lines.append(f"    pass")
+    # 使用已转换的目标函数代码（无TODO）
+    for objective_code in generated_formulas['objectives']:
+        code_lines.append(objective_code['code'])
         code_lines.append('')
 
-    # 多目标聚合函数
-    multi_obj = objective_strategy['sections']['multi_objective_handling']
-
-    code_lines.append(f"def calculate_aggregated_objective(solution):")
-    code_lines.append(f'    """')
-    code_lines.append(f"    聚合多目标")
-    code_lines.append(f'    ')
-    code_lines.append(f"    方案依据: solution_document Section 4.2 - 多目标处理")
-    code_lines.append(f"    方法: {multi_obj['approach']}")
-    code_lines.append(f"    权重: {multi_obj['weights']}")
-    code_lines.append(f'    ')
-    code_lines.append(f"    引用:")
-    for cite in multi_obj.get('citations', []):
-        code_lines.append(f"        - {cite}")
-    code_lines.append(f'    """')
-    code_lines.append(f"    primary = calculate_primary_objective(solution)")
-    code_lines.append(f"    ")
-    code_lines.append(f"    # TODO: 根据权重聚合所有目标")
-    code_lines.append(f"    return primary")
+    # 添加聚合目标函数
+    code_lines.append(generated_formulas['aggregated_objective'])
     code_lines.append('')
+
+    print(f"✓ 目标函数代码已集成: {len(generated_formulas['objectives'])} 个 + 聚合函数（完整实现，无TODO）")
 
     return "\n".join(code_lines)
 ```
 
-#### 3.5 生成算法核心
+#### 3.5 生成算法核心（修改：调用AI代码生成器）
 
 ```python
+# 调用 ai-code-generator.md
+from ai_code_generator import generate_algorithm_implementation
+
 def generate_algorithm_core(
     algorithm_selection,
-    solution_document_path
+    solution_document_path,
+    expert_guidance,  # 新增参数：来自步骤0.1
+    ten_element_model,  # 新增参数
+    generated_formulas  # 新增参数：来自步骤0.2
 ):
     """
     基于算法选择生成算法核心代码
 
     方案依据: solution_document Section 5 - 算法选择与配置
-    """
-    code_lines = []
 
+    ⚠️ 重要变更: 不再生成TODO，调用AI根据专家库伪代码生成完整实现
+    """
     selected = algorithm_selection['sections']['selected_algorithm']
     config = algorithm_selection['sections']['algorithm_configuration']
-
     algorithm_name = selected['algorithm_name']
 
-    code_lines.append('"""')
-    code_lines.append(f'{algorithm_name} 算法实现')
-    code_lines.append('')
-    code_lines.append(f'方案依据: {solution_document_path} Section 5')
-    code_lines.append(f'算法选择: {algorithm_name}')
-    code_lines.append(f'选择理由: {selected["selection_rationale"]}')
-    code_lines.append('引用:')
-    for cite in selected.get('citations', []):
-        code_lines.append(f'    - {cite}')
-    code_lines.append('"""')
-    code_lines.append('')
+    print(f"生成算法实现: {algorithm_name}")
+    print("  - 基于专家库伪代码")
+    print("  - 使用AI生成完整实现")
+    print("  - 无TODO，可直接运行")
 
-    # 算法类
-    class_name = algorithm_name.replace(' ', '').replace('-', '')
-    code_lines.append(f"class {class_name}:")
-    code_lines.append(f'    """')
-    code_lines.append(f"    {algorithm_name} 求解器")
-    code_lines.append(f'    ')
-    code_lines.append(f"    方案依据: solution_document Section 5.1 & 5.2")
-    code_lines.append(f'    """')
-    code_lines.append(f"    ")
-    code_lines.append(f"    def __init__(self):")
-    code_lines.append(f"        # 算法参数配置")
-    code_lines.append(f"        # 方案依据: solution_document Section 5.2 - 算法配置")
+    # 调用AI代码生成器
+    algorithm_code = generate_algorithm_implementation(
+        expert_guidance,
+        ten_element_model,
+        config
+    )
 
-    # 参数
-    for param_name, param_value in config.get('parameters', {}).items():
-        justification = config.get('parameter_justification', {}).get(param_name, '')
-        code_lines.append(f"        self.{param_name} = {param_value}  # {justification}")
+    print(f"✓ 算法核心代码已生成: {algorithm_name}（完整实现，无TODO）")
 
-    code_lines.append('')
-    code_lines.append(f"    def solve(self, problem_data):")
-    code_lines.append(f'        """')
-    code_lines.append(f"        求解入口")
-    code_lines.append(f'        ')
-    code_lines.append(f"        Args:")
-    code_lines.append(f"            problem_data: 问题数据")
-    code_lines.append(f'        ')
-    code_lines.append(f"        Returns:")
-    code_lines.append(f"            解决方案")
-    code_lines.append(f'        """')
-    code_lines.append(f"        # TODO: 实现{algorithm_name}算法")
-    code_lines.append(f"        pass")
-    code_lines.append('')
-
-    return "\n".join(code_lines)
+    return algorithm_code
 ```
 
 #### 3.6 生成主求解器

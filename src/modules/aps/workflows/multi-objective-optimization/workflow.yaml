@@ -1,0 +1,74 @@
+workflow_id: "aps-multi-objective-optimization"
+workflow_name: "多目标优化工作流"
+version: "4.3"
+description: |
+  处理多目标优化问题，生成帕累托前沿。
+
+  使用场景：
+  1. 当存在多个冲突目标时，计算帕累托前沿
+  2. 用户手动调用（bmad objective-expert → *multi-objective）
+
+  前置条件：
+  - 必须先完成目标识别，且存在多个目标
+  - 建议已完成约束识别和算法推荐
+
+metadata:
+  author: "APS Team"
+  created: "2025-10-29"
+  bmad_version: "v6-alpha"
+  expert: "objective-expert"
+  estimated_time: "15-20分钟"
+
+config:
+  use_objective_library: true
+  compute_pareto_frontier: true
+
+steps:
+  - step_id: "multi-obj-1"
+    name: "加载目标模型"
+    action: "exec"
+    target: "bmad/aps/tasks/load-objective-analysis.md"
+
+    pre_condition_check:
+      optional: true
+      fallback_mode:
+        description: "如果目标模型不存在，可从用户输入开始"
+        action: "request_user_input"
+
+    outputs:
+      - objective_model
+
+  - step_id: "multi-obj-2"
+    name: "选择多目标策略"
+    action: "exec"
+    target: "bmad/aps/tasks/select-multi-objective-strategy.md"
+    inputs:
+      - objective_model
+    outputs:
+      - mo_strategy
+
+  - step_id: "multi-obj-3"
+    name: "帕累托前沿计算"
+    action: "exec"
+    target: "bmad/aps/tasks/compute-pareto-frontier.md"
+    inputs:
+      - objective_model
+      - mo_strategy
+    outputs:
+      - pareto_frontier
+
+  - step_id: "multi-obj-4"
+    name: "用户选择偏好解"
+    action: "human_confirmation"
+    trigger_level: "P0"
+    template: "@交互对话模板库/帕累托解选择模板.md"
+    inputs:
+      - pareto_frontier
+    outputs:
+      - selected_solution
+
+outputs:
+  primary:
+    - pareto_frontier
+    - selected_solution
+    - mo_strategy
