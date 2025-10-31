@@ -254,7 +254,7 @@ def main():
     # 加载工艺路线数据
     process_route = load_process_route("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/工艺路线.csv")
     # 加载并处理排产结果数据
-    result = load_and_process_result("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/aps-outputs/scheduling_result.csv")
+    result = load_and_process_result("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/aps-outputs/schedule_result.csv")
     # 加载产品需求数据并合并
     demand = load_demand_data("/usr/src/workspace/github/QQhuxuhui/BMAD-METHOD/test/data/产品需求.csv")
     # 加载工作日历数据
@@ -264,11 +264,15 @@ def main():
     result = result.merge(demand, on=['订单号', '工单号', '工序号', '产品号'], how='left')
     result['生产日期'] = result['开始时间'].dt.date
     material['供应日期'] = pd.to_datetime(material['供应日期']).dt.date
-    df_use = result.groupby(["瓶颈物料号", "生产日期"])['需求量'].sum()
-    material_use = material.merge(df_use, how='left', left_on=['物料号', '供应日期'], right_on=["瓶颈物料号", "生产日期"])
-    for i, row in material_use.iterrows():
-        if row['需求量'] > row['供应数量']:
-            print(f"{row['瓶颈物料号']}{row['生产日期']}供应量为{row['供应数量']}, 而需求数量为{row['需求量']}")
+    # 过滤掉瓶颈物料号为空的记录
+    result_with_material = result[result['瓶颈物料号'].notna()]
+    if len(result_with_material) > 0:
+        df_use = result_with_material.groupby(["瓶颈物料号", "生产日期"])['需求量'].sum().reset_index()
+        material_use = material.merge(df_use, how='left', left_on=['物料号', '供应日期'], right_on=["瓶颈物料号", "生产日期"])
+        for i, row in material_use.iterrows():
+            if pd.notna(row.get('需求量')) and pd.notna(row.get('供应数量')) and pd.notna(row.get('瓶颈物料号')):
+                if row['需求量'] > row['供应数量']:
+                    print(f"{row['瓶颈物料号']}{row['生产日期']}供应量为{row['供应数量']}, 而需求数量为{row['需求量']}")
     flag, info = check_equipment(result, work_calendar)
     if flag:
         print(info)
