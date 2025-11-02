@@ -1,10 +1,22 @@
 {
   "module": "aps",
   "version": "1.0.0-alpha",
-  "buildTime": "2025-10-31T09:25:24.588Z",
+  "buildTime": "2025-11-02T10:00:00.000Z",
   "source": "src/modules/aps",
   "architecture": "BMAD-METHOD v6 - YAML",
   "sourceHash": "e8f1e9f4",
   "agents": 7,
-  "resources": 7
+  "resources": 7,
+  "recentChanges": [
+    {
+      "date": "2025-11-02",
+      "version": "V4.4",
+      "type": "P0_bugfix",
+      "description": "修复数据加载缺陷：添加generate-data-loader.md任务，确保生成的代码包含完整的数据加载模块",
+      "files": [
+        "src/modules/aps/tasks/generate-data-loader.md (新增)",
+        "src/modules/aps/tasks/generate-code-from-solution.md (已包含步骤3.15)"
+      ]
+    }
+  ]
 }

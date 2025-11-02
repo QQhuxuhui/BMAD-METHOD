@@ -561,7 +561,7 @@ def generate_main_solver(
     code_lines.append(f"    ")
     code_lines.append(f"    # 1. 加载数据")
     code_lines.append(f"    # 方案依据: TenElementModel Element 9")
-    code_lines.append(f"    problem_data = load_input_data(input_data_path)")
+    code_lines.append(f"    problem_data = load_all_input_data(input_data_path)")
     code_lines.append(f"    ")
     code_lines.append(f"    # 2. 初始化求解器")
     code_lines.append(f"    # 方案依据: solution_document Section 5")
@@ -581,6 +581,33 @@ def generate_main_solver(
     return "\n".join(code_lines)
 ```
 
+#### 3.15 生成数据加载模块（V4.4新增）
+
+```python
+def generate_data_loading_module(ten_element_model, solution_document_path):
+    """
+    基于TenElementModel Element 9生成通用数据加载模块
+
+    方案依据: solution_document Section 6 - 实现路线图
+    TenElementModel: Element 9 - input_data
+    引用: @TenElementModel/input_data
+
+    V4.4新增: 修复P0缺陷 - 确保数据加载模块生成
+    Bug修复: 之前调用load_input_data()但未生成该函数
+
+    Returns:
+        str: 数据加载模块的Python代码
+    """
+    from generate_data_loader import generate_data_loading_module as build_loader
+
+    # 调用通用数据加载器生成函数
+    # 该函数支持CSV, JSON, Excel, Parquet, Database等多种格式
+    data_loading_code = build_loader(ten_element_model, solution_document_path)
+
+    print("✓ 数据加载模块已生成（支持多种数据格式）")
+    return data_loading_code
+```
+
 ### 步骤4: 组装完整代码
 
 ```python
@@ -589,6 +616,7 @@ from datetime import datetime
 def assemble_complete_code(
     imports,
     data_models,
+    data_loading_module,
     constraint_functions,
     objective_functions,
     algorithm_core,
@@ -598,6 +626,9 @@ def assemble_complete_code(
 ):
     """
     组装完整的Python代码文件
+
+    V4.4修改: 新增data_loading_module参数
+    Bug修复: 确保数据加载模块被集成到最终代码中
 
     Returns:
         str: 完整代码
@@ -616,17 +647,28 @@ def assemble_complete_code(
     code.append('每个组件都标注了对应的方案依据和引用')
     code.append('')
     code.append('架构:')
-    code.append('  1. 数据模型 - 基于TenElementModel')
-    code.append('  2. 约束验证 - 基于约束处理策略')
-    code.append('  3. 目标函数 - 基于目标优化策略')
-    code.append('  4. 算法核心 - 基于算法选择')
-    code.append('  5. 求解器入口 - 基于实现路线图')
+    code.append('  1. 数据加载 - 基于TenElementModel Element 9（V4.4新增）')
+    code.append('  2. 数据模型 - 基于TenElementModel')
+    code.append('  3. 约束验证 - 基于约束处理策略')
+    code.append('  4. 目标函数 - 基于目标优化策略')
+    code.append('  5. 算法核心 - 基于算法选择')
+    code.append('  6. 求解器入口 - 基于实现路线图')
     code.append('"""')
     code.append('')
 
     # ====== 导入 ======
     code.append(imports)
     code.append('')
+    code.append('')
+
+    # ====== 数据加载模块（V4.4新增）======
+    code.append('# ' + '='*70)
+    code.append('# 数据加载模块')
+    code.append('# V4.4新增: 修复P0缺陷 - 支持多种数据格式')
+    code.append('# 方案依据: TenElementModel Element 9')
+    code.append('# ' + '='*70)
+    code.append('')
+    code.append(data_loading_module)
     code.append('')
 
     # ====== 数据模型 ======
@@ -696,6 +738,13 @@ def generate_code_traceability(
         "solution_document": solution_document_path,
         "approved_at": user_approved_solution.get("approved_at"),
         "mappings": {
+            "data_loading_module": {
+                "source": "solution_document Section 6 - 实现路线图",
+                "ten_element_model": "Element 9 (input_data)",
+                "code_components": ["load_all_input_data()", "load_*()"],
+                "version": "V4.4",
+                "note": "P0修复：支持CSV/JSON/Excel/Parquet/Database等多种数据格式"
+            },
             "data_models": {
                 "source": "solution_document Section 1.1 & 6.2",
                 "ten_element_model": "Element 1 (decision_variables), Element 2 (parameters)",
