@@ -435,6 +435,11 @@ def validate_element_code_mapping(
     """
     完整的十要素→代码映射验证
 
+    方案依据: P0改进文档 Step 4 - 建立十要素→代码映射验证
+    引用: @docs/improvements/P0-ten-element-completeness.md
+    TenElementModel: 定义了必须映射到代码的所有Element
+    核心原则: 每个Element都必须有对应的代码组件
+
     Returns:
         dict: 完整验证报告
     """

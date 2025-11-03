@@ -313,6 +313,10 @@ def analyze_validation_errors(
     """
     完整的验证错误分析流程
 
+    方案依据: P0改进文档 - 验证-修复闭环设计
+    引用: @docs/improvements/P0-ten-element-completeness.md
+    TenElementModel: 用于理解代码应有的完整结构
+
     Args:
         validation_report: 验证报告
         implementation_code: 当前代码

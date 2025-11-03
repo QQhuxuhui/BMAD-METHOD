@@ -478,6 +478,10 @@ def fix_code_from_validation(
     """
     完整的代码修复流程
 
+    方案依据: P0改进文档 - 自动修复机制设计
+    引用: @docs/improvements/P0-ten-element-completeness.md
+    核心策略: 根据错误类型选择修复方法（全量/组件/增量）
+
     Returns:
         dict: 修复结果
     """
