@@ -1,11 +1,11 @@
 {
   "module": "aps",
   "version": "1.0.0-alpha",
-  "buildTime": "2025-11-03T06:54:18.964Z",
+  "buildTime": "2025-11-03T07:13:03.955Z",
   "source": "src/modules/aps",
   "architecture": "BMAD-METHOD v6 - YAML",
-  "sourceHash": "p2collab",
+  "sourceHash": "p2fix441",
   "agents": 7,
   "resources": 7,
-  "lastChange": "P2专家协作机制优化 - 新增知识共享、置信度评估、互审机制"
+  "lastChange": "V4.4.1修复 - 解决P0数据依赖和P1功能完整性问题"
 }

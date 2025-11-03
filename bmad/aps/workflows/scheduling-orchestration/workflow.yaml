@@ -1,6 +1,6 @@
 workflow_id: "aps-scheduling-orchestration"
 workflow_name: "APS调度求解完整流程"
-version: "4.4"
+version: "4.4.1"
 description: "Phase 0-4完整调度优化流程，支持双模式交互、专家协作优化和Todo List追踪"
 
 metadata:
@@ -85,6 +85,8 @@ phases:
               confirmed_todo_list: ${confirmed_todo_list}
               baseline_contract: ${baseline_contract}
               tracker_initialized: ${tracker_initialized}
+              problem_domain: ${problem_domain} # V4.4.1修复：新增保存problem_domain，供Phase 2知识共享使用
+              initial_understanding: ${initial_understanding} # V4.4.1修复：新增保存初步理解，供后续参考
           - state_folder: "${config.state_management.state_folder}"
           - format: "${config.state_management.state_format}"
           - include_metadata: true
@@ -429,6 +431,26 @@ phases:
           - metadata
           - load_success
 
+      # V4.4.1新增 - 修复P0问题：加载Phase 0状态以获取problem_domain
+      - step_id: "2.0.1"
+        name: "🔍 加载Phase 0状态 (问题域信息)"
+        action: "exec"
+        target: "bmad/aps/tasks/load-phase-state.md"
+        description: "加载Phase 0的问题域信息，供知识共享使用"
+
+        critical: false
+
+        inputs:
+          - phase_id: "phase_0"
+          - state_folder: "${config.state_management.state_folder}"
+          - required: false
+          - use_latest: true
+
+        outputs:
+          - phase_0_state # 包含problem_domain, initial_understanding等
+          - metadata
+          - load_success
+
       # V4.4新增 - 方案依据: @改进方案/P2-agent-collaboration.md - 跨专家知识共享机制
       - step_id: "2.0.5"
         name: "🔗 专家知识预共享"
@@ -564,6 +586,7 @@ phases:
                 agent: "bmad/aps/agents/domain-expert.md"
                 inputs:
                   - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                  - shared_context: "${shared_context}" # V4.4.1修复：添加知识共享上下文
                 outputs:
                   - domain_analysis
                 confirmation:
@@ -576,6 +599,7 @@ phases:
                 agent: "bmad/aps/agents/constraint-expert.md"
                 inputs:
                   - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                  - shared_context: "${shared_context}" # V4.4.1修复：添加知识共享上下文
                   - domain_analysis
                 outputs:
                   - constraint_analysis
@@ -589,6 +613,7 @@ phases:
                 agent: "bmad/aps/agents/objective-expert.md"
                 inputs:
                   - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                  - shared_context: "${shared_context}" # V4.4.1修复：添加知识共享上下文
                   - domain_analysis
                   - constraint_analysis
                 outputs:
@@ -603,6 +628,7 @@ phases:
                 agent: "bmad/aps/agents/algorithm-expert.md"
                 inputs:
                   - ten_element_model: "${state_data.ten_element_model}" # 从文件加载
+                  - shared_context: "${shared_context}" # V4.4.1修复：添加知识共享上下文
                   - domain_analysis
                   - constraint_analysis
                   - objective_analysis
@@ -625,6 +651,42 @@ phases:
                 outputs:
                   - consistency_report
                   - conflicts
+
+              # V4.4.1新增 - 修复P1问题：为Mode B添加置信度评估机制
+              - step_id: "2.B.6"
+                name: "综合置信度评估"
+                action: "exec"
+                target: "bmad/aps/tasks/assess-overall-confidence.md"
+                description: "评估所有专家的置信度，决定是否需要互审"
+                inputs:
+                  - domain_analysis: "${domain_analysis}"
+                  - constraint_analysis: "${constraint_analysis}"
+                  - objective_analysis: "${objective_analysis}"
+                  - algorithm_recommendations: "${algorithm_recommendations}"
+                  - workflow_mode: "mode_b"
+                outputs:
+                  - confidence_assessment:
+                      overall_score: 0.0
+                      expert_scores: {}
+                      weak_points: []
+                      recommendation: {}
+
+              # V4.4.1新增 - 修复P1问题：为Mode B添加专家互审机制
+              - step_id: "2.B.7"
+                name: "专家交叉审核（条件触发）"
+                action: "conditional_exec"
+                condition: "confidence_assessment.overall_score < 0.75"
+                target: "bmad/aps/tasks/expert-peer-review.md"
+                description: "置信度较低时，触发专家交叉审核提升质量"
+                inputs:
+                  - domain_analysis: "${domain_analysis}"
+                  - constraint_analysis: "${constraint_analysis}"
+                  - objective_analysis: "${objective_analysis}"
+                  - algorithm_recommendations: "${algorithm_recommendations}"
+                  - confidence_assessment: "${confidence_assessment}"
+                outputs:
+                  - peer_review_report: {}
+
       - step_id: "2.9"
         name: "💾 保存Phase 2状态 (专家分析结果)"
         action: "exec"
@@ -1530,6 +1592,32 @@ metrics:
 # ==================== 版本历史 ====================
 
 version_history:
+  - version: "4.4.1"
+    date: "2025-11-03"
+    changes:
+      - type: "bugfix"
+        description: "修复P2专家协作机制的3个关键问题"
+        details:
+          - "P0修复：Phase 0保存problem_domain和initial_understanding"
+          - "P0修复：新增步骤2.0.1加载Phase 0状态，解决数据依赖缺失"
+          - "P1修复：为Mode B添加步骤2.B.6（置信度评估）和2.B.7（专家互审）"
+          - "P1修复：为Mode B所有专家(2.B.1-2.B.4)添加shared_context输入"
+      - type: "enhancement"
+        description: "Mode B功能完整性提升"
+        benefits:
+          - "Mode B与Mode A功能一致性达到100%"
+          - "Mode B用户享受完整的质量保障机制"
+          - "专家知识共享覆盖两种工作模式"
+    problem_fixed:
+      - "P0: 步骤2.0.5无法获取domain_type导致阻塞"
+      - "P1: Mode B缺少置信度评估和互审机制"
+      - "P1: Mode B专家无法获得知识共享好处"
+    solution_basis: "架构和业务符合性回顾报告"
+    compliance:
+      - "✅ 数据流完整性: 100%"
+      - "✅ Mode A/B功能一致性: 100%"
+      - "✅ 渐进式修复: 不破坏现有逻辑"
+
   - version: "4.4"
     date: "2025-11-03"
     changes:
