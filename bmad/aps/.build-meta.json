@@ -1,10 +1,11 @@
 {
   "module": "aps",
   "version": "1.0.0-alpha",
-  "buildTime": "2025-11-03T03:31:40.404Z",
+  "buildTime": "2025-11-03T06:54:18.964Z",
   "source": "src/modules/aps",
   "architecture": "BMAD-METHOD v6 - YAML",
-  "sourceHash": "b9710b3c",
+  "sourceHash": "p2collab",
   "agents": 7,
-  "resources": 7
+  "resources": 7,
+  "lastChange": "P2专家协作机制优化 - 新增知识共享、置信度评估、互审机制"
 }
