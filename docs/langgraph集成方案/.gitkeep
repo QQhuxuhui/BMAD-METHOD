@@ -1,0 +1,5 @@
+# LangGraph 集成方案文档目录
+
+本目录用于存放 BMAD-METHOD 与 LangGraph/LangServe 框架集成的所有技术方案文档。
+
+详情请查看 [README.md](./README.md)

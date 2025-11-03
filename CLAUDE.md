@@ -1,8 +1,44 @@
-# Claude Code 开发备忘
+# 你必须遵循的准则
+## 语言要求
+1. 所有回复必须使用中文
 
-个人开发快速参考。
+## 开发要求
+1. 在对某项功能进行修改和开发时，你必须要深度思考，不能影响我的其他正常功能，如果改动某项功能的时候必须要改动其他功能的 代码或者文字才能实现，你必须要向我确认
+2. 开发过程要严格遵循我的项目的技术框架规范
+3. 你可以任意使用现有的MCP
+4. 必须使用git做好文件的变更管理，并提交到远程仓库
+5. 必须使用合理的git分支策略
 
-## 分支命名
+## 开发环境说明
+1. 我的宿主机的环境管理方式如下：
+- **nvm**: nodejs的版本管理工具
+  - 功能：管理多个Node.js版本的安装和切换
+  - 用途：项目版本隔离、版本兼容性测试
+  - **🚨 强制要求：所有Node.js版本相关操作必须通过nvm进行，包括版本检查、切换、安装**
+  - 常用命令：`nvm list`、`nvm use <version>`、`nvm install <version>`
+  - 在使用nvm命令之前，需要执行一下source命令，使环境变量生效：`source ~/.nvm/nvm.sh`
+- **anaconda**: python的版本管理工具
+  - 功能：Python环境和包管理，支持虚拟环境
+  - 用途：Python版本管理、依赖包隔离、数据科学工具集成
+  - **🚨 强制要求：所有Python环境操作必须通过conda进行，包括环境创建、激活、包安装**
+  - 常用命令：`conda env list`、`conda activate <env>`、`conda install <package>`
+- **docker**: 容器技术
+  - 功能：应用容器化部署和运行
+  - 用途：环境一致性、微服务部署、开发环境隔离
+  - **🚨 强制要求：生产环境部署和服务容器化必须使用docker**
+  - 常用命令：`docker build`、`docker run`、`docker ps`、`docker logs`
+- **docker compose**: 容器编排工具
+  - 功能：多容器应用的定义和运行
+  - 用途：本地开发环境搭建、多服务协调部署
+  - **🚨 强制要求：多服务本地开发环境必须使用docker-compose进行编排**
+  - 常用命令：`docker-compose up`、`docker-compose down`、`docker-compose logs`
+
+### 环境管理最佳实践
+1. **开发环境隔离**：每个项目使用独立的Python虚拟环境和Node.js版本
+2. **版本锁定**：在项目中明确指定Python和Node.js的具体版本要求
+3. 
+
+## git分支命名规范
 
 **主分支**: `hanyun`
 
