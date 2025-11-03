@@ -1,11 +1,10 @@
 {
   "module": "aps",
   "version": "1.0.0-alpha",
-  "buildTime": "2025-11-03T07:13:03.955Z",
+  "buildTime": "2025-11-03T07:59:19.228Z",
   "source": "src/modules/aps",
   "architecture": "BMAD-METHOD v6 - YAML",
-  "sourceHash": "p2fix441",
+  "sourceHash": "d9b6e890",
   "agents": 7,
-  "resources": 7,
-  "lastChange": "V4.4.1修复 - 解决P0数据依赖和P1功能完整性问题"
+  "resources": 7
 }
