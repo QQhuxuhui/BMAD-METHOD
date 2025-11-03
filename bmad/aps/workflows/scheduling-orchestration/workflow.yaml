@@ -884,6 +884,166 @@ phases:
             error_message: "交付物保存失败"
             max_retries: 3
 
+      # ====== 验证-修复循环 (V4.4新增) ======
+      - step_id: "3.6.3"
+        name: "🛡️ 十要素代码覆盖验证"
+        action: "exec"
+        target: "bmad/aps/tasks/validate-element-code-mapping.md"
+        description: "验证生成的代码覆盖了所有十要素，防止Element缺失"
+
+        mandatory: true
+        critical: true
+
+        inputs:
+          - implementation_code
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - solution_document_path
+
+        outputs:
+          - element_mapping_validation
+          - missing_mappings
+
+        verification_gate:
+          critical: true
+          check: "element_mapping_validation.summary.all_covered == true"
+          on_fail: "proceed_to_fix" # 不阻断，进入修复流程
+          error_message: |
+            ❌ 十要素代码覆盖验证失败！
+
+            缺失的映射: {missing_mappings}
+
+      - step_id: "3.6.4"
+        name: "🔍 代码完整性和质量验证"
+        action: "exec"
+        target: "bmad/aps/tasks/validate-code-completeness.md"
+        description: "三层验证：完整性、语法、方案一致性"
+
+        mandatory: true
+        critical: true
+
+        inputs:
+          - implementation_code
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - solution_document: "${user_approved_solution}"
+          - expert_guidance: {}
+
+        outputs:
+          - validation_report
+          - validation_errors
+
+        verification_gate:
+          critical: true
+          check: "validation_report.overall_result == 'PASSED'"
+          on_fail: "proceed_to_fix" # 不阻断，进入修复流程
+
+      # ====== 条件分支：验证失败处理 ======
+      - step_id: "3.6.6"
+        name: "🔧 验证失败处理分支"
+        action: "conditional"
+        description: "根据验证结果决定是否需要修复"
+
+        condition: |
+          validation_report.overall_result != 'PASSED' OR
+          element_mapping_validation.summary.all_covered != true
+
+        on_true:
+          next_steps: ["3.6.7", "3.6.8", "3.6.9"] # 进入修复流程
+        on_false:
+          next_steps: ["3.6.5"] # 跳过修复，继续验证一致性
+
+      # ====== 自动修复流程 ======
+      - step_id: "3.6.7"
+        name: "📊 分析验证错误"
+        action: "exec"
+        target: "bmad/aps/tasks/analyze-validation-errors.md"
+        description: "分析错误类型，生成修复策略"
+
+        inputs:
+          - validation_report
+          - implementation_code
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - user_approved_solution
+          - retry_count: "${workflow.retry_count | default(0)}"
+
+        outputs:
+          - classified_errors
+          - fix_strategy
+          - fix_report
+
+      - step_id: "3.6.8"
+        name: "🔧 自动修复代码"
+        action: "exec"
+        target: "bmad/aps/tasks/fix-code-from-validation.md"
+        description: "根据修复策略自动修复代码"
+
+        inputs:
+          - implementation_code
+          - fix_strategy
+          - classified_errors
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - user_approved_solution
+          - solution_document_path
+          - retry_count: "${workflow.retry_count | default(0)}"
+
+        outputs:
+          - fixed_code
+          - fix_report_detail
+          - code_traceability_updated
+
+        post_action:
+          # 更新implementation_code为修复后的代码
+          - set_variable:
+              name: "implementation_code"
+              value: "${fixed_code}"
+
+      - step_id: "3.6.9"
+        name: "🔄 重新验证修复后的代码"
+        action: "exec"
+        target: "bmad/aps/tasks/validate-code-completeness.md"
+        description: "验证修复后的代码"
+
+        inputs:
+          - implementation_code: "${fixed_code}"
+          - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+          - solution_document: "${user_approved_solution}"
+          - expert_guidance: {}
+
+        outputs:
+          - re_validation_report
+
+        verification_gate:
+          critical: true
+          check: "re_validation_report.overall_result == 'PASSED'"
+          on_fail: "retry_or_escalate"
+          max_retries: 2
+          error_message: |
+            ❌ 代码修复后仍然验证失败！
+
+            已重试: {workflow.retry_count} 次
+
+            建议动作:
+            - 如果 retry_count < 2: 返回 Step 3.6.7 重新分析
+            - 如果 retry_count >= 2: 需要人工介入
+
+      # ====== 人工介入（可选）======
+      - step_id: "3.6.10"
+        name: "👤 人工介入修复"
+        action: "human_confirmation"
+        trigger_level: "P0"
+        condition: "workflow.retry_count >= 2 AND re_validation_report.overall_result != 'PASSED'"
+        description: "自动修复失败，请求人工介入"
+
+        template: "@交互对话模板库/code-fix-intervention.md"
+
+        inputs:
+          - validation_report
+          - fix_report_detail
+          - retry_attempts: "${workflow.retry_count}"
+          - failed_code: "${fixed_code}"
+
+        outputs:
+          - user_decision # 选项: manual_fix | lower_standards | restart | abort
+
       - step_id: "3.6.5"
         name: "🔍 验证代码-方案一致性"
         action: "exec"

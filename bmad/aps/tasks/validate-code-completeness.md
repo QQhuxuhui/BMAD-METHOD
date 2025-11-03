@@ -400,12 +400,16 @@ def validate_solution_consistency(
     data_sources = input_data.get('sources', [])
     print(f"\n检查数据源（期望 {len(data_sources)} 个）:")
 
-    if "load_input_data" in code:
-        print("  ✓ 数据加载函数存在")
+    # V4.4更新: 支持新旧两种函数名
+    if "load_all_input_data" in code or "load_input_data" in code:
+        if "load_all_input_data" in code:
+            print("  ✓ 数据加载函数存在 (load_all_input_data)")
+        else:
+            print("  ✓ 数据加载函数存在 (load_input_data - 旧版)")
     else:
         result["errors"].append({
             "type": "MISSING_DATA_LOADER",
-            "message": "未找到数据加载函数 load_input_data",
+            "message": "未找到数据加载函数 load_all_input_data 或 load_input_data",
             "severity": "CRITICAL"
         })
         print("  ✗ 数据加载函数未找到")
