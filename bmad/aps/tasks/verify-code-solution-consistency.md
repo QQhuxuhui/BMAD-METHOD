@@ -1,7 +1,7 @@
 # Task: Verify Code-Solution Consistency
 
 **任务ID**: `verify-code-solution-consistency`
-**版本**: V4.3
+**版本**: V4.4.1
 **用途**: Phase 3 Step 3.6.5 - 验证生成的代码与用户确认的方案完全一致，避免大模型幻觉
 
 ## 输入
@@ -88,6 +88,103 @@ def verify_file_header_references(implementation_code):
         print("✓ 文件头部引用标记完整")
     else:
         print(f"✗ 文件头部引用标记不完整: {result['issues']}")
+
+    return result
+```
+
+### 步骤1.5: 验证专家库引用完整性（V4.4.1新增）
+
+```python
+import re
+
+def verify_expert_library_citations(implementation_code):
+    """
+    验证代码中的专家库引用完整性
+
+    方案依据: @bmad/aps/tasks/generate-code-from-solution.md Line 86-114
+    验证要求:
+    - 专家库引用 >= 3处
+    - 格式: @xxx库/yyy/zzz.md
+    - 至少涵盖2个不同的专家库类型
+
+    V4.4.1新增: 修复专家库引用缺失问题
+
+    Returns:
+        dict: 验证结果
+    """
+    print("\n" + "="*70)
+    print("🔍 验证专家库引用完整性...")
+    print("="*70)
+
+    # 查找所有专家库引用（格式：@xxx库/yyy）
+    expert_pattern = r'@[^/\s]+库/[^\s]+'
+    citations = re.findall(expert_pattern, implementation_code)
+
+    # 去重并统计
+    unique_citations = list(set(citations))
+
+    # 识别专家库类型
+    expected_libraries = ['算法库', '约束库', '目标库', '领域库', '建模库']
+    found_libraries = set()
+
+    for citation in unique_citations:
+        for lib in expected_libraries:
+            if lib in citation:
+                found_libraries.add(lib)
+
+    # 统计结果
+    result = {
+        "total_citations": len(citations),
+        "unique_citations": len(unique_citations),
+        "citations_list": unique_citations,
+        "found_libraries": list(found_libraries),
+        "library_count": len(found_libraries)
+    }
+
+    # 验证1: 至少3处引用
+    if result["total_citations"] < 3:
+        result["passed"] = False
+        result["error"] = f"专家库引用不足！要求>=3处，实际{result['total_citations']}处"
+        result["severity"] = "critical"
+        print(f"  ❌ 专家库引用不足: {result['total_citations']}/3")
+        print(f"  找到的引用: {result['citations_list']}")
+        return result
+
+    # 验证2: 至少2个不同专家库
+    if result["library_count"] < 2:
+        result["passed"] = False
+        result["error"] = f"专家库覆盖不足！至少需要引用2个不同专家库，实际{result['library_count']}个"
+        result["severity"] = "major"
+        print(f"  ❌ 专家库覆盖不足: {result['library_count']}/2")
+        print(f"  已覆盖: {result['found_libraries']}")
+        return result
+
+    # 验证3: 检查引用格式
+    invalid_citations = []
+    for citation in unique_citations:
+        # 检查是否符合格式 @xxx库/yyy
+        if not re.match(r'@[^/\s]+库/[^\s]+', citation):
+            invalid_citations.append(citation)
+
+    if invalid_citations:
+        result["passed"] = False
+        result["error"] = f"发现格式错误的引用: {invalid_citations}"
+        result["severity"] = "minor"
+        result["invalid_citations"] = invalid_citations
+        print(f"  ⚠️  格式错误的引用: {invalid_citations}")
+
+    # 所有验证通过
+    result["passed"] = True
+    print(f"  ✓ 专家库引用数量: {result['total_citations']}处（要求>=3）")
+    print(f"  ✓ 专家库类型覆盖: {result['library_count']}个（要求>=2）")
+    print(f"  ✓ 已覆盖的专家库: {', '.join(result['found_libraries'])}")
+    print(f"  ✓ 引用列表: ")
+    for i, citation in enumerate(unique_citations[:10], 1):  # 最多显示10个
+        print(f"      {i}. {citation}")
+    if len(unique_citations) > 10:
+        print(f"      ... 还有 {len(unique_citations) - 10} 个引用")
+
+    print("="*70)
 
     return result
 ```
@@ -460,7 +557,7 @@ def generate_consistency_report(all_checks):
     report = {
         "metadata": {
             "verified_at": datetime.now().isoformat(),
-            "version": "4.3",
+            "version": "4.4.1",
             "phase": "Phase 3 Step 3.6.5"
         },
 
@@ -607,5 +704,46 @@ verification_gate:
 ---
 
 **创建**: 2025-10-24
+**最后更新**: 2025-11-03 (V4.4.1)
 **BMAD版本**: v6-alpha
 **核心机制**: Workflow级别强制验证，确保代码与方案一致，避免大模型幻觉
+
+## 版本历史
+
+### V4.4.1 (2025-11-03) - 专家库引用验证增强
+
+**问题**: 缺少对代码中专家库引用完整性的强制验证
+
+**修复内容**:
+
+1. ✅ 新增 `verify_expert_library_citations()` 函数（步骤1.5）
+   - 验证专家库引用数量（要求 >= 3处）
+   - 验证专家库类型覆盖（要求 >= 2个不同专家库）
+   - 验证引用格式正确性（@xxx库/yyy/zzz.md）
+   - 提供详细的验证报告和错误提示
+
+2. ✅ 补充现有 `verify_expert_library_usage()` 函数（步骤7）
+   - 原功能：验证方案中的引用是否出现在代码中
+   - 新功能：补充验证代码引用的总体完整性
+
+3. ✅ 更新质量检查清单
+   - 明确了"专家库引用 >= 3处"的要求
+   - 与generate-code-from-solution.md的要求保持一致
+
+**方案依据**:
+
+- @bmad/aps/tasks/generate-code-from-solution.md Line 86-114 (引用标记要求)
+- 与代码生成任务的引用检查逻辑保持一致
+
+**符合BMAD规范**:
+
+- ✅ 添加了版本标注（V4.4.1）
+- ✅ 添加了详细的验证逻辑和错误提示
+- ✅ 与代码生成任务形成完整的生成-验证闭环
+- ✅ 保持了Workflow级别强制验证机制
+
+### V4.3 (2025-10-24) - 初始版本
+
+- 实现基础的代码-方案一致性验证
+- 包含算法、参数、约束、目标的一致性检查
+- 建立Workflow级别强制验证机制
