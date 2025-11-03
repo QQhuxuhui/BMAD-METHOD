@@ -1,0 +1,20 @@
+# V4.0 BMAD-LangGraph Integration Documentation
+
+This directory contains the complete V4.0 integration plan documentation.
+
+## Document Structure
+
+- README.md - Main entry point and navigation
+- 01-overview.md - Solution overview and core value
+- 02-architecture.md - Three-layer architecture design
+- 03-mapping.md - BMAD → LangGraph mapping
+- 04-technical-spec.md - Technical specifications
+- 05-implementation-roadmap.md - 16-week implementation plan
+- 06-risk-assessment.md - Risk assessment and mitigation
+- appendix-code-examples.md - Code examples appendix
+
+## Quick Links
+
+- [Return to parent README](../README.md)
+- [V3.0 Solution](../langgraph-langserve-deployment.md)
+- [V2.0 Solution](../langgraph-private-deployment-research.md)
