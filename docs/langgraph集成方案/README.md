@@ -6,12 +6,12 @@
 
 ### 核心方案文档
 
-| 文档                                                                                   | 说明                                                                | 状态      | 推荐度             |
-| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------- | --------- | ------------------ |
-| **[v4.0-bmad-langgraph-integration/](./v4.0-bmad-langgraph-integration/)** 🆕          | **智能体工厂模式：BMAD DSL → 编译器 → LangGraph（大规模批量开发）** | ⚠️ 需修正 | ⭐⭐⭐（仅大规模） |
-| **[langgraph-langserve-deployment.md](./langgraph-langserve-deployment.md)**           | **LangGraph + LangServe 快速部署方案（单个智能体）**                | ✅ 稳定   | ⭐⭐⭐⭐⭐         |
-| [langgraph-private-deployment-research.md](./langgraph-private-deployment-research.md) | LangGraph + 国产模型私有化部署详细方案                              | ✅ 完成   | ⭐⭐⭐⭐           |
-| [enterprise-web-deployment-research.md](./enterprise-web-deployment-research.md)       | 企业级 Web 部署调研（包含 MCP 等多方案对比）                        | ✅ 完成   | ⭐⭐⭐             |
+| 文档                                                                                   | 说明                                                                 | 状态    | 推荐度                |
+| -------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------- | --------------------- |
+| **[v4.0-bmad-langgraph-integration/](./v4.0-bmad-langgraph-integration/)** 🔥          | **分阶段实施方案：Phase 1轻适配（推荐）→ Phase 2-3完整工厂（可选）** | ✅ 推荐 | ⭐⭐⭐⭐⭐（Phase 1） |
+| **[langgraph-langserve-deployment.md](./langgraph-langserve-deployment.md)**           | **LangGraph + LangServe 快速部署方案（单个智能体）**                 | ✅ 稳定 | ⭐⭐⭐⭐⭐            |
+| [langgraph-private-deployment-research.md](./langgraph-private-deployment-research.md) | LangGraph + 国产模型私有化部署详细方案                               | ✅ 完成 | ⭐⭐⭐⭐              |
+| [enterprise-web-deployment-research.md](./enterprise-web-deployment-research.md)       | 企业级 Web 部署调研（包含 MCP 等多方案对比）                         | ✅ 完成 | ⭐⭐⭐                |
 
 ---
 
@@ -176,14 +176,14 @@ V3.0 (langgraph-langserve-deployment.md) ⭐ **推荐大多数场景**
 
     ↓
 
-V4.0 (v4.0-bmad-langgraph-integration/) 🚀 NEW ⚠️ **需谨慎评估**
-├── BMAD DSL → 编译器 → 自研LangGraph框架
-├── 智能体工厂模式（开发效率提升 2-3倍）
-├── 声明式配置 + 自动代码生成
-├── **投入**: 20-24周 + 60-72人周
-├── **回本点**: 30-40个智能体
-├── **状态**: ⚠️ 深度审查发现问题，已修正评估
-└── 适用场景：**仅大规模批量开发（30+智能体/年）**
+V4.0 (v4.0-bmad-langgraph-integration/) 🔥 NEW - **分阶段实施**
+├── **Phase 1**: 轻适配器（2-3周）→ **推荐所有场景** ⭐⭐⭐⭐⭐
+│   └── 国产模型支持 + 立即ROI + 80%场景终点
+├── **Phase 2**: 编译器POC（+4-6周）→ 中大规模场景
+│   └── YAML→Python + 决策点验证ROI
+├── **Phase 3**: 完整工厂（+18-26周）→ 仅超大规模
+│   └── 完整BMAD DSL编译器 + 30+智能体/年
+└── **核心优势**: 渐进式投入 + 每阶段可退出 + 风险可控
 ```
 
 ---
@@ -218,21 +218,16 @@ V4.0 (v4.0-bmad-langgraph-integration/) 🚀 NEW ⚠️ **需谨慎评估**
 
 ## 🛠️ 技术栈对比
 
-| 组件           | V1.0 方案      | V2.0 方案          | V3.0 方案（推荐）   | **V4.0 方案（大规模）** 🆕 ⚠️  |
-| -------------- | -------------- | ------------------ | ------------------- | ------------------------------ |
-| **开发方式**   | 手写Python     | 手写Python         | 手写Python          | **YAML配置**                   |
-| **智能体框架** | MCP/LangGraph  | LangGraph          | LangGraph           | **BMAD DSL + 自研LangGraph**   |
-| **Web 框架**   | NestJS/FastAPI | FastAPI            | FastAPI + LangServe | **FastAPI + LangServe**        |
-| **流式传输**   | 手写 WebSocket | 手写 WebSocket     | 框架内置 SSE        | **框架内置 SSE**               |
-| **API 路由**   | 手写路由       | 手写路由           | 自动生成            | **自动生成**                   |
-| **测试 UI**    | 需自己开发     | 需自己开发         | 内置 Playground     | **内置 Playground**            |
-| **大模型**     | Claude API     | 国产模型（私有化） | 国产模型（私有化）  | **国产模型（私有化）**         |
-| **开发周期**   | 4-6 周         | 3-4 个月           | 1-2 周              | **初期5-6月，后续1-2天/个** ⚠️ |
-| **代码量**     | ~2000 行       | ~2000 行           | ~500 行             | **~100 行 YAML**               |
-| **开发效率**   | 1x             | 1x                 | 1x                  | **2-3x** ⚠️（修正）            |
-| **适用场景**   | 探索           | 1-2个              | **1-30个** ✅       | **30+ 智能体** ⚠️              |
-| **ROI回本点**  | -              | -                  | 立即                | **30-40个智能体** ⚠️           |
-| **推荐度**     | ⭐⭐           | ⭐⭐⭐             | **⭐⭐⭐⭐⭐** ✅   | ⭐⭐⭐（仅大规模）             |
+| 组件           | V1.0 方案      | V2.0 方案          | V3.0 方案           | **V4.0 Phase 1** 🔥     | **V4.0 Phase 2-3**  |
+| -------------- | -------------- | ------------------ | ------------------- | ----------------------- | ------------------- |
+| **开发方式**   | 手写Python     | 手写Python         | 手写Python          | **Python轻适配**        | YAML配置            |
+| **智能体框架** | MCP/LangGraph  | LangGraph          | LangGraph           | **BMAD + LangChain**    | BMAD DSL编译器      |
+| **Web 框架**   | NestJS/FastAPI | FastAPI            | FastAPI + LangServe | **FastAPI + LangServe** | FastAPI + LangServe |
+| **大模型**     | Claude API     | 国产模型（私有化） | 国产模型（私有化）  | **国产模型** ✅         | 国产模型            |
+| **开发周期**   | 4-6 周         | 3-4 个月           | 1-2 周              | **2-3周** ✅            | +18-26周            |
+| **ROI**        | -              | -                  | 立即                | **立即** ✅             | 18-36月             |
+| **适用场景**   | 探索           | 1-2个              | 1-30个              | **所有场景** ⭐⭐⭐⭐⭐ | 30+智能体           |
+| **推荐度**     | ⭐⭐           | ⭐⭐⭐             | ⭐⭐⭐⭐⭐          | **⭐⭐⭐⭐⭐** 🔥       | ⭐⭐⭐              |
 
 ---
 
@@ -305,7 +300,16 @@ A: 按照 `langgraph-langserve-deployment.md` 中的"快速启动"章节，1 天
 
 ## 📅 更新日志
 
-- **2025-11-04**: ⚠️ V4.0方案深度审查与修正
+- **2025-11-04 (晚)**: 🔥 V4.0重构为分阶段实施方案
+  - **采用方案A**：Phase 1（轻适配器） → Phase 2（编译器POC） → Phase 3（完整工厂）
+  - **核心变化**：从"一次性20-24周投入"改为"渐进式投入+每阶段可退出"
+  - **新增文档**：
+    - [08-phased-implementation.md](./v4.0-bmad-langgraph-integration/08-phased-implementation.md) - 分阶段实施详细指南
+  - **删除文档**：01-overview.md、02-architecture.md（完整方案的旧文档）
+  - **核心推荐**：所有场景从Phase 1开始（2-3周），80%场景在此停止 ✅
+  - **状态**: ✅ 推荐实施
+
+- **2025-11-04 (早)**: ⚠️ V4.0方案深度审查与修正
   - 使用Sequential Thinking进行12轮深度审查
   - 发现多项评估偏差：
     - 工作量低估50-67%（12-16周 → 20-24周）
@@ -314,14 +318,14 @@ A: 按照 `langgraph-langserve-deployment.md` 中的"快速启动"章节，1 天
     - 风险等级低估（🟢低 → 🟡中）
   - 创建 [07-review-findings.md](./v4.0-bmad-langgraph-integration/07-review-findings.md) 审查报告
   - 修正所有文档中的评估数据
-  - **结论**: V4.0仅适合大规模场景（30+智能体/年），大多数场景推荐V3.0
+  - **结论**: 完整V4.0仅适合大规模场景，需分阶段实施
 
 - **2025-11-03 (晚)**: 🚀 新增 V4.0 智能体工厂方案（初稿）
   - 创建 v4.0-bmad-langgraph-integration/ 子目录
   - 完成核心方案设计文档（README + 01-overview + 02-architecture）
   - 定位：批量开发智能体的企业级方案
   - 核心特性：BMAD DSL → 编译器 → 自研LangGraph框架
-  - ⚠️ 后续发现评估存在偏差，已于11-04修正
+  - ⚠️ 后续发现评估存在偏差，已于11-04修正并重构为分阶段方案
 
 - **2025-11-03 (早)**: 创建文档目录，整理三份调研报告
   - 新增 V3.0 方案（LangGraph + LangServe）
