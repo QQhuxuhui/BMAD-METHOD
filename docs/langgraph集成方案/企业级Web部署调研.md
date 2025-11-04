@@ -28,7 +28,7 @@
 
 ### 1.2 APS 模块核心特性
 
-**七大智能体协作系统**:
+**八大智能体协作系统** (V4.4.1+):
 
 - 系统编排协调智能体 (orchestrator)
 - 调度算法专家 (algorithm-expert)
@@ -36,6 +36,7 @@
 - 目标优化专家 (objective-expert)
 - 领域应用专家 (domain-expert)
 - 算法扩展指导 (extension-guide)
+- **代码实现专家** (code-implementation-expert) ⭐ 新增
 - 质量评测专家 (quality-evaluator)
 
 **关键技术创新**:
