@@ -1,6 +1,6 @@
 workflow_id: "aps-scheduling-orchestration"
 workflow_name: "APS调度求解完整流程"
-version: "4.4.0"
+version: "4.4.1"
 description: "Phase 0-4完整调度优化流程，支持双模式交互、专家协作优化、Todo List追踪，Phase 3.5代码生成分离"
 
 metadata:

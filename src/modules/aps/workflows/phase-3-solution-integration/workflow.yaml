@@ -1,6 +1,6 @@
 workflow_id: "aps-phase-3-solution-integration"
 workflow_name: "Phase 3: 方案集成"
-version: "4.4.0"
+version: "4.4.1"
 description: "专注于技术方案设计、文档生成和用户确认，确保高质量的技术方案交付"
 
 metadata:
@@ -559,7 +559,7 @@ metrics:
 
 # ====== 版本信息 ======
 version_history:
-  - version: "4.4.0"
+  - version: "4.4.1"
     date: "2025-11-04"
     changes:
       - "从原Phase 3拆分，专注方案集成"

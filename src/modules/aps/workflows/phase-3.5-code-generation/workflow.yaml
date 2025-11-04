@@ -1,6 +1,6 @@
 workflow_id: "aps-phase-3.5-code-generation"
 workflow_name: "Phase 3.5: 代码生成"
-version: "4.4.0"
+version: "4.4.1"
 description: "由代码实现专家主导，基于用户确认的技术方案生成高质量可执行代码"
 
 metadata:
@@ -850,7 +850,7 @@ metrics:
 
 # ====== 版本信息 ======
 version_history:
-  - version: "4.4.0"
+  - version: "4.4.1"
     date: "2025-11-04"
     changes:
       - "新增Phase 3.5代码生成专用工作流"
