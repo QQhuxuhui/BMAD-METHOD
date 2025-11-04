@@ -1,0 +1,570 @@
+workflow_id: "aps-phase-3-solution-integration"
+workflow_name: "Phase 3: 方案集成"
+version: "4.4.0"
+description: "专注于技术方案设计、文档生成和用户确认，确保高质量的技术方案交付"
+
+metadata:
+  author: "APS Team"
+  created: "2025-11-04"
+  bmad_version: "v6-alpha"
+  estimated_time: "15-20分钟"
+  phase_number: "3"
+  phase_focus: "方案集成和确认"
+
+config:
+  interaction_mode: "inherited_from_phase_2"
+  document_generation_required: true
+  user_confirmation_required: true
+  quality_gates_enabled: true
+
+inputs:
+  required_inputs:
+    - name: "phase_1_5_state"
+      description: "Phase 1.5 TenElementModel状态"
+      source: "load_phase_state"
+      phase_id: "phase_1_5"
+    - name: "phase_2_state"
+      description: "Phase 2 专家分析状态"
+      source: "load_phase_state"
+      phase_id: "phase_2"
+    - name: "selected_mode"
+      description: "用户选择的交互模式"
+      source: "phase_0_5_state"
+      field: "selected_mode"
+
+steps:
+  # ====== 阶段1: 状态加载和验证 ======
+  - step_id: "3.0.1"
+    name: "🔍 加载Phase 1.5状态 (TenElementModel)"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+    description: "加载TenElementModel基线，作为方案生成的核心依据"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_1_5"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+            文件路径: {state_folder}/phase_1_5_state_latest.yaml
+
+            TenElementModel是方案生成的核心依赖，必须存在。
+
+            解决方案:
+            - 请从 Phase 1.5 重新执行
+
+    inputs:
+      - phase_id: "phase_1_5"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+
+    outputs:
+      - phase_1_5_state
+      - metadata
+      - load_success
+
+  - step_id: "3.0.2"
+    name: "🔍 加载Phase 2状态 (专家分析)"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+    description: "加载所有专家的分析结果，作为方案生成的输入"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_2"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 2 专家分析结果缺失！
+
+            文件路径: {state_folder}/phase_2_state_latest.yaml
+
+            解决方案:
+            - 请从 Phase 2 重新执行
+
+    inputs:
+      - phase_id: "phase_2"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+
+    outputs:
+      - phase_2_state
+      - metadata
+      - load_success
+
+  - step_id: "3.0.3"
+    name: "✅ Phase间依赖完整性验证"
+    action: "exec"
+    target: "bmad/aps/tasks/verify-phase-dependencies.md"
+    description: "验证Phase 1.5和Phase 2状态完整性"
+
+    inputs:
+      - phase_1_5_state: "${phase_1_5_state}"
+      - phase_2_state: "${phase_2_state}"
+      - required_phases: ["phase_1_5", "phase_2"]
+
+    outputs:
+      - dependency_validation
+      - missing_dependencies
+
+    verification_gate:
+      critical: true
+      check: "dependency_validation.all_dependencies_met == true"
+      on_fail: "block_with_error"
+      error_message: |
+        ❌ Phase依赖验证失败！
+
+        缺失的依赖: {missing_dependencies}
+
+        请确保前置Phase已完成并保存了状态文件。
+
+  # ====== 阶段2: 方案融合 ======
+  - step_id: "3.1"
+    name: "📋 方案融合（基于状态文件）"
+    action: "exec"
+    target: "bmad/aps/tasks/integrate-solution.md"
+    description: "融合TenElementModel和专家分析，生成完整的调度优化方案（纯方案，不含代码）"
+
+    inputs:
+      # 从Phase 1.5状态文件加载
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - model_baseline: "${phase_1_5_state.state_data.model_baseline}"
+      - model_hash: "${phase_1_5_state.state_data.model_hash}"
+
+      # 从Phase 2状态文件加载
+      - domain_analysis: "${phase_2_state.state_data.domain_analysis}"
+      - constraint_analysis: "${phase_2_state.state_data.constraint_analysis}"
+      - objective_analysis: "${phase_2_state.state_data.objective_analysis}"
+      - algorithm_recommendations: "${phase_2_state.state_data.algorithm_recommendations}"
+      - consistency_report: "${phase_2_state.state_data.consistency_report}"
+
+      # 元数据
+      - phase_1_5_metadata: "${phase_1_5_state.metadata}"
+      - phase_2_metadata: "${phase_2_state.metadata}"
+      - selected_mode: "${selected_mode}"
+
+    outputs:
+      - integrated_solution # 完整方案对象（不含代码）
+      - solution_metadata # 方案元数据
+
+    quality_gates:
+      - name: "Solution Integration Completeness"
+        check: "integrated_solution.all_sections_present == true"
+        severity: "critical"
+      - name: "Expert Analysis Integration"
+        check: "integrated_solution.expert_analyses_integrated == true"
+        severity: "critical"
+      - name: "TenElementModel Consistency"
+        check: "integrated_solution.ten_element_aligned == true"
+        severity: "critical"
+
+  - step_id: "3.2"
+    name: "✅ 方案一致性检查"
+    action: "exec"
+    target: "bmad/aps/tasks/final-consistency-check.md"
+    description: "验证方案与TenElementModel的一致性"
+
+    inputs:
+      - integrated_solution
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - expert_analyses:
+          domain: "${phase_2_state.state_data.domain_analysis}"
+          constraint: "${phase_2_state.state_data.constraint_analysis}"
+          objective: "${phase_2_state.state_data.objective_analysis}"
+          algorithm: "${phase_2_state.state_data.algorithm_recommendations}"
+
+    outputs:
+      - consistency_validation
+      - consistency_issues
+
+    verification_gate:
+      critical: true
+      check: "consistency_validation.overall_status == 'PASS'"
+      on_fail: "block_and_retry"
+      error_message: |
+        ❌ 方案一致性检查失败！
+
+        发现的不一致: {consistency_issues}
+
+        解决方案:
+        - 修正方案中的不一致部分
+        - 重新运行一致性检查
+        - 确保方案严格遵循TenElementModel
+
+  # ====== 阶段3: 方案文档生成 ======
+  - step_id: "3.3"
+    name: "💾 保存方案交付物"
+    action: "exec"
+    target: "bmad/aps/tasks/save-solution-document.md"
+    description: "将完整方案保存为Markdown文档，作为独立交付物"
+
+    mandatory_save: true
+    critical: true
+
+    inputs:
+      - integrated_solution
+      - consistency_validation
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - output_folder: "${config.output_folder}"
+      - docs_folder: "${config.docs_folder}"
+      - include_metadata: true
+      - include_data_sources: true # 标注数据来源
+      - document_phase: "phase_3_solution_integration"
+
+    outputs:
+      - solution_document_path # 方案文档路径 (Markdown)
+      - solution_data_path # 方案数据路径 (YAML)
+      - solution_document_content # 方案文档内容
+      - verification_result
+      - file_metadata
+
+    post_action_verify:
+      # 核心检查1：Markdown文件已保存
+      - check: "verification_result.markdown_file.file_saved == true"
+        on_fail: "block_and_retry"
+        error_message: "方案文档(Markdown)保存失败，无法继续"
+        max_retries: 3
+
+      # 核心检查2：文件名格式正确（防止生成README.md等错误文件）
+      - check: "file_metadata.markdown_file.file_name.startswith('solution_document_')"
+        on_fail: "block_with_error"
+        error_message: |
+          ❌ 方案文档文件名不符合规范！
+
+          要求格式: solution_document_{timestamp}.md
+          实际文件: ${file_metadata.markdown_file.file_name}
+
+          这通常意味着生成了错误的文件（如README.md用户手册）。
+          方案文档必须是独立的设计文档，包含完整的技术方案和追溯信息。
+
+      # 核心检查3：内容结构完整性（最关键！）
+      - check: "verification_result.content_validation.has_required_sections == true"
+        on_fail: "block_with_error"
+        error_message: |
+          ❌ 方案文档缺少必需章节！
+
+          完整方案文档必须包含以下章节:
+          - 1. 问题定义与建模
+          - 2. 领域适配方案
+          - 3. 约束处理策略
+          - 4. 目标优化策略
+          - 5. 算法选择与配置
+          - 6. 实现路线图
+          - 附录: TenElementModel完整定义
+
+          缺失的章节: ${verification_result.content_validation.missing_sections}
+
+          说明: 方案文档不是用户手册，而是完整的技术设计文档。
+
+      # 核心检查4：YAML数据文件已保存
+      - check: "verification_result.yaml_file.yaml_saved == true"
+        on_fail: "block_and_retry"
+        error_message: "方案数据(YAML)保存失败，无法继续"
+        max_retries: 3
+
+      # 核心检查5：Phase 3专项检查
+      - check: "verification_result.phase_validation.phase_3_complete == true"
+        on_fail: "block_with_error"
+        error_message: |
+          ❌ Phase 3方案集成验证失败！
+
+          Phase 3必须确保:
+          - 技术方案完整性
+          - 专家建议集成度
+          - 十要素模型对齐
+          - 可交付文档生成
+
+  - step_id: "3.3.1"
+    name: "🔍 方案文档质量检查"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-solution-document-quality.md"
+    description: "验证方案文档的质量和完整性"
+
+    inputs:
+      - solution_document_path: "${solution_document_path}"
+      - solution_data_path: "${solution_data_path}"
+      - integrated_solution: "${integrated_solution}"
+      - quality_standards: "phase_3_solution_document"
+
+    outputs:
+      - document_quality_report
+      - quality_issues
+      - quality_score
+
+    verification_gate:
+      critical: true
+      check: "document_quality_report.overall_quality_score >= 90"
+      on_fail: "block_and_retry"
+      error_message: |
+        ❌ 方案文档质量不达标！
+
+        质量评分: {quality_score}/100 (要求: ≥90)
+        质量问题: {quality_issues}
+
+        请改进文档质量后重新生成。
+
+  # ====== 阶段4: 用户确认 ======
+  - step_id: "3.4"
+    name: "👤 用户确认方案"
+    action: "human_confirmation"
+    trigger_level: "P0"
+    confirmation_type: "solution_approval"
+    template: "@交互对话模板库/方案确认模板.md"
+    description: "展示完整方案，用户确认后方可进入代码生成阶段"
+
+    inputs:
+      - integrated_solution
+      - solution_document_path
+      - consistency_validation
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - quality_report: "${document_quality_report}"
+      - phase_info:
+          phase_number: "3"
+          phase_name: "方案集成"
+          next_phase: "3.5 代码生成"
+          estimated_time_next_phase: "20-25分钟"
+
+    outputs:
+      - user_approved_solution # 用户确认后的方案
+      - user_feedback # 用户反馈意见
+      - approval_timestamp # 确认时间戳
+
+    post_action:
+      # 强制更新方案为用户确认版本
+      - set_variable:
+          name: "final_solution"
+          value: "${user_approved_solution}"
+
+  - step_id: "3.4.5"
+    name: "🔍 方案文档完整性终极验证"
+    action: "exec"
+    target: "bmad/aps/tasks/verify-solution-documents-exist.md"
+    description: "代码生成前的最后一道防线，确保方案文档完整存在"
+
+    critical: true
+    blocking: true
+
+    inputs:
+      - solution_document_path: "${solution_document_path}"
+      - solution_data_path: "${solution_data_path}"
+      - output_folder: "${config.output_folder}"
+      - phase_context: "phase_3_before_code_generation"
+
+    outputs:
+      - final_verification
+
+    verification_gate:
+      critical: true
+      checks:
+        - "final_verification.markdown_exists == true"
+        - "final_verification.yaml_exists == true"
+        - "final_verification.has_all_sections == true"
+        - "final_verification.all_checks_passed == true"
+        - "final_verification.user_approved == true"
+      on_fail: "block_with_error"
+      error_message: |
+        ❌ 方案文档验证失败，无法进入代码生成阶段！
+
+        请确保以下条件满足：
+        1. solution_document_*.md (包含6个技术章节 + 附录) 已生成
+        2. solution_data_*.yaml (包含完整方案对象) 已生成
+        3. 所有必需章节完整
+        4. 用户已确认方案
+        5. 所有验证检查通过
+
+        阻断问题: {final_verification.blocking_issues}
+
+        解决方案:
+        - 重新执行 Step 3.3 (保存方案交付物)
+        - 确保用户确认方案
+        - 或从 Phase 3 开始重新执行
+
+  # ====== 阶段5: 状态保存 ======
+  - step_id: "3.9"
+    name: "💾 保存Phase 3状态 (方案集成)"
+    action: "exec"
+    target: "bmad/aps/tasks/save-phase-state.md"
+    description: "保存方案集成结果，作为Phase 3.5代码生成的输入基线"
+
+    mandatory_save: true
+    critical: true
+
+    inputs:
+      - phase_id: "phase_3"
+      - state_data:
+          integrated_solution: ${final_solution}
+          user_approved_solution: ${user_approved_solution}
+          solution_document_path: ${solution_document_path}
+          solution_data_path: ${solution_data_path}
+          consistency_validation: ${consistency_validation}
+          document_quality_report: ${document_quality_report}
+          solution_metadata: ${solution_metadata}
+          final_verification: ${final_verification}
+          phase_completion_info:
+            phase_name: "方案集成"
+            completion_time: "${workflow.current_time}"
+            user_approval: true
+            document_generated: true
+            quality_passed: true
+      - state_folder: "${config.state_management.state_folder}"
+      - format: "${config.state_management.state_format}"
+      - include_metadata: true
+
+    outputs:
+      - saved_state_file
+      - verification_result
+      - file_metadata
+      - manifest_updated
+
+    post_action_verify:
+      - check: "verification_result.all_checks_passed == true"
+        on_fail: "block_and_retry"
+        error_message: "Phase 3状态保存失败"
+        max_retries: 3
+
+    # 为Phase 3.5准备的数据引用
+    success_actions:
+      - log: "✅ Phase 3 方案集成完成，状态已保存"
+      - log: "📄 方案文档: ${solution_document_path}"
+      - log: "📊 方案数据: ${solution_data_path}"
+      - log: "👤 用户确认: ${approval_timestamp}"
+      - log: "🚀 准备进入 Phase 3.5 代码生成阶段"
+
+# ====== 输出定义 ======
+outputs:
+  primary:
+    - integrated_solution # 完整的集成方案
+    - user_approved_solution # 用户确认的方案
+    - solution_document_path # 方案文档路径
+    - solution_data_path # 方案数据路径
+    - phase_3_state_file # Phase 3状态文件路径
+
+  metadata:
+    - solution_metadata # 方案元数据
+    - consistency_validation # 一致性验证结果
+    - document_quality_report # 文档质量报告
+    - final_verification # 最终验证结果
+    - user_feedback # 用户反馈
+
+# ====== 错误处理 ======
+error_handling:
+  on_solution_integration_failure:
+    action: "block_and_retry"
+    max_retries: 3
+    error_message: "方案集成失败，请检查TenElementModel和专家分析结果"
+
+  on_document_generation_failure:
+    action: "block_and_retry"
+    max_retries: 3
+    error_message: "方案文档生成失败，请检查方案完整性和格式"
+
+  on_consistency_check_failure:
+    action: "block_and_retry"
+    max_retries: 3
+    error_message: "一致性检查失败，请修正方案中的不一致部分"
+
+  on_user_rejection:
+    action: "rollback_to_phase_2"
+    message: "用户拒绝方案，返回Phase 2重新协调专家建议"
+
+  on_state_save_failure:
+    action: "block_and_retry"
+    max_retries: 3
+    error_message: "Phase 3状态保存失败，请检查文件系统权限"
+
+# ====== 质量门禁 ======
+quality_gates:
+  solution_integration:
+    enabled: true
+    checks:
+      - name: "TenElementModel Alignment"
+        required: true
+        validation: "solution.ten_element_aligned == true"
+      - name: "Expert Analysis Integration"
+        required: true
+        validation: "solution.expert_analyses_integrated == true"
+      - name: "Solution Completeness"
+        required: true
+        validation: "solution.all_sections_present == true"
+
+  document_generation:
+    enabled: true
+    checks:
+      - name: "Markdown Document Generated"
+        required: true
+        validation: "verification_result.markdown_file.file_saved == true"
+      - name: "YAML Data Generated"
+        required: true
+        validation: "verification_result.yaml_file.yaml_saved == true"
+      - name: "Document Structure Complete"
+        required: true
+        validation: "verification_result.content_validation.has_required_sections == true"
+
+  user_approval:
+    enabled: true
+    checks:
+      - name: "User Confirmation Required"
+        required: true
+        validation: "user_approved_solution != null"
+      - name: "Approval Timestamp Recorded"
+        required: true
+        validation: "approval_timestamp != null"
+
+# ====== 依赖管理 ======
+dependencies:
+  required_phases:
+    - phase_id: "phase_1_5"
+      description: "TenElementModel基线"
+    - phase_id: "phase_2"
+      description: "专家分析结果"
+
+  required_inputs:
+    - name: "ten_element_model"
+      source: "phase_1_5_state"
+      field: "state_data.ten_element_model"
+    - name: "expert_analyses"
+      source: "phase_2_state"
+      field: "state_data"
+
+  outputs_for_next_phase:
+    - name: "integrated_solution"
+      target_phase: "phase_3_5"
+      field: "user_approved_solution"
+    - name: "solution_document_path"
+      target_phase: "phase_3_5"
+      field: "solution_document_path"
+
+# ====== 性能指标 ======
+metrics:
+  phase_duration:
+    target: "15-20分钟"
+    warning_threshold: "25分钟"
+    critical_threshold: "30分钟"
+
+  quality_metrics:
+    solution_completeness: "100%"
+    document_generation_success: "100%"
+    user_approval_rate: "≥95%"
+    consistency_check_pass: "100%"
+
+  resource_usage:
+    memory_limit: "1GB"
+    cpu_limit: "50%"
+
+# ====== 版本信息 ======
+version_history:
+  - version: "4.4.0"
+    date: "2025-11-04"
+    changes:
+      - "从原Phase 3拆分，专注方案集成"
+      - "强化方案文档生成和验证"
+      - "新增用户确认强制阻断"
+      - "增强十要素对齐验证"
+    author: "APS Team"
+    description: "Phase 3方案集成专业化版本"

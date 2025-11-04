@@ -1,0 +1,862 @@
+workflow_id: "aps-phase-3.5-code-generation"
+workflow_name: "Phase 3.5: 代码生成"
+version: "4.4.0"
+description: "由代码实现专家主导，基于用户确认的技术方案生成高质量可执行代码"
+
+metadata:
+  author: "APS Team"
+  created: "2025-11-04"
+  bmad_version: "v6-alpha"
+  estimated_time: "20-25分钟"
+  phase_number: "3.5"
+  phase_focus: "代码实现和质量保证"
+
+config:
+  interaction_mode: "inherited_from_phase_3"
+  code_expert_required: true
+  quality_gates_enabled: true
+  ten_element_mapping_validation: true
+
+inputs:
+  required_inputs:
+    - name: "phase_3_state"
+      description: "Phase 3 方案集成状态"
+      source: "load_phase_state"
+      phase_id: "phase_3"
+    - name: "phase_1_5_state"
+      description: "Phase 1.5 TenElementModel状态"
+      source: "load_phase_state"
+      phase_id: "phase_1_5"
+    - name: "selected_mode"
+      description: "用户选择的交互模式"
+      source: "phase_0_5_state"
+      field: "selected_mode"
+
+steps:
+  # ====== 阶段1: 状态加载和验证 ======
+  - step_id: "3.5.0"
+    name: "🔍 加载Phase 3状态 (方案集成)"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+    description: "加载用户确认的技术方案，作为代码生成的输入"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_3"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 3 方案集成状态缺失！
+
+            文件路径: {state_folder}/phase_3_state_latest.yaml
+
+            Phase 3的技术方案是代码生成的核心依赖，必须存在。
+
+            解决方案:
+            - 请从 Phase 3 重新执行方案集成
+            - 确保用户已确认技术方案
+
+    inputs:
+      - phase_id: "phase_3"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+
+    outputs:
+      - phase_3_state
+      - metadata
+      - load_success
+
+  - step_id: "3.5.0.1"
+    name: "🔍 加载Phase 1.5状态 (TenElementModel)"
+    action: "exec"
+    target: "bmad/aps/tasks/load-phase-state.md"
+    description: "加载TenElementModel，用于十要素映射验证"
+
+    critical: true
+
+    pre_condition_check:
+      required_files:
+        - phase_id: "phase_1_5"
+          on_missing: "block_with_error"
+          error_message: |
+            ❌ CRITICAL: Phase 1.5 TenElementModel 缺失！
+
+            文件路径: {state_folder}/phase_1_5_state_latest.yaml
+
+            TenElementModel是代码十要素映射的基准，必须存在。
+
+            解决方案:
+            - 请从 Phase 1.5 重新执行建模
+
+    inputs:
+      - phase_id: "phase_1_5"
+      - state_folder: "${config.state_management.state_folder}"
+      - required: true
+      - use_latest: true
+
+    outputs:
+      - phase_1_5_state
+      - metadata
+      - load_success
+
+  - step_id: "3.5.0.2"
+    name: "✅ Phase 3输入完整性验证"
+    action: "exec"
+    target: "bmad/aps/tasks/verify-code-generation-inputs.md"
+    description: "验证代码生成所需的所有输入完整性"
+
+    inputs:
+      - phase_3_state: "${phase_3_state}"
+      - phase_1_5_state: "${phase_1_5_state}"
+      - required_inputs:
+          - "user_approved_solution"
+          - "solution_document_path"
+          - "ten_element_model"
+          - "consistency_validation"
+
+    outputs:
+      - input_validation_result
+      - missing_inputs
+
+    verification_gate:
+      critical: true
+      check: "input_validation_result.all_inputs_valid == true"
+      on_fail: "block_with_error"
+      error_message: |
+        ❌ 代码生成输入验证失败！
+
+        缺失的输入: {missing_inputs}
+
+        请确保：
+        1. Phase 3已完成方案集成
+        2. 用户已确认技术方案
+        3. 方案文档已生成
+        4. TenElementModel完整存在
+
+  # ====== 阶段2: 代码实现专家调用 ======
+  - step_id: "3.5.1"
+    name: "👨‍💻 调用代码实现专家"
+    action: "exec"
+    agent: "bmad/aps/agents/code-implementation-expert.agent.yaml"
+    command: "*generate-code"
+    description: "由代码实现专家主导，生成高质量的调度优化代码"
+
+    critical: true
+
+    inputs:
+      # 核心输入：来自Phase 3的技术方案
+      - user_approved_solution: "${phase_3_state.state_data.user_approved_solution}"
+      - solution_document_path: "${phase_3_state.state_data.solution_document_path}"
+      - solution_data_path: "${phase_3_state.state_data.solution_data_path}"
+
+      # 基准：来自Phase 1.5的TenElementModel
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - model_baseline: "${phase_1_5_state.state_data.model_baseline}"
+
+      # 参考信息：来自Phase 3的验证结果
+      - consistency_validation: "${phase_3_state.state_data.consistency_validation}"
+      - document_quality_report: "${phase_3_state.state_data.document_quality_report}"
+
+      # 配置信息
+      - output_folder: "${config.output_folder}"
+      - models_folder: "${config.models_folder}"
+      - code_quality_standards: "phase_3_5_high_quality"
+      - selected_mode: "${selected_mode}"
+
+    outputs:
+      - implementation_code # 生成的代码包
+      - code_metadata # 代码元数据
+      - code_traceability # 代码与方案的可追溯映射
+      - expert_analysis_report # 代码实现专家分析报告
+
+    quality_gates:
+      - name: "Expert Implementation Complete"
+        check: "expert_analysis_report.implementation_complete == true"
+        severity: "critical"
+      - name: "Code Structure Valid"
+        check: "code_metadata.structure_valid == true"
+        severity: "critical"
+      - name: "Traceability Complete"
+        check: "code_traceability.completeness_score >= 95"
+        severity: "high"
+
+  - step_id: "3.5.2"
+    name: "🔍 代码实现专家报告分析"
+    action: "exec"
+    target: "bmad/aps/tasks/analyze-expert-implementation-report.md"
+    description: "分析代码实现专家的执行报告，确认代码质量"
+
+    inputs:
+      - expert_analysis_report: "${expert_analysis_report}"
+      - implementation_code: "${implementation_code}"
+      - code_traceability: "${code_traceability}"
+      - expected_quality_standards: "phase_3_5_code_quality"
+
+    outputs:
+      - expert_report_analysis
+      - quality_indicators
+      - potential_issues
+
+    verification_gate:
+      critical: true
+      check: "expert_report_analysis.overall_assessment == 'PASS'"
+      on_fail: "review_and_retry"
+      error_message: |
+        ❌ 代码实现专家报告分析未通过！
+
+        问题: {potential_issues}
+
+        解决方案:
+        - 检查专家报告中的问题点
+        - 重新调用代码实现专家
+        - 或调整代码生成策略
+
+  # ====== 阶段3: 十要素映射验证 ======
+  - step_id: "3.5.3"
+    name: "🛡️ 十要素代码覆盖验证"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-ten-element-mapping-enhanced.md"
+    description: "验证生成的代码覆盖了所有十要素，防止Element缺失"
+
+    mandatory: true
+    critical: true
+
+    inputs:
+      - implementation_code
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - solution_document_path: "${phase_3_state.state_data.solution_document_path}"
+      - code_traceability: "${code_traceability}"
+
+    outputs:
+      - element_mapping_validation
+      - missing_mappings
+      - mapping_coverage_score
+
+    validation_criteria:
+      decision_variables:
+        coverage_required: "100%"
+        validation: "代码中包含所有决策变量的数据结构定义"
+      parameters:
+        coverage_required: "100%"
+        validation: "代码包含参数配置模块"
+      constraints:
+        coverage_required: "100%"
+        validation: "代码包含约束检查和实现"
+      objectives:
+        coverage_required: "100%"
+        validation: "代码包含优化目标实现"
+      algorithms:
+        coverage_required: "100%"
+        validation: "代码包含推荐算法的完整实现"
+      time_models:
+        coverage_required: "95%"
+        validation: "代码包含时间处理逻辑"
+      uncertainty:
+        coverage_required: "90%"
+        validation: "代码包含随机性处理"
+      solver_config:
+        coverage_required: "100%"
+        validation: "代码包含求解器配置"
+      data_interfaces:
+        coverage_required: "100%"
+        validation: "代码包含输入数据加载"
+      output_formats:
+        coverage_required: "100%"
+        validation: "代码包含结果格式化输出"
+
+    verification_gate:
+      critical: true
+      check: "element_mapping_validation.summary.all_covered == true"
+      on_fail: "proceed_to_fix" # 不阻断，进入修复流程
+      error_message: |
+        ❌ 十要素代码覆盖验证失败！
+
+        缺失的映射: {missing_mappings}
+        覆盖率: {mapping_coverage_score}%
+
+        将进入修复流程自动补充缺失的映射。
+
+  # ====== 阶段4: 代码质量验证 ======
+  - step_id: "3.5.4"
+    name: "🔍 代码完整性和质量验证"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-code-completeness-enhanced.md"
+    description: "三层验证：完整性、语法、方案一致性"
+
+    mandatory: true
+    critical: true
+
+    inputs:
+      - implementation_code
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - user_approved_solution: "${phase_3_state.state_data.user_approved_solution}"
+      - solution_document_path: "${phase_3_state.state_data.solution_document_path}"
+      - expert_guidance: "${expert_analysis_report}"
+
+    validation_layers:
+      layer_1_completeness:
+        - "所有必需模块文件存在"
+        - "函数和类的定义完整"
+        - "导入语句正确"
+        - "配置文件存在"
+
+      layer_2_syntax:
+        - "Python语法正确性"
+        - "类型注解完整性 ≥ 90%"
+        - "文档字符串覆盖率 ≥ 95%"
+        - "代码风格符合PEP8"
+
+      layer_3_consistency:
+        - "代码架构遵循方案设计"
+        - "算法实现匹配推荐"
+        - "约束实现与方案一致"
+        - "目标函数数学等价"
+        - "接口设计符合规范"
+
+    outputs:
+      - validation_report
+      - validation_errors
+      - quality_score
+
+    verification_gate:
+      critical: true
+      check: "validation_report.overall_result == 'PASSED'"
+      on_fail: "proceed_to_fix" # 不阻断，进入修复流程
+      error_message: |
+        ❌ 代码质量验证失败！
+
+        验证结果: {validation_report.overall_result}
+        质量评分: {quality_score}/100
+        错误数量: {len(validation_errors)}
+
+        将进入自动修复流程。
+
+  # ====== 阶段5: 验证失败处理 ======
+  - step_id: "3.5.5"
+    name: "🔧 验证失败处理分支"
+    action: "conditional"
+    description: "根据验证结果决定是否需要修复"
+
+    condition: |
+      validation_report.overall_result != 'PASSED' OR
+      element_mapping_validation.summary.all_covered != true
+
+    on_true:
+      next_steps: ["3.5.6", "3.5.7", "3.5.8"] # 进入修复流程
+    on_false:
+      next_steps: ["3.5.9"] # 跳过修复，继续一致性验证
+
+  # ====== 阶段6: 自动修复流程 ======
+  - step_id: "3.5.6"
+    name: "📊 分析验证错误"
+    action: "exec"
+    target: "bmad/aps/tasks/analyze-validation-errors-enhanced.md"
+    description: "分析错误类型，生成修复策略"
+
+    inputs:
+      - validation_report
+      - element_mapping_validation
+      - implementation_code
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - user_approved_solution: "${phase_3_state.state_data.user_approved_solution}"
+      - retry_count: "${workflow.retry_count | default(0)}"
+
+    error_classification:
+      category_1_missing_elements:
+        description: "十要素映射缺失"
+        severity: "high"
+        auto_fixable: true
+      category_2_syntax_errors:
+        description: "语法和格式错误"
+        severity: "medium"
+        auto_fixable: true
+      category_3_logic_errors:
+        description: "逻辑实现错误"
+        severity: "high"
+        auto_fixable: false
+      category_4_consistency_issues:
+        description: "与方案不一致"
+        severity: "high"
+        auto_fixable: false
+
+    outputs:
+      - classified_errors
+      - fix_strategy
+      - fix_report
+      - auto_fix_possible
+
+  - step_id: "3.5.7"
+    name: "🔧 自动修复代码"
+    action: "exec"
+    target: "bmad/aps/tasks/fix-code-from-validation-enhanced.md"
+    description: "根据修复策略自动修复代码"
+
+    condition: "auto_fix_possible == true"
+
+    inputs:
+      - implementation_code
+      - fix_strategy
+      - classified_errors
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - user_approved_solution: "${phase_3_state.state_data.user_approved_solution}"
+      - solution_document_path: "${phase_3_state.state_data.solution_document_path}"
+      - retry_count: "${workflow.retry_count | default(0)}"
+
+    fix_methods:
+      missing_elements:
+        - "补充缺失的决策变量代码"
+        - "添加缺失的约束实现"
+        - "补充目标函数代码"
+        - "完善算法实现"
+      syntax_errors:
+        - "自动修复PEP8违规"
+        - "补充缺失的类型注解"
+        - "完善文档字符串"
+      consistency_issues:
+        - "调整代码结构与方案一致"
+        - "修正算法参数配置"
+
+    outputs:
+      - fixed_code
+      - fix_report_detail
+      - code_traceability_updated
+
+    post_action:
+      # 更新implementation_code为修复���的代码
+      - set_variable:
+          name: "implementation_code"
+          value: "${fixed_code}"
+      - set_variable:
+          name: "code_traceability"
+          value: "${code_traceability_updated}"
+
+  - step_id: "3.5.8"
+    name: "🔄 重新验证修复后的代码"
+    action: "exec"
+    target: "bmad/aps/tasks/validate-code-completeness-enhanced.md"
+    description: "验证修复后的代码"
+
+    inputs:
+      - implementation_code: "${fixed_code}"
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - user_approved_solution: "${phase_3_state.state_data.user_approved_solution}"
+      - expert_guidance: "${expert_analysis_report}"
+
+    outputs:
+      - re_validation_report
+      - final_quality_score
+
+    verification_gate:
+      critical: true
+      check: "re_validation_report.overall_result == 'PASSED'"
+      on_fail: "retry_or_escalate"
+      max_retries: 2
+      error_message: |
+        ❌ 代码修复后仍然验证失败！
+
+        已重试: {workflow.retry_count} 次
+        最终质量评分: {final_quality_score}/100
+
+        建议动作:
+        - 如果 retry_count < 2: 返回 Step 3.5.6 重新分析
+        - 如果 retry_count >= 2: 需要人工介入
+
+  # ====== 阶段7: 人工介入（可选）======
+  - step_id: "3.5.8.5"
+    name: "👤 人工介入修复"
+    action: "human_confirmation"
+    trigger_level: "P0"
+    condition: "workflow.retry_count >= 2 AND re_validation_report.overall_result != 'PASSED'"
+    description: "自动修复失败，请求人工介入"
+
+    template: "@交互对话模板库/code-fix-intervention.md"
+
+    inputs:
+      - validation_report
+      - fix_report_detail
+      - retry_attempts: "${workflow.retry_count}"
+      - failed_code: "${fixed_code}"
+      - error_summary:
+          quality_score: "${final_quality_score}"
+          error_count: "${len(classified_errors)}"
+          auto_fix_failed: true
+
+    outputs:
+      - user_decision # 选项: manual_fix | lower_standards | restart | abort
+
+    post_action:
+      condition_based_execution:
+        - condition: "user_decision == 'manual_fix'"
+          actions: ["等待用户提供修复代码"]
+        - condition: "user_decision == 'lower_standards'"
+          actions: ["降低质量标准继续", "记录质量降级"]
+        - condition: "user_decision == 'restart'"
+          actions: ["重置retry_count", "从Step 3.5.1重新开始"]
+        - condition: "user_decision == 'abort'"
+          actions: ["终止Phase 3.5", "报告失败原因"]
+
+  # ====== 阶段8: 方案一致性验证 ======
+  - step_id: "3.5.9"
+    name: "🔍 验证代码-方案一致性"
+    action: "exec"
+    target: "bmad/aps/tasks/verify-code-solution-consistency-enhanced.md"
+    description: "Workflow级别强制验证代码与方案一致性，避免大模型幻觉"
+
+    mandatory: true
+    critical: true
+
+    inputs:
+      - implementation_code
+      - user_approved_solution: "${phase_3_state.state_data.user_approved_solution}"
+      - solution_document_path: "${phase_3_state.state_data.solution_document_path}"
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - code_traceability: "${code_traceability}"
+
+    consistency_checks:
+      architecture_level:
+        - "代码架构是否遵循方案设计"
+        - "模块划分是否与方案一致"
+        - "接口设计是否符合规范"
+      algorithm_level:
+        - "算法实现是否匹配推荐"
+        - "参数配置是否正确"
+        - "性能特征是否符合预期"
+      constraint_level:
+        - "约束实现是否与方案一致"
+        - "约束逻辑是否正确"
+        - "边界条件是否处理"
+      objective_level:
+        - "目标函数是否数学等价"
+        - "优化方向是否正确"
+        - "权重设置是否匹配"
+      interface_level:
+        - "输入输出接口是否符合规范"
+        - "数据格式是否正确"
+        - "错误处理是否完善"
+
+    outputs:
+      - consistency_check_result
+      - inconsistencies_found
+      - consistency_score
+
+    verification_gate:
+      critical: true
+      check: "consistency_check_result.overall_status == 'PASS'"
+      on_fail: "block_and_retry"
+      error_message: |
+        ❌ 代码与方案不一致！
+
+        发现的不一致: {inconsistencies_found}
+        一致性评分: {consistency_score}/100
+
+        这是严重问题，代码必须严格遵循用户确认的方案。
+
+        解决方案:
+        - 修正代码使其严格遵循方案
+        - 不允许偏离用户确认的方案
+        - 确保代码包含完整的引用标记
+      max_retries: 3
+
+  # ====== 阶段9: 保存交付物 ======
+  - step_id: "3.5.10"
+    name: "💾 保存代码交付物"
+    action: "exec"
+    target: "bmad/aps/tasks/save-code-deliverables.md"
+    description: "保存代码、文档和所有相关交付物"
+
+    mandatory_save: true
+    critical: true
+
+    inputs:
+      - implementation_code
+      - code_traceability
+      - expert_analysis_report
+      - solution_document_path: "${phase_3_state.state_data.solution_document_path}"
+      - ten_element_model: "${phase_1_5_state.state_data.ten_element_model}"
+      - output_folder: "${config.output_folder}"
+      - models_folder: "${config.models_folder}"
+      - docs_folder: "${config.docs_folder}"
+      - code_folder: "${config.code_folder}"
+
+    deliverables_to_save:
+      primary:
+        - "Python代码包 (.py文件)"
+        - "代码文档 (README.md, API文档)"
+        - "实现说明报告"
+        - "测试代码"
+      secondary:
+        - "配置文件"
+        - "示例数据"
+        - "性能基准报告"
+        - "十要素映射对照表"
+
+    outputs:
+      - saved_code_files
+      - saved_documentation
+      - verification_result
+      - deliverable_manifest
+
+    post_action_verify:
+      - check: "verification_result.all_saved == true"
+        on_fail: "block_and_retry"
+        error_message: "代码交付物保存失败"
+        max_retries: 3
+
+  - step_id: "3.5.11"
+    name: "✅ 验证交付物完整性"
+    action: "exec"
+    target: "bmad/aps/tasks/verify-code-deliverables-integrity.md"
+    description: "验证所有代码交付物已保存且格式正确"
+
+    critical: true
+
+    inputs:
+      - deliverable_manifest: "${deliverable_manifest}"
+      - saved_code_files: "${saved_code_files}"
+      - output_folder: "${config.output_folder}"
+      - expected_deliverables:
+          - "main.py"
+          - "algorithm.py"
+          - "data_structures.py"
+          - "constraints.py"
+          - "objectives.py"
+          - "solver.py"
+          - "utils.py"
+          - "README.md"
+
+    outputs:
+      - integrity_check_result
+      - missing_deliverables
+      - format_issues
+
+    verification_gate:
+      critical: true
+      check: "integrity_check_result.all_valid == true"
+      on_fail: "block_and_retry"
+      error_message: |
+        ❌ 代码交付物完整性验证失败！
+
+        缺失文件: {missing_deliverables}
+        格式问题: {format_issues}
+
+        请确保所有必需的代码文件和文档都已正确保存。
+
+  # ====== 阶段10: 用户确认（可选）======
+  - step_id: "3.5.12"
+    name: "👤 用户确认代码生成（可选）"
+    action: "conditional_human_confirmation"
+    condition: "selected_mode == 'mode_a'" # 仅在模式A（专家用户）时确认
+    trigger_level: "P1"
+    confirmation_type: "code_review"
+    template: "@交互对话模板库/代码确认模板.md"
+    description: "展示生成的代码，获取用户确认"
+
+    inputs:
+      - deliverable_manifest: "${deliverable_manifest}"
+      - code_summary: "${expert_analysis_report.code_summary}"
+      - quality_score: "${final_quality_score}"
+      - consistency_score: "${consistency_score}"
+      - ten_element_coverage: "${element_mapping_validation.summary.coverage_percentage}"
+
+    outputs:
+      - user_code_approval
+      - code_review_feedback
+
+  # ====== 阶段11: 状态保存 ======
+  - step_id: "3.5.13"
+    name: "💾 保存Phase 3.5状态 (代码生成)"
+    action: "exec"
+    target: "bmad/aps/tasks/save-phase-state.md"
+    description: "保存代码生成结果，作为Phase 4质量保证的输入"
+
+    mandatory_save: true
+    critical: true
+
+    inputs:
+      - phase_id: "phase_3_5"
+      - state_data:
+          implementation_code: ${implementation_code}
+          code_traceability: ${code_traceability}
+          expert_analysis_report: ${expert_analysis_report}
+          element_mapping_validation: ${element_mapping_validation}
+          validation_report: ${validation_report}
+          consistency_check_result: ${consistency_check_result}
+          deliverable_manifest: ${deliverable_manifest}
+          saved_code_files: ${saved_code_files}
+          integrity_check_result: ${integrity_check_result}
+          user_code_approval: ${user_code_approval}
+          phase_completion_info:
+            phase_name: "代码生成"
+            completion_time: "${workflow.current_time}"
+            expert_used: "code_implementation_expert"
+            quality_score: "${final_quality_score}"
+            ten_element_coverage: "${element_mapping_validation.summary.coverage_percentage}"
+      - state_folder: "${config.state_management.state_folder}"
+      - format: "${config.state_management.state_format}"
+      - include_metadata: true
+
+    outputs:
+      - saved_state_file
+      - verification_result
+      - file_metadata
+      - manifest_updated
+
+    post_action_verify:
+      - check: "verification_result.all_checks_passed == true"
+        on_fail: "block_and_retry"
+        error_message: "Phase 3.5状态保存失败"
+        max_retries: 3
+
+    # 成功消息
+    success_actions:
+      - log: "✅ Phase 3.5 代码生成完成，状态已保存"
+      - log: "💻 代码包: ${saved_code_files.main_package_path}"
+      - log: "📚 代码文档: ${saved_documentation.readme_path}"
+      - log: "🏆 质量评分: ${final_quality_score}/100"
+      - log: "🔗 十要素覆盖: ${element_mapping_validation.summary.coverage_percentage}%"
+      - log: "🚀 准备进入 Phase 4 质量保证阶段"
+
+# ====== 输出定义 ======
+outputs:
+  primary:
+    - implementation_code # 完整的代码包
+    - code_traceability # 代码可追溯性
+    - deliverable_manifest # 交付物清单
+    - phase_3_5_state_file # Phase 3.5状态文件路径
+
+  metadata:
+    - expert_analysis_report # 专家分析报告
+    - element_mapping_validation # 十要素映射验证
+    - validation_report # 验证报告
+    - consistency_check_result # 一致性检查结果
+    - quality_metrics # 质量指标
+
+# ====== 错误处理 ======
+error_handling:
+  on_expert_failure:
+    action: "retry_with_different_approach"
+    max_retries: 2
+    error_message: "代码实现专家执行失败，尝试不同方法"
+
+  on_mapping_validation_failure:
+    action: "auto_fix_and_retry"
+    max_retries: 3
+    error_message: "十要素映射验证失败，自动修复中"
+
+  on_consistency_check_failure:
+    action: "block_and_manual_fix"
+    error_message: "代码与方案不一致，需要手动修复"
+
+  on_quality_gate_failure:
+    action: "escalate_to_human"
+    error_message: "质量门禁失败，请求人工介入"
+
+# ====== 质量门禁 ======
+quality_gates:
+  expert_implementation:
+    enabled: true
+    checks:
+      - name: "Expert Implementation Complete"
+        required: true
+        validation: "expert_analysis_report.implementation_complete == true"
+      - name: "Code Structure Valid"
+        required: true
+        validation: "code_metadata.structure_valid == true"
+
+  ten_element_mapping:
+    enabled: true
+    checks:
+      - name: "Complete Coverage"
+        required: true
+        validation: "element_mapping_validation.summary.all_covered == true"
+      - name: "Minimum Coverage Threshold"
+        required: true
+        validation: "element_mapping_validation.summary.coverage_percentage >= 95"
+
+  code_quality:
+    enabled: true
+    checks:
+      - name: "Syntax Validation"
+        required: true
+        validation: "validation_report.syntax_check.passed == true"
+      - name: "Logic Validation"
+        required: true
+        validation: "validation_report.logic_check.passed == true"
+      - name: "Quality Score Threshold"
+        required: true
+        validation: "validation_report.overall_score >= 85"
+
+  solution_consistency:
+    enabled: true
+    checks:
+      - name: "Architecture Consistency"
+        required: true
+        validation: "consistency_check_result.architecture_match == true"
+      - name: "Algorithm Consistency"
+        required: true
+        validation: "consistency_check_result.algorithm_match == true"
+      - name: "Overall Consistency"
+        required: true
+        validation: "consistency_check_result.overall_status == 'PASS'"
+
+# ====== 依赖管理 ======
+dependencies:
+  required_phases:
+    - phase_id: "phase_3"
+      description: "用户确认的技术方案"
+    - phase_id: "phase_1_5"
+      description: "TenElementModel基准"
+
+  required_inputs:
+    - name: "user_approved_solution"
+      source: "phase_3_state"
+      field: "state_data.user_approved_solution"
+    - name: "ten_element_model"
+      source: "phase_1_5_state"
+      field: "state_data.ten_element_model"
+    - name: "solution_document_path"
+      source: "phase_3_state"
+      field: "state_data.solution_document_path"
+
+  outputs_for_next_phase:
+    - name: "implementation_code"
+      target_phase: "phase_4"
+      field: "implementation_code"
+    - name: "deliverable_manifest"
+      target_phase: "phase_4"
+      field: "deliverable_manifest"
+    - name: "code_traceability"
+      target_phase: "phase_4"
+      field: "code_traceability"
+
+# ====== 性能指标 ======
+metrics:
+  phase_duration:
+    target: "20-25分钟"
+    warning_threshold: "30分钟"
+    critical_threshold: "35分钟"
+
+  quality_metrics:
+    code_quality_score: "≥85/100"
+    ten_element_coverage: "≥95%"
+    solution_consistency: "100%"
+    expert_success_rate: "≥95%"
+
+  resource_usage:
+    memory_limit: "2GB"
+    cpu_limit: "70%"
+
+# ====== 版本信息 ======
+version_history:
+  - version: "4.4.0"
+    date: "2025-11-04"
+    changes:
+      - "新增Phase 3.5代码生成专用工作流"
+      - "集成代码实现专家智能体"
+      - "强化十要素映射验证"
+      - "增强代码质量门禁"
+      - "支持验证-修复循环"
+    author: "APS Team"
+    description: "Phase 3.5代码生成专业化版本"
