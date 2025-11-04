@@ -55,11 +55,17 @@ APS模块的工作流定义目录，实现Phase 0-4完整调度求解流程。
 - 使用场景：Phase 2专家协调后、Phase 3集成前
 - 描述：跨专家建议一致性验证
 
-**phase-3-integration/** - 方案集成
+**phase-3-solution-integration/** - 方案集成
 
 - Phase：Phase 3
-- 描述：融合专家建议，生成可执行代码
+- 描述：技术方案设计、文档生成和用户确认
 - 预计时间：15-20分钟
+
+**phase-3.5-code-generation/** - 代码生成
+
+- Phase：Phase 3.5
+- 描述：由代码实现专家主导，基于用户确认方案生成代码
+- 预计时间：20-25分钟
 
 **phase-4-quality/** - 质量保证
 
