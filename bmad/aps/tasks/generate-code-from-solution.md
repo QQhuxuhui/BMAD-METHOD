@@ -112,14 +112,36 @@ def validate_precedence_constraint(schedule):
 - 状态文件引用存在
 - 在Step 3.6.5自动验证
 
-### 3. 只生成代码，不保存文件
+### 3. 只生成单一文件的代码，不保存文件
 
 本任务**只生成代码内容**，文件保存由后续Step 3.6完成。
+
+**CRITICAL**: 生成的代码必须是**单一Python文件**，所有组件（数据模型、约束验证、目标函数、算法核心、求解器入口）都集成在一个文件中。
 
 ```yaml
 output_scope:
   generate: true # 生成代码
   save: false # 不保存文件（由Step 3.6负责）
+
+single_file_requirement:
+  critical: true
+  rule: '所有代码组件必须集成在一个Python文件中'
+
+  structure:
+    - 文件头部（模块文档、追溯信息）
+    - 导入语句（所有依赖库）
+    - 数据加载模块
+    - 数据模型类
+    - 约束验证函数
+    - 目标函数
+    - 算法核心实现
+    - 求解器入口函数
+    - __main__入口
+
+  forbidden:
+    - 不能拆分成多个.py文件
+    - 不能使用相对导入（from .xxx import yyy）
+    - 不能假设存在其他模块文件
 ```
 
 ## 处理逻辑
@@ -820,6 +842,17 @@ def assemble_complete_code(
     code.append('"""')
     code.append('调度优化求解器')
     code.append('')
+    code.append('╔════════════════════════════════════════════════════════════╗')
+    code.append('║ 重要说明：单一文件自包含设计                               ║')
+    code.append('╚════════════════════════════════════════════════════════════╝')
+    code.append('')
+    code.append('本文件包含完整的调度求解器实现，无需其他自定义模块文件。')
+    code.append('所有功能（数据加载、模型定义、约束验证、算法实现）均在此文件中。')
+    code.append('')
+    code.append('使用方式:')
+    code.append('  python solver.py  # 直接运行')
+    code.append('  或作为模块导入: from solver import solve_scheduling_problem')
+    code.append('')
     code.append(f'生成时间: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}')
     code.append(f'方案文档: {solution_document_path}')
     code.append(f'方案确认: {user_approved_solution.get("approved_at")}')
@@ -827,13 +860,15 @@ def assemble_complete_code(
     code.append('本代码严格按照用户确认的方案生成')
     code.append('每个组件都标注了对应的方案依据和引用')
     code.append('')
-    code.append('架构:')
-    code.append('  1. 数据加载 - 基于TenElementModel Element 9（V4.4新增）')
-    code.append('  2. 数据模型 - 基于TenElementModel')
-    code.append('  3. 约束验证 - 基于约束处理策略')
-    code.append('  4. 目标函数 - 基于目标优化策略')
-    code.append('  5. 算法核心 - 基于算法选择')
-    code.append('  6. 求解器入口 - 基于实现路线图')
+    code.append('文件结构:')
+    code.append('  1. 导入依赖 - 标准库和第三方库')
+    code.append('  2. 数据加载模块 - 基于TenElementModel Element 9')
+    code.append('  3. 数据模型类 - 基于TenElementModel Element 1, 2')
+    code.append('  4. 约束验证函数 - 基于约束处理策略（Section 3）')
+    code.append('  5. 目标函数 - 基于目标优化策略（Section 4）')
+    code.append('  6. 算法核心实现 - 基于算法选择（Section 5）')
+    code.append('  7. 求解器入口 - 基于实现路线图（Section 6）')
+    code.append('  8. 主程序入口 - __main__')
     code.append('"""')
     code.append('')
 
@@ -988,8 +1023,14 @@ def generate_code_metadata(implementation_code, user_approved_solution):
 outputs:
   implementation_code:
     type: string
-    description: 生成的完整Python代码
+    description: 生成的完整Python代码（单一文件）
     format: 'UTF-8编码的Python源文件内容'
+    file_structure: '单一.py文件，包含所有功能模块'
+    characteristics:
+      - 自包含（self-contained）: 不依赖其他自定义.py文件
+      - 完整可运行: python solver.py即可执行
+      - 模块化组织: 使用注释分隔各功能模块
+      - 标准库导入: 只使用Python标准库和常见第三方库（numpy, pandas等）
 
   code_metadata:
     type: object
@@ -998,11 +1039,12 @@ outputs:
       generated_at: string (ISO8601)
       solution_approved_at: string (ISO8601)
       code_statistics:
-      total_lines: integer
+        total_lines: integer
         code_size_bytes: integer
       algorithm: string
       language: string
       version: string
+      file_type: 'single_file' # V4.5新增：明确标注单文件类型
 
   code_traceability:
     type: object
@@ -1015,6 +1057,8 @@ outputs:
 
 ## 质量检查
 
+### 基础质量
+
 - [ ] 代码严格按照方案生成
 - [ ] 每个组件都有方案依据标注
 - [ ] 使用方案中确定的算法
@@ -1024,6 +1068,16 @@ outputs:
 - [ ] 所有引用都清晰标注
 - [ ] 代码可追溯性完整
 - [ ] 代码语法正确（Python 3.8+）
+
+### 单文件要求（V4.5新增）
+
+- [ ] 所有代码在一个.py文件中
+- [ ] 无相对导入（from . import）
+- [ ] 无跨文件引用
+- [ ] 导入语句只使用标准库和第三方库
+- [ ] 文件头部说明了单文件自包含设计
+- [ ] 可以通过`python solver.py`直接运行
+- [ ] 代码组件通过注释分隔清晰
 
 ## 引用标记生成规范（新增）
 
@@ -1111,11 +1165,50 @@ PARAMETER_NAME = value
 ---
 
 **创建**: 2025-10-24
-**最后更新**: 2025-11-03 (V4.4.1)
+**最后更新**: 2025-11-04 (V4.5)
 **BMAD版本**: v6-alpha
-**核心机制**: 基于方案的代码生成，方案是唯一权威，完整的引用标记体系
+**核心机制**: 基于方案的代码生成，方案是唯一权威，完整的引用标记体系，单一文件输出
 
 ## 版本历史
+
+### V4.5 (2025-11-04) - 单文件代码生成强化
+
+**更新目标**: 明确强化单一文件代码生成要求，确保所有代码组件集成在一个.py文件中
+
+**新增内容**:
+
+1. ✅ **单文件要求明确化**
+   - 在"强制要求"部分新增`single_file_requirement`规范
+   - 明确禁止拆分成多个.py文件
+   - 明确禁止使用相对导入（from . import）
+   - 明确禁止假设存在其他模块文件
+
+2. ✅ **文件头部说明增强**
+   - 新增"单一文件自包含设计"说明框
+   - 添加使用方式说明（直接运行 vs 模块导入）
+   - 详细列出文件结构（8个部分）
+
+3. ✅ **输出规范更新**
+   - `implementation_code`增加`file_structure`字段
+   - 增加`characteristics`说明（自包含、完整可运行等）
+   - `code_metadata`增加`file_type: 'single_file'`字段
+
+4. ✅ **质量检查增强**
+   - 新增"单文件要求"检查清单
+   - 验证无相对导入
+   - 验证无跨文件引用
+   - 验证可直接运行
+
+**影响范围**:
+
+- 不影响现有代码生成逻辑（已经是单文件输出）
+- 仅是明确化和文档增强
+- 增加质量验证项
+
+**方案依据**:
+
+- 用户需求：确保生成的代码全部在一个文件内
+- 设计原则：简化部署、提高可移植性、便于理解和维护
 
 ### V4.4.1 (2025-11-03) - 专家库引用缺失修复
 
