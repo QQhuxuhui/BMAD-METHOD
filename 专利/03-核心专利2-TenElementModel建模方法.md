@@ -35,18 +35,21 @@
 **2. 现有建模方法的局限性**
 
 **传统数学建模方法**:
+
 - 需要专业的数学建模技能
 - 建模过程耗时(2-4周)
 - 缺乏标准化模板
 - 难以复用和传承
 
 **商业建模软件**:
+
 - 学习曲线陡峭
 - 灵活性不足
 - 无法处理特殊约束
 - 成本高昂
 
 **AI辅助建模工具**:
+
 - 缺乏领域深度
 - 生成模型质量不稳定
 - 缺乏统一标准
@@ -55,6 +58,7 @@
 **3. 知识表示的挑战**
 
 调度优化涉及多种类型的知识：
+
 - **理论知识**: 算法原理、优化理论
 - **经验知识**: 参数设置、调优技巧
 - **领域知识**: 业务规则、行业惯例
@@ -66,6 +70,7 @@
 ### 技术空白
 
 目前缺乏：
+
 - 覆盖调度优化问题全要素的统一建模框架
 - 支持跨专家协作的标准化建模语言
 - 确保模型一致性和可追溯性的技术方案
@@ -97,51 +102,61 @@
 **十要素定义**:
 
 **要素1: 决策变量 (Decision Variables)**
+
 - 定义: 需要优化的决策内容
 - 类型: 连续变量、离散变量、序列变量、二进制变量
 - 属性: 变量名称、数据类型、定义域、维度规模
 
 **要素2: 参数 (Parameters)**
+
 - 定义: 问题已知的输入数据
 - 类型: 数值参数、集合参数、矩阵参数
 - 属性: 参数名称、数据类型、取值范围、数据来源
 
 **要素3: 约束 (Constraints)**
+
 - 定义: 优化问题的约束条件
 - 类型: 硬约束、软约束、逻辑约束
 - 属性: 约束名称、约束类型、数学表达式、优先级
 
 **要素4: 优化目标 (Objectives)**
+
 - 定义: 需要优化的目标函数
 - 类型: 单目标、多目标、层次目标
 - 属性: 目标名称、函数表达式、权重、优化方向
 
 **要素5: 算法 (Algorithm)**
+
 - 定义: 求解问题的算法策略
 - 类型: 精确算法、启发式算法、元启发式算法
 - 属性: 算法名称、参数配置、复杂度分析、适用场景
 
 **要素6: 时间模型 (Time Model)**
+
 - 定义: 时间相关的模型要素
 - 类型: 连续时间、离散时间、时间窗
 - 属性: 时间粒度、时间范围、时间单位、时间依赖关系
 
 **要素7: 不确定性 (Uncertainty)**
+
 - 定义: 不确定因素的处理方式
 - 类型: 随机性、模糊性、鲁棒性
 - 属性: 不确定因素、概率分布、处理策略、风险度量
 
 **要素8: 求解配置 (Solver Configuration)**
+
 - 定义: 求解器的配置参数
 - 类型: 时间限制、精度要求、并行配置
 - 属性: 求解器名称、参数设置、停止条件、输出控制
 
 **要素9: 输入数据 (Input Data)**
+
 - 定义: 数据输入的格式和规范
 - 类型: 结构化数据、非结构化数据
 - 属性: 数据格式、字段定义、验证规则、数据来源
 
 **要素10: 输出格式 (Output Format)**
+
 - 定义: 结果输出的格式和内容
 - 类型: 数值结果、可视化结果、报告格式
 - 属性: 输出格式、内容结构、精度要求、展示方式
@@ -151,12 +166,14 @@
 **协作原理**: 基于TenElementModel建立统一的协作语言
 
 **专家分工**:
+
 - **领域专家**: 负责要素1、2、9的建模
 - **约束专家**: 负责要素3的建模和验证
 - **目标专家**: 负责要素4的设计和权衡
 - **算法专家**: 负责要素5、8的推荐和配置
 
 **协作流程**:
+
 1. **并行分析**: 各专家基于同一TenElementModel框架开展工作
 2. **实时同步**: 专家修改立即反映到共享模型中
 3. **冲突检测**: 自动检测专家间的不一致和冲突
@@ -168,6 +185,7 @@
 **自动化建模流程**:
 
 **步骤1: 需求理解和要素提取**
+
 ```
 输入: 自然语言需求描述
 处理: NLP分析 → 要素识别 → 分类标注
@@ -175,6 +193,7 @@
 ```
 
 **步骤2: 要素结构化建模**
+
 ```
 输入: 初步要素清单
 处理: 模板匹配 → 参数推断 → 关系建立
@@ -182,6 +201,7 @@
 ```
 
 **步骤3: 知识库匹配和填充**
+
 ```
 输入: 结构化TenElementModel
 处理: 知识检索 → 模板填充 → 参数推荐
@@ -189,6 +209,7 @@
 ```
 
 **步骤4: 一致性验证和优化**
+
 ```
 输入: 完整TenElementModel
 处理: 一致性检查 → 冲突检测 → 模型优化
@@ -198,6 +219,7 @@
 #### 4. 知识表示和管理
 
 **知识库结构**:
+
 ```
 知识库/
 ├── decision-variable-library/     # 决策变量模板库
@@ -213,21 +235,22 @@
 ```
 
 **知识模板结构**:
+
 ```yaml
 # constraint-library/temporal/时间窗约束.md
-name: "时间窗约束"
-category: "temporal"
-type: "hard_constraint"
-description: "限制服务时间的约束条件"
+name: '时间窗约束'
+category: 'temporal'
+type: 'hard_constraint'
+description: '限制服务时间的约束条件'
 mathematical_formulation: |
   early_i ≤ start_time_i ≤ late_i, ∀i ∈ Customers
 parameters:
   - name: early_i
     type: time
-    description: "最早服务时间"
+    description: '最早服务时间'
   - name: late_i
     type: time
-    description: "最晚服务时间"
+    description: '最晚服务时间'
 implementation_notes: |
   在算法中需要：
   1. 检查时间窗冲突
@@ -238,7 +261,7 @@ applicable_scenarios:
   - 生产调度
   - 服务排班
 references:
-  - "Solomon, M. (1987). Algorithms for the vehicle routing problem with time windows"
+  - 'Solomon, M. (1987). Algorithms for the vehicle routing problem with time windows'
 ```
 
 #### 5. 模型验证和质量保证
@@ -246,21 +269,25 @@ references:
 **验证层次**:
 
 **层次1: 完整性验证**
+
 - 检查所有10个要素是否都已定义
 - 验证每个要素的必需属性是否存在
 - 确保要素间的依赖关系完整
 
 **层次2: 一致性验证**
+
 - 检查决策变量与约束的一致性
 - 验证目标函数与决策变量的关系
 - 确保算法配置与问题特征的匹配
 
 **层次3: 可行性验证**
+
 - 检查约束集合的相容性
 - 验证目标函数的数学正确性
 - 确保数据格式的合理性
 
 **层次4: 可求解性验证**
+
 - 评估问题的计算复杂度
 - 验证算法选择的适用性
 - 确保求解器配置的合理性
@@ -268,30 +295,32 @@ references:
 #### 6. 可追溯性机制
 
 **追溯内容**:
+
 - **决策来源**: 每个要素的决策依据
 - **知识引用**: 使用的知识模板和文献
 - **专家贡献**: 各专家的具体贡献
 - **修改历史**: 模型的修改和演化记录
 
 **追溯实现**:
+
 ```yaml
 TenElementModel:
   metadata:
-    version: "4.3"
-    created_at: "2025-10-29T14:35:22Z"
-    created_by: ["domain-expert", "constraint-expert", "objective-expert", "algorithm-expert"]
+    version: '4.3'
+    created_at: '2025-10-29T14:35:22Z'
+    created_by: ['domain-expert', 'constraint-expert', 'objective-expert', 'algorithm-expert']
     modification_history:
-      - timestamp: "2025-10-29T15:20:10Z"
-        modified_by: "constraint-expert"
-        changes: "添加时间窗约束"
-        reason: "用户提出2小时送达要求"
+      - timestamp: '2025-10-29T15:20:10Z'
+        modified_by: 'constraint-expert'
+        changes: '添加时间窗约束'
+        reason: '用户提出2小时送达要求'
 
   3_constraints:
     - id: C1
-      name: "时间窗约束"
-      citation: "@专家库/约束库/temporal/时间窗约束.md"
-      created_by: "constraint-expert"
-      justification: "用户需求中明确要求2小时内送达"
+      name: '时间窗约束'
+      citation: '@专家库/约束库/temporal/时间窗约束.md'
+      created_by: 'constraint-expert'
+      justification: '用户需求中明确要求2小时内送达'
       confidence: 0.95
 ```
 
@@ -330,6 +359,7 @@ TenElementModel:
 **建模过程**:
 
 #### 步骤1: 需求理解和要素提取
+
 ```
 自然语言分析:
 - 问题类型: 车辆路径问题(VRP)
@@ -343,24 +373,26 @@ TenElementModel:
 #### 步骤2: TenElementModel构建
 
 **要素1: 决策变量**
+
 ```yaml
 1_decision_variables:
   - name: vehicle_routes
     type: sequence
-    description: "每辆车的配送路径序列"
-    domain: "客户集合的排列"
-    size: "12条路径"
+    description: '每辆车的配送路径序列'
+    domain: '客户集合的排列'
+    size: '12条路径'
     index_set: V = {1,2,...,12}
 
   - name: delivery_time
     type: continuous
-    description: "每个客户的配送时间"
-    domain: "[11:00, 19:00]"
-    size: "100个时间点"
+    description: '每个客户的配送时间'
+    domain: '[11:00, 19:00]'
+    size: '100个时间点'
     index_set: C = {1,2,...,100}
 ```
 
 **要素2: 参数**
+
 ```yaml
 2_parameters:
   vehicles:
@@ -373,100 +405,103 @@ TenElementModel:
 
   customers:
     count: 100
-    demands: [5,8,12,...,20]  # 具体需求量
+    demands: [5, 8, 12, ..., 20] # 具体需求量
     time_windows:
-      early: [11:00, 11:30,..., 12:00]
-      late: [18:00, 18:30,..., 19:00]
+      early: [11:00, 11:30, ..., 12:00]
+      late: [18:00, 18:30, ..., 19:00]
     locations:
-      latitude: [31.23, 31.24,..., 31.45]
-      longitude: [121.47, 121.48,..., 121.67]
+      latitude: [31.23, 31.24, ..., 31.45]
+      longitude: [121.47, 121.48, ..., 121.67]
 
   distance_matrix:
     type: symmetric
     size: 100x100
     unit: kilometers
-    data: [[0, 2.5, 3.8,...], [2.5, 0, 1.2,...], ...]
+    data: [[0, 2.5, 3.8, ...], [2.5, 0, 1.2, ...], ...]
 ```
 
 **要素3: 约束**
+
 ```yaml
 3_constraints:
   - id: C1
-    name: "车辆容量约束"
-    type: "hard_constraint"
-    category: "capacity"
+    name: '车辆容量约束'
+    type: 'hard_constraint'
+    category: 'capacity'
     mathematical_formulation: |
       Σ(demand_i * x_ijk) ≤ capacity_k, ∀k ∈ V, ∀r ∈ R
-    citation: "@专家库/约束库/capacity/车辆容量约束.md"
+    citation: '@专家库/约束库/capacity/车辆容量约束.md'
     parameters:
-      - demand_i: "客户i的需求量"
-      - x_ijk: "决策变量，客户i是否由车辆k在路径r服务"
-      - capacity_k: "车辆k的容量"
+      - demand_i: '客户i的需求量'
+      - x_ijk: '决策变量，客户i是否由车辆k在路径r服务'
+      - capacity_k: '车辆k的容量'
 
   - id: C2
-    name: "时间窗约束"
-    type: "hard_constraint"
-    category: "temporal"
+    name: '时间窗约束'
+    type: 'hard_constraint'
+    category: 'temporal'
     mathematical_formulation: |
       early_i ≤ start_time_i ≤ late_i, ∀i ∈ C
-    citation: "@专家库/约束库/temporal/时间窗约束.md"
+    citation: '@专家库/约束库/temporal/时间窗约束.md'
     parameters:
-      - early_i: "客户i的最早服务时间"
-      - late_i: "客户i的最晚服务时间"
-      - start_time_i: "客户i的实际开始服务时间"
+      - early_i: '客户i的最早服务时间'
+      - late_i: '客户i的最晚服务时间'
+      - start_time_i: '客户i的实际开始服务时间'
 
   - id: C3
-    name: "温度控制约束"
-    type: "hard_constraint"
-    category: "operational"
+    name: '温度控制约束'
+    type: 'hard_constraint'
+    category: 'operational'
     mathematical_formulation: |
       2°C ≤ cargo_temp_k(t) ≤ 8°C, ∀k ∈ V, ∀t ∈ T
-    citation: "@专家库/约束库/operational/温度控制约束.md"
+    citation: '@专家库/约束库/operational/温度控制约束.md'
 ```
 
 **要素4: 优化目标**
+
 ```yaml
 4_objectives:
   primary:
-    name: "总成本最小化"
-    type: "cost"
-    direction: "minimize"
+    name: '总成本最小化'
+    type: 'cost'
+    direction: 'minimize'
     mathematical_formulation: |
       minimize: Σ(Fixed_Cost_k * y_k) + Σ(Distance_ij * Distance_Rate * x_ijk) +
                Σ(Work_Time_k * Labor_Rate)
-    citation: "@专家库/目标库/cost/总成本最小化.md"
+    citation: '@专家库/目标库/cost/总成本最小化.md'
     weight: 1.0
     components:
-      - name: "固定成本"
-        formula: "Σ(500 * y_k)"
-        description: "车辆使用固定成本"
-      - name: "运输成本"
-        formula: "Σ(distance_ij * 2.0 * 1.3 * x_ijk)"
-        description: "燃料和时间成本，考虑冷链加成"
-      - name: "人工成本"
-        formula: "Σ(work_time_k * 50)"
-        description: "司机工作时间成本"
+      - name: '固定成本'
+        formula: 'Σ(500 * y_k)'
+        description: '车辆使用固定成本'
+      - name: '运输成本'
+        formula: 'Σ(distance_ij * 2.0 * 1.3 * x_ijk)'
+        description: '燃料和时间成本，考虑冷链加成'
+      - name: '人工成本'
+        formula: 'Σ(work_time_k * 50)'
+        description: '司机工作时间成本'
 ```
 
 **要素5: 算法**
+
 ```yaml
 5_algorithm:
   primary:
-    name: "改进遗传算法"
-    type: "meta_heuristic"
-    citation: "@专家库/算法库/meta-heuristic/改进遗传算法.md"
+    name: '改进遗传算法'
+    type: 'meta_heuristic'
+    citation: '@专家库/算法库/meta-heuristic/改进遗传算法.md'
     configuration:
       population_size: 100
       max_generations: 500
       crossover_rate: 0.8
       mutation_rate: 0.05
-      selection_method: "tournament"
+      selection_method: 'tournament'
       tournament_size: 3
       elitism_ratio: 0.1
     complexity_analysis:
-      time_complexity: "O(G * P * N^2)"
-      space_complexity: "O(P * N)"
-      where: "G=generations, P=population, N=customers"
+      time_complexity: 'O(G * P * N^2)'
+      space_complexity: 'O(P * N)'
+      where: 'G=generations, P=population, N=customers'
 ```
 
 **要素6-10**: [略，按照相同格式定义]
@@ -474,26 +509,31 @@ TenElementModel:
 #### 步骤3: 跨专家协作和验证
 
 **领域专家贡献**:
+
 - 识别冷链配送场景特征
 - 提取业务规则和约束条件
 - 定义数据格式和来源
 
 **约束专家贡献**:
+
 - 建模容量约束和时间窗约束
 - 添加温度控制等运营约束
 - 验证约束集合的一致性
 
 **目标专家贡献**:
+
 - 设计多目标成本函数
 - 分析成本构成和权重
 - 处理目标间的权衡关系
 
 **算法专家贡献**:
+
 - 推荐适合的求解算法
 - 配置算法参数
 - 评估算法性能指标
 
 **一致性检查结果**:
+
 ```
 完整性检查: ✅ 通过 (所有10个要素已定义)
 一致性检查: ✅ 通过 (无冲突)
@@ -523,6 +563,7 @@ TenElementModel:
 ## 权利要求书
 
 ### 权利要求1
+
 一种基于十要素统一模型的调度优化问题建模方法，其特征在于，包括以下步骤：
 
 (1) 建立包含十个要素的统一建模框架，所述十个要素包括：决策变量、参数、约束、优化目标、算法、时间模型、不确定性、求解配置、输入数据和输出格式；
@@ -540,6 +581,7 @@ TenElementModel:
 (7) 生成可追溯的建模文档，记录每个要素的决策依据和知识来源。
 
 ### 权利要求2
+
 根据权利要求1所述的方法，其特征在于，所述十个要素具有以下定义：
 
 (1) 决策变量：定义需要优化的决策内容，包括变量名称、数据类型、定义域和维度规模；
@@ -563,6 +605,7 @@ TenElementModel:
 (10) 输出格式：定义结果输出的格式和内容，包括输出格式、内容结构、精度要求和展示方式。
 
 ### 权利要求3
+
 根据权利要求1所述的方法，其特征在于，步骤(4)中所述专家智能体协作包括：
 
 (1) 领域专家，负责决策变量、参数和输入数据要素的建模；
@@ -578,6 +621,7 @@ TenElementModel:
 (6) 自动检测专家间的不一致和冲突，并通过协商或仲裁解决冲突。
 
 ### 权利要求4
+
 根据权利要求1所述的方法，其特征在于，步骤(6)中所述多层级验证包括：
 
 (1) 完整性验证：检查所有十个要素是否都已定义，验证每个要素的必需属性是否存在；
@@ -589,6 +633,7 @@ TenElementModel:
 (4) 可求解性验证：评估问题的计算复杂度，验证算法选择的适用性。
 
 ### 权利要求5
+
 根据权利要求1所述的方法，其特征在于，还包括建立模块化知识库，所述知识库包括：
 
 (1) 决策变量模板库，存储各种类型的决策变量模板；
@@ -602,6 +647,7 @@ TenElementModel:
 (5) 每个知识模板包含标准化的描述、数学表达、实现说明和适用场景。
 
 ### 权利要求6
+
 根据权利要求1所述的方法，其特征在于，步骤(7)中所述可追溯性包括：
 
 (1) 记录每个要素的决策来源和依据；
@@ -613,6 +659,7 @@ TenElementModel:
 (4) 建立要素间的依赖关系和影响分析。
 
 ### 权利要求7
+
 一种基于十要素统一模型的调度优化问题建模系统，其特征在于，包括：
 
 (1) 需求分析模块，用于解析自然语言需求并提取问题特征；
@@ -630,6 +677,7 @@ TenElementModel:
 (7) 文档生成模块，用于生成可追溯的建模文档。
 
 ### 权利要求8
+
 根据权利要求7所述的系统，其特征在于，所述专家协作模块支持：
 
 (1) 并行协作模式，多个专家同时基于同一模型框架工作；
@@ -641,6 +689,7 @@ TenElementModel:
 (4) 冲突检测和解决机制，自动识别和解决专家间的冲突。
 
 ### 权利要求9
+
 根据权利要求7所述的系统，其特征在于，所述验证模块包括：
 
 (1) 完整性验证子模块，检查模型要素的完整性；
@@ -652,6 +701,7 @@ TenElementModel:
 (4) 可求解性验证子模块，评估模型的可求解性。
 
 ### 权利要求10
+
 根据权利要求1所述的方法，其特征在于，所述TenElementModel采用YAML格式进行标准化存储，支持：
 
 (1) 结构化数据表示，便于计算机处理；
