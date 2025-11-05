@@ -202,6 +202,44 @@ class Settings:
         self.EVALUATION_API_KEY = os.getenv("EVALUATION_API_KEY", self.LLM_API_KEY)
         self.EVALUATION_SLEEP_TIME = int(os.getenv("EVALUATION_SLEEP_TIME", "10"))
 
+        # Model Adapter Configuration
+        self.ENCRYPTION_KEY = os.getenv("ENCRYPTION_KEY", "dev-encryption-key-change-in-production")
+
+        # Default Model Configuration
+        self.DEFAULT_MODEL_PROVIDER = os.getenv("DEFAULT_MODEL_PROVIDER", "qwen")
+        self.DEFAULT_MODEL_NAME = os.getenv("DEFAULT_MODEL_NAME", "default-model")
+
+        # Model Health Check Configuration
+        self.MODEL_HEALTH_CHECK_INTERVAL = int(os.getenv("MODEL_HEALTH_CHECK_INTERVAL", "300"))  # 5分钟
+        self.MODEL_HEALTH_CHECK_TIMEOUT = float(os.getenv("MODEL_HEALTH_CHECK_TIMEOUT", "10.0"))
+        self.MODEL_MAX_CONSECUTIVE_FAILURES = int(os.getenv("MODEL_MAX_CONSECUTIVE_FAILURES", "3"))
+
+        # Model Request Configuration
+        self.MODEL_DEFAULT_TIMEOUT = float(os.getenv("MODEL_DEFAULT_TIMEOUT", "30.0"))
+        self.MODEL_DEFAULT_MAX_RETRIES = int(os.getenv("MODEL_DEFAULT_MAX_RETRIES", "3"))
+        self.MODEL_RETRY_DELAY = float(os.getenv("MODEL_RETRY_DELAY", "1.0"))
+
+        # Qwen Model Configuration
+        self.QWEN_API_KEY = os.getenv("QWEN_API_KEY", "")
+        self.QWEN_API_BASE_URL = os.getenv("QWEN_API_BASE_URL", "http://10.90.15.22:8103/v1")
+        self.QWEN_MODEL_VERSION = os.getenv("QWEN_MODEL_VERSION", "qwen3-30b-a3b")
+        self.QWEN_MAX_TOKENS = int(os.getenv("QWEN_MAX_TOKENS", "4096"))
+        self.QWEN_TEMPERATURE = float(os.getenv("QWEN_TEMPERATURE", "0.7"))
+
+        # DeepSeek Model Configuration
+        self.DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+        self.DEEPSEEK_API_BASE_URL = os.getenv("DEEPSEEK_API_BASE_URL", "http://10.90.15.22:8103/v1")
+        self.DEEPSEEK_MODEL_VERSION = os.getenv("DEEPSEEK_MODEL_VERSION", "deepseek-r1")
+        self.DEEPSEEK_MAX_TOKENS = int(os.getenv("DEEPSEEK_MAX_TOKENS", "4096"))
+        self.DEEPSEEK_TEMPERATURE = float(os.getenv("DEEPSEEK_TEMPERATURE", "0.7"))
+
+        # GLM Model Configuration (optional)
+        self.GLM_API_KEY = os.getenv("GLM_API_KEY", "")
+        self.GLM_API_BASE_URL = os.getenv("GLM_API_BASE_URL", "https://open.bigmodel.cn/api/paas/v4")
+        self.GLM_MODEL_VERSION = os.getenv("GLM_MODEL_VERSION", "glm-4")
+        self.GLM_MAX_TOKENS = int(os.getenv("GLM_MAX_TOKENS", "4096"))
+        self.GLM_TEMPERATURE = float(os.getenv("GLM_TEMPERATURE", "0.7"))
+
         # Apply environment-specific settings
         self.apply_environment_settings()
 
