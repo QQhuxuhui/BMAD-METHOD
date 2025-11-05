@@ -34,13 +34,14 @@ dependencies = [
     "tqdm>=4.67.1",
     "colorama>=0.4.6",
     "ddgs>=9.6.0",
+    "tenacity>=9.0.0",
 ]
 
 [project.optional-dependencies]
 dev = ["black", "isort", "flake8", "ruff", "djlint==1.36.4"]
 
 [dependency-groups]
-test = ["httpx>=0.28.1", "pytest>=8.3.5"]
+test = ["httpx>=0.28.1", "pytest>=8.3.5", "pytest-asyncio>=0.24.0"]
 
 
 [tool.pytest.ini_options]
