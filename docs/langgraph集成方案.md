@@ -25,7 +25,7 @@
 
 ### 目标
 
-- **Phase 1**：实现BMAD-METHOD与LangGraph 1.0的轻量级集成，包括前后端项目基础设施搭建和国产模型（Qwen/GLM/DeepSeek）的即插即用，3-4周内快速见效
+- **Phase 1**：实现BMAD-METHOD与LangGraph 1.0的轻量级集成，包括前后端项目基础设施搭建和国产模型（Qwen/GLM/DeepSeek）的即插即用，2-3周内快速见效
 - **Phase 2**：在Phase 1验证ROI达标后，开发YAML到Python的编译器POC，验证智能体批量开发的可行性，4-6周完成POC验证
 - **Phase 3**：仅在年开发智能体数量≥30个的明确需求下，构建完整的BMAD DSL编译器和自研LangGraph框架，18-26周实现企业级智能体工厂
 - **Phase 4**：基于LangGraph 1.0的人机协作特性，优化智能体工作流中的人工确认和决策机制
@@ -373,14 +373,19 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 **部署环境约束**：
 
-- **Python环境**：>=3.11（LangGraph CLI硬性要求）
+- **Python环境**：>=3.11（LangGraph CLI最低要求），推荐3.13+（production-ready模板要求，向下兼容）
 - **Node.js环境**：>=18（前端开发要求）
 - **Docker容器化**：支持多阶段构建和镜像优化
 - **数据库**：PostgreSQL 16+，Redis 7+
+- **监控可观测性**：Langfuse（LLM追踪）、Grafana 10.0+（监控可视化）、Prometheus 2.48+（指标收集）
+- **安全和限流**：JWT认证、slowapi 0.1.9+（API限流保护）
 
 **分阶段技术约束**：
 
-- **Phase 1**：最小化架构变更，聚焦模型适配和LangServe集成
+- **Phase 1**：
+  - Story 1.2：基于production-ready模板快速搭建后端（6-8小时 vs 3-5天），获得生产级监控和安全特性
+  - Story 1.3：从零搭建前端（30小时），确保代码质量和团队掌控力
+  - 最小化架构变更，聚焦模型适配和LangServe集成
 - **Phase 2**：引入YAML编译器，保持向后兼容
 - **Phase 3**：可选的完整重写，保留双引擎方案
 
@@ -390,7 +395,13 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 ### 史诗 1：Phase 1 - LangGraph 1.0轻量级集成
 
-**目标**：搭建前后端项目基础设施，实现BMAD-METHOD与LangGraph 1.0的轻量级集成，重点支持国产模型，3-4周快速见效
+**目标**：搭建前后端项目基础设施，实现BMAD-METHOD与LangGraph 1.0的轻量级集成，重点支持国产模型，2-3周快速见效
+
+**时间优化**（2025-11-05更新）：
+
+- Story 1.2采用模板方案节省80%时间（3-5天 → 6-8小时）
+- Story 1.3从零搭建优化开发效率（保持2天高质量交付）
+- Epic 1总时间从3-4周优化到2-3周
 
 这个史诗将建立完整的项目基础设施（后端FastAPI + 前端Vue 3），实现核心的模型适配能力，并为后续扩展奠定基础。包含从环境搭建、项目初始化到基础API端点实现的完整工作流，让团队能够立即使用国产模型并获得价值。
 
@@ -444,27 +455,41 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 1. 创建符合项目规范的后端目录结构
 2. 初始化FastAPI应用，包含基础配置和中间件
-3. 集成LangGraph 1.0并验证基础功能
+3. 集成LangGraph 0.6.4并验证基础功能
 4. 实现健康检查和监控端点
 5. 配置开发环境和依赖管理
 6. 提供完整的开发文档和启动脚本
 
-**参考模板**：[fastapi-langgraph-agent-production-ready-template](https://github.com/wassim249/fastapi-langgraph-agent-production-ready-template)
+**实施方案**：**克隆模板 + 适配BMAD**（2025-11-05决策）
+
+**采用模板**：[fastapi-langgraph-agent-production-ready-template](https://github.com/wassim249/fastapi-langgraph-agent-production-ready-template)
+
+**核心优势**：
+
+- ⏱️ 开发时间缩短80%（3-5天 → 6-8小时）
+- 🏭 获得生产级监控和安全特性（Langfuse、Grafana、JWT、Rate Limiting）
+- ✅ 1.5k stars，积极维护，MIT许可
 
 **核心技术栈**：
 
+- Python 3.13+（模板要求）
 - FastAPI 0.116+
-- LangGraph 0.6+
-- PostgreSQL (checkpoint后端)
-- Redis (缓存)
+- LangGraph 0.6.4（锁定版本）
+- PostgreSQL 16+ (checkpoint后端)
+- Redis 7+ (缓存)
 - structlog (结构化日志)
+- **Langfuse** (LLM可观测性)
+- **Grafana** (监控可视化)
+- **slowapi** (API限流)
 - Docker (容器化)
+
+**时间估算**：6-8小时（vs 原计划3-5天）
 
 #### 故事 1.3：初始化Vue 3 + TypeScript前端项目
 
 **作为一个** BMAD开发者
-**我希望** 基于enterprise-ready模板快速搭建Vue 3 + TypeScript + Ant Design Vue前端项目
-**以便于** 开始监控界面UI开发并遵循企业级最佳实践
+**我希望** 从零开始搭建Vue 3 + TypeScript + Ant Design Vue前端项目
+**以便于** 开始监控界面UI开发并完全掌控代码质量
 
 **验收标准**：
 
@@ -475,9 +500,27 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 5. 配置开发环境和构建工具
 6. 提供完整的开发文档和启动脚本
 
-**参考模板**：
+**实施方案**：**从零开始搭建**（2025-11-05决策）
 
-- [antdv-pro](https://github.com/antdv-pro/antdv-pro) - Vue3 + Vite4 + Ant Design Vue4 + Pinia
+**决策理由**（对比克隆模板方案）：
+
+- ⏱️ **时间更优**：30小时 vs 模板适配47小时（快36%）
+- ✨ **代码质量更高**：简洁、精准、无冗余代码
+- 🎯 **完全贴合需求**：只实现需要的功能（Dashboard、WorkflowMonitor、Settings）
+- 📚 **学习价值**：团队深入理解Vue 3生态，提升能力
+- 🔒 **可维护性强**：完全掌控每一行代码，易于维护
+
+**对比分析**：
+
+- antdv-pro虽然功能丰富（827 stars），但包含大量不需要的企业级功能（多租户、复杂权限）
+- 技术栈版本不完全匹配（Vue 3.3 vs 3.4，Vite 4 vs 5）
+- 需要删除50%代码并学习他人架构，成本高于从零开始
+
+**参考最佳实践**（不全盘克隆）：
+
+- [antdv-pro](https://github.com/antdv-pro/antdv-pro) - 参考路由配置和布局设计
+- Vue 3官方文档 - Composition API最佳实践
+- Ant Design Vue官方文档 - 组件使用规范
 
 **核心技术栈**：
 
@@ -487,6 +530,8 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 - Vite 5.0+
 - Pinia 2.1+
 - Vue Router 4.2+
+
+**时间估算**：30小时（1.5-2天，精简高效）
 
 #### 故事 1.4：实现国产模型适配器
 
@@ -783,12 +828,12 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 3. **价值明确**：立即获得国产模型支持能力
 4. **可扩展**：为后续Phase奠定坚实基础
 
-**核心建议**：不要被完整的20-24周方案吓到，80%场景通过Phase 1的3周投入就能解决核心痛点！
+**核心建议**：不要被完整的20-24周方案吓到，80%场景通过Phase 1的2-3周投入就能解决核心痛点！
 
 ### 决策点规划
 
-- **Week 4-5（Phase 1结束）**：决策点1 - Phase 1是否满足需求？
-  - ✅ **是（80%场景）** → 停止并庆祝！3周解决核心问题
+- **Week 2-3（Phase 1结束）**：决策点1 - Phase 1是否满足需求？
+  - ✅ **是（80%场景）** → 停止并庆祝！2-3周解决核心问题
   - ❌ **否** → 评估是否继续Phase 2（需要年开发30+智能体）
 
 - **Week 10（Phase 2结束）**：决策点2 - ROI是否达标？
@@ -799,16 +844,30 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 ## 📊 成功指标
 
-### Phase 1成功指标
+### Phase 1成功指标（2-3周交付）
+
+**基础设施指标**：
 
 - [ ] 后端FastAPI服务正常运行，健康检查端点可用
 - [ ] 前端Vue应用正常运行，可访问监控界面
 - [ ] 前后端通过Docker Compose可一键启动
+- [ ] Langfuse LLM可观测性功能正常工作
+- [ ] Grafana监控面板可访问，显示关键指标
+- [ ] JWT认证和API限流功能正常工作
+
+**功能指标**：
+
 - [ ] 国产模型成功集成，支持Qwen/GLM/DeepSeek
 - [ ] LangGraph 1.0工作流正常运行，兼容八大智能体
 - [ ] API端点正常工作，前端可实时监控
 - [ ] 用户可以人工确认关键决策点
-- [ ] 开发效率提升，新智能体开发时间缩短
+
+**效率指标**：
+
+- [ ] Story 1.2后端搭建时间：6-8小时（vs 原计划3-5天，节省80%）
+- [ ] Story 1.3前端搭建时间：30小时（1.5-2天，高质量交付）
+- [ ] Epic 1总交付时间：2-3周（vs 原计划3-4周，节省25%）
+- [ ] 新智能体开发时间从2-3天缩短到1天内
 
 ### Phase 2成功指标
 
@@ -827,9 +886,17 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 ---
 
-**文档版本**: v1.0
-**最后更新**: 2025-11-04
+**文档版本**: v1.1
+**最后更新**: 2025-11-05
 **状态**: ✅ 已完成，等待评审和实施决策
 
 **维护者**: John (PM)
 **审批人**: 待指定
+
+**v1.1更新内容**：
+
+- Epic 1时间优化：3-4周 → 2-3周
+- Story 1.2实施方案调整：克隆模板+适配（节省80%时间）
+- Story 1.3实施方案调整：从零搭建（确保代码质量）
+- 技术栈更新：Python 3.13+、Langfuse、Grafana、slowapi
+- 成功指标细化：增加基础设施指标和效率指标
