@@ -5,17 +5,25 @@ LangChain兼容包装器
 以便与LangGraph工作流无缝集成。
 """
 
-from typing import List, Optional, Any, AsyncIterator, Dict
+from typing import List, Optional, Any, AsyncIterator, Dict, Iterator
+import asyncio
 from langchain_core.language_models import BaseChatModel
-from langchain_core.messages import BaseMessage, AIMessage, HumanMessage, SystemMessage
+from langchain_core.messages import (
+    BaseMessage,
+    AIMessage,
+    HumanMessage,
+    SystemMessage,
+    AIMessageChunk,
+)
 from langchain_core.outputs import ChatGeneration, ChatResult, ChatGenerationChunk
 from langchain_core.callbacks import (
     CallbackManagerForLLMRun,
     AsyncCallbackManagerForLLMRun,
 )
+from pydantic import Field
 import structlog
 
-from backend.model_adapters.base import BaseModelAdapter, ModelResponse
+from model_adapters.base import BaseModelAdapter, ModelResponse
 
 logger = structlog.get_logger(__name__)
 
@@ -27,14 +35,9 @@ class LangChainModelAdapter(BaseChatModel):
     使其能够在LangGraph工作流中使用。
     """
 
-    adapter: BaseModelAdapter
-    """底层的模型适配器实例"""
-
-    model_name: str = "custom-model"
-    """模型名称"""
-
-    streaming: bool = False
-    """是否支持流式输出"""
+    adapter: BaseModelAdapter = Field(description="底层的模型适配器实例")
+    model_name: str = Field(default="custom-model", description="模型名称")
+    streaming: bool = Field(default=False, description="是否支持流式输出")
 
     class Config:
         arbitrary_types_allowed = True
@@ -72,7 +75,8 @@ class LangChainModelAdapter(BaseChatModel):
     ) -> ChatResult:
         """同步生成响应（LangChain要求实现）
 
-        Note: 由于我们的适配器是异步的，这里抛出异常提示使用异步方法。
+        Note: 由于底层适配器是异步的，这里在同步上下文中运行异步代码。
+        建议在异步环境中使用ainvoke()或agenerate()以获得更好的性能。
 
         Args:
             messages: 输入消息列表
@@ -80,11 +84,22 @@ class LangChainModelAdapter(BaseChatModel):
             run_manager: 回调管理器
             **kwargs: 额外参数
 
-        Raises:
-            NotImplementedError: 提示使用异步方法
+        Returns:
+            ChatResult: LangChain聊天结果对象
         """
-        raise NotImplementedError(
-            "Synchronous generation not supported. Use ainvoke() or agenerate() instead."
+        # 在同步上下文中运行异步代码
+        try:
+            loop = asyncio.get_event_loop()
+            if loop.is_running():
+                # 如果事件循环已经在运行，创建新的任务
+                import nest_asyncio
+                nest_asyncio.apply()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        return loop.run_until_complete(
+            self._agenerate(messages, stop, None, **kwargs)
         )
 
     async def _agenerate(
@@ -141,6 +156,42 @@ class LangChainModelAdapter(BaseChatModel):
 
         return ChatResult(generations=[generation])
 
+    def _stream(
+        self,
+        messages: List[BaseMessage],
+        stop: Optional[List[str]] = None,
+        run_manager: Optional[CallbackManagerForLLMRun] = None,
+        **kwargs: Any,
+    ) -> Iterator[ChatGenerationChunk]:
+        """同步流式生成响应
+
+        Args:
+            messages: 输入消息列表
+            stop: 停止词列表
+            run_manager: 回调管理器
+            **kwargs: 额外参数
+
+        Yields:
+            ChatGenerationChunk: LangChain流式生成块
+        """
+        # 在同步上下文中运行异步流式生成
+        try:
+            loop = asyncio.get_event_loop()
+        except RuntimeError:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+        # 创建异步生成器
+        async_gen = self._astream(messages, stop, None, **kwargs)
+
+        # 同步地消费异步生成器
+        while True:
+            try:
+                chunk = loop.run_until_complete(async_gen.__anext__())
+                yield chunk
+            except StopAsyncIteration:
+                break
+
     async def _astream(
         self,
         messages: List[BaseMessage],
@@ -169,7 +220,7 @@ class LangChainModelAdapter(BaseChatModel):
 
         # 流式调用底层适配器
         async for chunk in self.adapter.chat_stream(dict_messages, **kwargs):
-            ai_chunk = AIMessage(content=chunk)
+            ai_chunk = AIMessageChunk(content=chunk)
             yield ChatGenerationChunk(message=ai_chunk)
 
             # 触发回调
