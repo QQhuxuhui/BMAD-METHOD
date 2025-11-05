@@ -23,7 +23,7 @@ class TestPythonEnvironment:
 
     def test_python_path(self):
         """测试Python路径配置"""
-        assert 'bmad-langgraph' in sys.executable.lower(), "应该在bmad-langgraph虚拟环境中"
+        assert 'langgraph' in sys.executable.lower(), "应该在langgraph虚拟环境中"
 
 
 class TestPackageImports:
