@@ -1,0 +1,284 @@
+{
+  "dashboard": {
+    "title": "模型适配器监控面板",
+    "description": "监控国产模型适配器的性能、成本和健康状态",
+    "tags": ["model", "adapter", "llm"],
+    "timezone": "browser",
+    "schemaVersion": 16,
+    "version": 1,
+    "refresh": "30s",
+    "panels": [
+      {
+        "id": 1,
+        "type": "graph",
+        "title": "模型请求速率",
+        "targets": [
+          {
+            "expr": "rate(model_requests_total{status=\"success\"}[5m])",
+            "legendFormat": "{{model_name}} - Success",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(model_requests_total{status=\"error\"}[5m])",
+            "legendFormat": "{{model_name}} - Error",
+            "refId": "B"
+          }
+        ],
+        "xaxis": {
+          "show": true
+        },
+        "yaxes": [
+          {
+            "label": "请求/秒",
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        }
+      },
+      {
+        "id": 2,
+        "type": "graph",
+        "title": "模型响应延迟 (P50, P95, P99)",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.50, rate(model_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{model_name}} - P50",
+            "refId": "A"
+          },
+          {
+            "expr": "histogram_quantile(0.95, rate(model_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{model_name}} - P95",
+            "refId": "B"
+          },
+          {
+            "expr": "histogram_quantile(0.99, rate(model_request_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{model_name}} - P99",
+            "refId": "C"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "秒",
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "x": 12,
+          "y": 0,
+          "w": 12,
+          "h": 8
+        }
+      },
+      {
+        "id": 3,
+        "type": "singlestat",
+        "title": "总错误率",
+        "targets": [
+          {
+            "expr": "sum(rate(model_requests_total{status=\"error\"}[5m])) / sum(rate(model_requests_total[5m])) * 100",
+            "refId": "A"
+          }
+        ],
+        "format": "percent",
+        "valueName": "current",
+        "gridPos": {
+          "x": 0,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        },
+        "thresholds": "5,10",
+        "colors": ["#299c46", "#e0b400", "#d44a3a"]
+      },
+      {
+        "id": 4,
+        "type": "singlestat",
+        "title": "活跃模型数量",
+        "targets": [
+          {
+            "expr": "sum(active_models_count)",
+            "refId": "A"
+          }
+        ],
+        "format": "none",
+        "valueName": "current",
+        "gridPos": {
+          "x": 6,
+          "y": 8,
+          "w": 6,
+          "h": 4
+        }
+      },
+      {
+        "id": 5,
+        "type": "graph",
+        "title": "Token消耗速率",
+        "targets": [
+          {
+            "expr": "rate(model_tokens_used_total{token_type=\"input\"}[5m])",
+            "legendFormat": "{{model_name}} - Input",
+            "refId": "A"
+          },
+          {
+            "expr": "rate(model_tokens_used_total{token_type=\"output\"}[5m])",
+            "legendFormat": "{{model_name}} - Output",
+            "refId": "B"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "Tokens/秒",
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 12,
+          "w": 12,
+          "h": 8
+        }
+      },
+      {
+        "id": 6,
+        "type": "graph",
+        "title": "API成本累计 (USD)",
+        "targets": [
+          {
+            "expr": "model_cost_total",
+            "legendFormat": "{{model_name}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "美元",
+            "show": true,
+            "format": "currencyUSD"
+          }
+        ],
+        "gridPos": {
+          "x": 12,
+          "y": 12,
+          "w": 12,
+          "h": 8
+        }
+      },
+      {
+        "id": 7,
+        "type": "table",
+        "title": "模型健康状态",
+        "targets": [
+          {
+            "expr": "model_health_status",
+            "format": "table",
+            "refId": "A"
+          }
+        ],
+        "styles": [
+          {
+            "pattern": "Value",
+            "type": "string",
+            "mappingType": 1,
+            "valueMaps": [
+              {
+                "value": "1",
+                "text": "健康"
+              },
+              {
+                "value": "0",
+                "text": "不健康"
+              }
+            ],
+            "thresholds": ["0.5"],
+            "colorMode": "cell",
+            "colors": ["rgba(245, 54, 54, 0.9)", "rgba(50, 172, 45, 0.97)"]
+          }
+        ],
+        "gridPos": {
+          "x": 0,
+          "y": 20,
+          "w": 12,
+          "h": 6
+        }
+      },
+      {
+        "id": 8,
+        "type": "graph",
+        "title": "错误类型分布",
+        "targets": [
+          {
+            "expr": "rate(model_errors_total[5m])",
+            "legendFormat": "{{model_name}} - {{error_type}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "错误/秒",
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "x": 12,
+          "y": 20,
+          "w": 12,
+          "h": 6
+        }
+      },
+      {
+        "id": 9,
+        "type": "graph",
+        "title": "模型使用分布 (请求数)",
+        "targets": [
+          {
+            "expr": "sum by (model_name) (rate(model_requests_total[5m]))",
+            "legendFormat": "{{model_name}}",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "请求/秒",
+            "show": true
+          }
+        ],
+        "stack": true,
+        "gridPos": {
+          "x": 0,
+          "y": 26,
+          "w": 12,
+          "h": 8
+        }
+      },
+      {
+        "id": 10,
+        "type": "graph",
+        "title": "健康检查延迟",
+        "targets": [
+          {
+            "expr": "histogram_quantile(0.95, rate(model_health_check_duration_seconds_bucket[5m]))",
+            "legendFormat": "{{model_name}} - P95",
+            "refId": "A"
+          }
+        ],
+        "yaxes": [
+          {
+            "label": "秒",
+            "show": true
+          }
+        ],
+        "gridPos": {
+          "x": 12,
+          "y": 26,
+          "w": 12,
+          "h": 8
+        }
+      }
+    ]
+  }
+}
