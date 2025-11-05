@@ -1,7 +1,7 @@
 # LangGraph集成方案产品需求文档 (PRD)
 
 **项目名称**: BMAD-METHOD LangGraph集成方案
-**PRD版本**: v1.0
+**PRD版本**: v1.1
 **创建日期**: 2025-11-04
 **产品负责人**: John (PM)
 **技术基础**: LangGraph 1.0.2 稳定版本
@@ -25,7 +25,7 @@
 
 ### 目标
 
-- **Phase 1**：实现BMAD-METHOD与LangGraph 1.0的轻量级集成，重点支持国产模型（Qwen/GLM/DeepSeek）的即插即用，2-3周内快速见效
+- **Phase 1**：实现BMAD-METHOD与LangGraph 1.0的轻量级集成，包括前后端项目基础设施搭建和国产模型（Qwen/GLM/DeepSeek）的即插即用，3-4周内快速见效
 - **Phase 2**：在Phase 1验证ROI达标后，开发YAML到Python的编译器POC，验证智能体批量开发的可行性，4-6周完成POC验证
 - **Phase 3**：仅在年开发智能体数量≥30个的明确需求下，构建完整的BMAD DSL编译器和自研LangGraph框架，18-26周实现企业级智能体工厂
 - **Phase 4**：基于LangGraph 1.0的人机协作特性，优化智能体工作流中的人工确认和决策机制
@@ -46,9 +46,10 @@ BMAD-METHOD已经发展到V4.4.1版本，具备了完整的八大智能体协作
 
 ### 变更日志
 
-| 日期       | 版本 | 描述                                       | 作者      |
-| ---------- | ---- | ------------------------------------------ | --------- |
-| 2025-11-04 | v1.0 | 基于LangGraph 1.0.2和现有V4.4.1架构创建PRD | John (PM) |
+| 日期       | 版本 | 描述                                                                                               | 作者      |
+| ---------- | ---- | -------------------------------------------------------------------------------------------------- | --------- |
+| 2025-11-04 | v1.0 | 基于LangGraph 1.0.2和现有V4.4.1架构创建PRD                                                         | John (PM) |
+| 2025-11-05 | v1.1 | Epic 1新增Story 1.2/1.3（前后端项目初始化），原Story 1.2-1.6重新编号为1.4-1.8，时间估算调整为3-4周 | John (PM) |
 
 ---
 
@@ -63,6 +64,15 @@ BMAD-METHOD已经发展到V4.4.1版本，具备了完整的八大智能体协作
 - 支持DeepSeek R1系列（7B-671B）的API调用
 - 提供统一的模型适配接口，支持模型热切换
 - 支持本地部署（vLLM/Ollama）和云端API两种模式
+
+**FR1.5**: 基础项目架构搭建
+
+- 基于production-ready模板搭建FastAPI后端项目结构
+- 基于enterprise-ready模板搭建Vue 3 + TypeScript前端项目结构
+- 配置开发环境和构建工具链（Vite、ESLint、Prettier等）
+- 实现基础的健康检查和监控端点
+- 配置Docker容器化开发环境
+- 提供完整的开发文档和启动脚本
 
 **FR2**: LangGraph 1.0工作流编排
 
@@ -334,9 +344,10 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 ### 更新的分阶段实施策略
 
-**Phase 1**：使用LangGraph 1.0重构轻适配器
+**Phase 1**：搭建基础设施并实现轻量级集成
 
-- 采用新的`langchain.agents`API
+- 基于production-ready模板初始化后端和前端项目
+- 采用新的`langchain.agents`API实现智能体
 - 利用内置持久化功能简化状态管理
 - 验证与现有国产模型的兼容性
 
@@ -379,9 +390,9 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 ### 史诗 1：Phase 1 - LangGraph 1.0轻量级集成
 
-**目标**：实现BMAD-METHOD与LangGraph 1.0的轻量级集成，重点支持国产模型，2-3周快速见效
+**目标**：搭建前后端项目基础设施，实现BMAD-METHOD与LangGraph 1.0的轻量级集成，重点支持国产模型，3-4周快速见效
 
-这个史诗将建立项目基础设施，实现核心的模型适配能力，并为后续扩展奠定基础。包含从环境搭建到基础API端点实现的完整工作流，让团队能够立即使用国产模型并���得价值。
+这个史诗将建立完整的项目基础设施（后端FastAPI + 前端Vue 3），实现核心的模型适配能力，并为后续扩展奠定基础。包含从环境搭建、项目初始化到基础API端点实现的完整工作流，让团队能够立即使用国产模型并获得价值。
 
 ### 史诗 2：Phase 2 - YAML编译器POC开发
 
@@ -423,7 +434,61 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 4. 验证LangGraph 1.0基础功能正常工作
 5. 提供环境验证脚本和文档
 
-#### 故事 1.2：实现国产模型适配器
+#### 故事 1.2：初始化FastAPI+LangGraph后端项目
+
+**作为一个** BMAD开发者
+**我希望** 基于production-ready模板快速搭建FastAPI+LangGraph后端项目结构
+**以便于** 开始智能体服务开发并遵循行业最佳实践
+
+**验收标准**：
+
+1. 创建符合项目规范的后端目录结构
+2. 初始化FastAPI应用，包含基础配置和中间件
+3. 集成LangGraph 1.0并验证基础功能
+4. 实现健康检查和监控端点
+5. 配置开发环境和依赖管理
+6. 提供完整的开发文档和启动脚本
+
+**参考模板**：[fastapi-langgraph-agent-production-ready-template](https://github.com/wassim249/fastapi-langgraph-agent-production-ready-template)
+
+**核心技术栈**：
+
+- FastAPI 0.116+
+- LangGraph 0.6+
+- PostgreSQL (checkpoint后端)
+- Redis (缓存)
+- structlog (结构化日志)
+- Docker (容器化)
+
+#### 故事 1.3：初始化Vue 3 + TypeScript前端项目
+
+**作为一个** BMAD开发者
+**我希望** 基于enterprise-ready模板快速搭建Vue 3 + TypeScript + Ant Design Vue前端项目
+**以便于** 开始监控界面UI开发并遵循企业级最佳实践
+
+**验收标准**：
+
+1. 使用Vite创建Vue 3 + TypeScript项目
+2. 集成Ant Design Vue 4.x UI组件库
+3. 配置Pinia状态管理和Vue Router路由
+4. 实现基础布局和导航结构
+5. 配置开发环境和构建工具
+6. 提供完整的开发文档和启动脚本
+
+**参考模板**：
+
+- [antdv-pro](https://github.com/antdv-pro/antdv-pro) - Vue3 + Vite4 + Ant Design Vue4 + Pinia
+
+**核心技术栈**：
+
+- Vue 3.4+
+- TypeScript 5.3+
+- Ant Design Vue 4.1+
+- Vite 5.0+
+- Pinia 2.1+
+- Vue Router 4.2+
+
+#### 故事 1.4：实现国产模型适配器
 
 **作为一个** BMAD系统用户
 **我希望** 能够使用国产大模型（Qwen/GLM/DeepSeek）替代OpenAI
@@ -437,7 +502,7 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 4. 提供模型健康检查和性能监控
 5. 兼容现有BMAD工作流的调用方式
 
-#### 故事 1.3：迁移八大智能体到LangGraph 1.0
+#### 故事 1.5：迁移八大智能体到LangGraph 1.0
 
 **作为一个** BMAD开发者
 **我希望** 将现有八大智能体迁移到LangGraph 1.0架构
@@ -451,7 +516,7 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 4. 验证Phase 0-4的完整工作流执行
 5. 保持与现有workflow.yaml配置的兼容性
 
-#### 故事 1.4：集成LangServe自动API生成
+#### 故事 1.6：集成LangServe自动API生成
 
 **作为一个** 前端开发者
 **我希望** 通过LangServe自动生成RESTful API
@@ -465,7 +530,7 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 4. 实现JWT认证和权限控制
 5. 提供API使用示例和前端集成代码
 
-#### 故事 1.5：实现SSE流式传输前端集成
+#### 故事 1.7：实现SSE流式传输前端集成
 
 **作为一个** 最终用户
 **我希望** 能够实时看到智能体的工作过程和输出结果
@@ -479,7 +544,7 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 4. 提供人工确认界面（interrupt机制）
 5. 支持执行历史的回溯和复盘
 
-#### 故事 1.6：Phase 1集成测试和验证
+#### 故事 1.8：Phase 1集成测试和验证
 
 **作为一个** 项目经理
 **我希望** 验证Phase 1是否解决了核心痛点
@@ -722,7 +787,7 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 ### 决策点规划
 
-- **Week 4（Phase 1结束）**：决策点1 - Phase 1是否满足需求？
+- **Week 4-5（Phase 1结束）**：决策点1 - Phase 1是否满足需求？
   - ✅ **是（80%场景）** → 停止并庆祝！3周解决核心问题
   - ❌ **否** → 评估是否继续Phase 2（需要年开发30+智能体）
 
@@ -736,6 +801,9 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 ### Phase 1成功指标
 
+- [ ] 后端FastAPI服务正常运行，健康检查端点可用
+- [ ] 前端Vue应用正常运行，可访问监控界面
+- [ ] 前后端通过Docker Compose可一键启动
 - [ ] 国产模型成功集成，支持Qwen/GLM/DeepSeek
 - [ ] LangGraph 1.0工作流正常运行，兼容八大智能体
 - [ ] API端点正常工作，前端可实时监控
