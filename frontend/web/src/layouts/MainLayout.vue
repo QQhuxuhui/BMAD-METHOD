@@ -20,7 +20,6 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useAppStore } from '@/stores/app'
 import { storeToRefs } from 'pinia'
 import AppHeader from './AppHeader.vue'
@@ -28,6 +27,5 @@ import AppSidebar from './AppSidebar.vue'
 import AppFooter from './AppFooter.vue'
 
 const appStore = useAppStore()
-const { sidebarCollapsed } = storeToRefs(appStore)
-const collapsed = ref(sidebarCollapsed.value)
+const { sidebarCollapsed: collapsed } = storeToRefs(appStore)
 </script>

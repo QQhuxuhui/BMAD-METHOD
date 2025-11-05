@@ -1,983 +1,977 @@
-# BMAD-METHOD LangGraph集成方案 - 全栈架构文档
+# BMAD-METHOD LangGraph集成方案全栈架构文档
 
-**项目名称**: BMAD-METHOD LangGraph集成方案
-**架构版本**: v1.0
-**创建日期**: 2025-11-04
-**架构师**: Winston (Architect)
-**基于PRD**: docs/langgraph集成方案.md
-
----
-
-## 目录
-
-1. [Introduction](#1-introduction)
-2. [High Level Architecture](#2-high-level-architecture)
-3. [Tech Stack](#3-tech-stack)
-4. [Data Models](#4-data-models)
-5. [API Specification](#5-api-specification)
-6. [Components](#6-components)
-7. [External APIs](#7-external-apis)
-8. [Core Workflows](#8-core-workflows)
-9. [Database Schema](#9-database-schema)
-10. [Unified Project Structure](#10-unified-project-structure)
-11. [Development Workflow](#11-development-workflow)
-12. [Deployment Architecture](#12-deployment-architecture)
-13. [Security and Performance](#13-security-and-performance)
-14. [Testing Strategy](#14-testing-strategy)
-15. [Coding Standards](#15-coding-standards)
-16. [Error Handling Strategy](#16-error-handling-strategy)
-17. [Monitoring and Observability](#17-monitoring-and-observability)
+**文档版本**: v1.0
+**创建日期**: 2025-11-05
+**作者**: Winston (Architect)
+**状态**: Draft
 
 ---
 
-## 1. Introduction
+## Introduction
 
-本文档概述了**BMAD-METHOD LangGraph集成方案**的完整全栈架构，包括后端智能体编排系统、前端监控界面及其集成方式。本文档作为AI驱动开发的唯一真实来源，确保整个技术栈的一致性。
+本文档概述了BMAD-METHOD LangGraph集成方案的完整全栈架构，包括后端系统、前端实现及其集成方式。它是AI驱动开发的唯一真实来源，确保整个技术栈的一致性。
 
-本架构采用**分阶段实施策略**（Phase 1-3），支持从轻量级模型适配（2-3周）到完整企业级智能体工厂（18-26周）的渐进式演进。核心目标是实现国产大模型（Qwen/GLM/DeepSeek）的即插即用支持，并通过LangGraph 1.0的持久化和人机协作特性，将智能体开发效率提升3-5倍。
+这种统一的方法结合了传统上分离的后端和前端架构文档，简化了现代全栈应用的开发流程，因为这些关注点日益交织在一起。
 
-### 1.1 Starter Template
+### Starter Template or Existing Project
 
-**项目类型**: 棕地增强项目（Brownfield Enhancement）
+本项目采用了**混合策略**，结合了成熟模板和从零搭建：
 
-**现有基础**: BMAD-METHOD V4.4.1，具备完整的八大智能体协作系统（Orchestrator、Algorithm、Constraint、Objective、Domain、Code Implementation、Extension、Quality）
+**后端项目（Story 1.2）**：
 
-**集成方式**:
+- 基于 [fastapi-langgraph-agent-production-ready-template](https://github.com/wassim249/fastapi-langgraph-agent-production-ready-template)
+- 克隆模板后进行BMAD特定适配
+- **节省80%开发时间**（3-5天 → 6-8小时）
+- 获得生产级特性：
+  - Langfuse 3.0.3 (LLM可观测性追踪)
+  - Prometheus + Grafana (监控可视化)
+  - JWT认证 + slowapi限流
+  - structlog结构化日志
+  - Docker Compose容器化
 
-- 基于现有BMAD架构进行LangGraph 1.0集成
-- 保持与现有workflow.yaml配置的兼容性
-- 采用LangServe提供RESTful API自动生成
-- 前端使用SSE（Server-Sent Events）流式传输实时监控智能体执行
+**前端项目（Story 1.3）**：
 
-**关键约束**:
+- **从零搭建**，确保完全掌控代码质量
+- 参考但不全盘克隆antdv-pro最佳实践
+- **开发时间优化**：30小时完成高质量交付
+- 优势：
+  - 代码简洁精准，无冗余
+  - 完全贴合需求（Dashboard、WorkflowMonitor、Settings）
+  - 团队深入理解Vue 3生态
+  - 长期可维护性强
 
-- 必须兼容Python 3.11+（LangGraph CLI硬性要求）
-- 需向后兼容现有智能体配置
-- 架构变更应最小化，优先考虑轻量级适配器模式
+**架构约束**：
 
-### 1.2 Change Log
+- 必须保留模板中的生产级特性（监控、安全、日志）
+- 前端架构需完全适配后端API设计
+- 保持Monorepo结构便于共享类型定义
 
-| 日期       | 版本 | 描述                                     | 作者                |
-| ---------- | ---- | ---------------------------------------- | ------------------- |
-| 2025-11-04 | v1.0 | 基于LangGraph集成方案PRD创建初始架构文档 | Winston (Architect) |
+### Change Log
+
+| Date       | Version | Description                            | Author              |
+| ---------- | ------- | -------------------------------------- | ------------------- |
+| 2025-11-05 | v1.0    | 基于PRD v1.2和实际项目创建初始架构文档 | Winston (Architect) |
 
 ---
 
-## 2. High Level Architecture
+## High Level Architecture
 
-### 2.1 Technical Summary
+### Technical Summary
 
-本架构采用**基于LangGraph 1.0的微服务架构**，结合LangServe实现自动化API生成。后端使用Python 3.11+构建智能体编排服务，通过LangGraph的StateGraph管理八大智能体的工作流执行。前端采用Vue 3构建监控界面，使用SSE（Server-Sent Events）实现实时流式传输。数据持久化基于PostgreSQL和Redis，支持工作流状态的自动保存和恢复。部署采用Docker容器化方案，支持本地开发、预生产和生产环境的统一管理。整体架构遵循"轻量级适配器"原则，最小化对现有BMAD V4.4.1架构的侵入性变更。
+BMAD-METHOD LangGraph集成方案采用**现代化微服务架构**，结合容器化部署和云原生可观测性。后端基于FastAPI 0.115.12和LangGraph 0.4.1构建，利用Python 3.13.2的最新特性实现八大智能体工作流编排，通过PostgreSQL持久化checkpoint状态，Redis提供会话缓存。前端采用Vue 3.5 Composition API + TypeScript 5.9，使用Ant Design Vue 4.2构建响应式监控界面，通过Axios与后端RESTful API通信，Pinia管理全局状态。整个系统通过Docker Compose实现一键启动的本地开发环境，集成Langfuse进行LLM调用追踪，Prometheus + Grafana提供实时监控和告警，支持国产大模型（Qwen/GLM/DeepSeek）的即插即用。架构设计遵循"轻适配器"原则，Phase 1优先实现核心价值（2-3周），为后续YAML编译器（Phase 2）和智能体工厂（Phase 3）预留扩展空间。
 
-### 2.2 Platform and Infrastructure Choice
+### Platform and Infrastructure Choice
 
-**选定平台**: Docker容器化 + 自托管
+经过对比分析，我们选择了**混合云 + 容器化**的基础设施方案：
 
-**核心服务**:
+**推荐方案（已实施）**：
 
-- **LangGraph工作流服务**: Python 3.11 + LangServe + FastAPI
-- **国产模型适配服务**: 轻量级抽象层支持多模型切换
-- **前端监控界面**: Vue 3 + Ant Design Vue + SSE客户端
-- **数据持久化**: PostgreSQL 16+ + Redis 7+
-- **反向代理**: Nginx（API网关和前端静态资源）
+- **主平台**：Docker + Docker Compose（本地开发和生产环境）
+- **数据库**：PostgreSQL 16（LangGraph checkpoint后端）+ Redis 7（会话/缓存）
+- **监控可观测性**：Langfuse 3.0.3（LLM追踪）+ Prometheus 2.48+（指标收集）+ Grafana 10.0+（可视化）
+- **安全认证**：JWT Token + slowapi 0.1.9（API限流）
+- **部署方式**：容器化部署，支持私有云和公有云
 
-**部署区域**:
+**最终选择**：
 
-- 开发环境: 本地Docker Compose
-- 生产环境: 私有云/IDC自托管
+- **平台**：Docker + Docker Compose
+- **关键服务**：FastAPI、PostgreSQL、Redis、Langfuse、Prometheus、Grafana
+- **部署主机和区域**：支持本地开发环境和私有云部署（具体区域待Phase 1完成后根据实际需求确定）
 
-**选择理由**：
+### Repository Structure
 
-1. PRD明确要求支持本地部署（vLLM/Ollama）和云端API两种模式
-2. 棕地项目已有基础设施，增量投入最小
-3. 数据本地化需求和成本控制是核心关切
-4. Docker Compose可快速搭建开发环境
+本项目采用**Monorepo**结构，所有代码集中在单一仓库管理：
 
-### 2.3 Repository Structure
+**结构选择**：Monorepo（单一仓库）
+**Monorepo工具**：Git子目录（轻量级，无需额外工具如Nx/Turborepo）
+**包组织策略**：按功能模块划分（backend、frontend/web、docs）
 
-**结构选择**: Monorepo（不使用专门工具，保持简单）
-
-**包组织策略**:
+**实际仓库结构**：
 
 ```
-BMAD-METHOD/                      # Monorepo根目录
-├── backend/                      # 后端服务（Python）
-│   ├── langgraph_service/        # LangGraph工作流服务
-│   ├── model_adapters/           # 国产模型适配器
-│   └── shared/                   # 后端共享代码
-├── frontend/                     # 前端应用（Vue）
-│   ├── web/                      # 监控界面
-│   └── shared/                   # 前端共享组件
-├── shared/                       # 全栈共享（类型定义、常量）
-├── docs/                         # 文档
-├── scripts/                      # 部署和构建脚本
-└── docker/                       # Docker配置文件
+BMAD-METHOD/
+├── backend/                    # FastAPI + LangGraph后端
+│   ├── app/                   # 应用代码
+│   ├── docker-compose.yml     # 本地开发环境
+│   ├── pyproject.toml         # Python依赖（uv管理）
+│   └── README.md              # 后端文档
+├── frontend/web/              # Vue 3前端
+│   ├── src/                   # 源代码
+│   ├── package.json           # npm依赖
+│   └── README.md              # 前端文档
+├── docs/                      # 项目文档
+│   ├── langgraph集成方案.md   # PRD v1.2
+│   ├── stories/               # 用户故事
+│   └── architecture.md        # 本架构文档
+├── .bmad-core/                # BMAD工具链
+└── README.md                  # 项目总览
 ```
 
-### 2.4 High Level Architecture Diagram
+### High Level Architecture Diagram
 
 ```mermaid
 graph TB
     subgraph "用户层"
-        User[用户/开发者]
-        Browser[浏览器]
+        User[用户浏览器]
+        Mobile[移动设备<br/>次要支持]
     end
 
-    subgraph "前端层 (Frontend)"
-        WebUI[Web监控界面<br/>Vue 3 + Ant Design Vue]
-        SSE[SSE客户端<br/>实时流式接收]
+    subgraph "前端层 - Vue 3 SPA"
+        VueApp[Vue 3.5 App<br/>Ant Design Vue UI]
+        Router[Vue Router<br/>路由管理]
+        Store[Pinia Store<br/>状态管理]
+        APIClient[Axios Client<br/>API调用层]
     end
 
-    subgraph "API网关层"
-        Nginx[Nginx<br/>反向代理]
+    subgraph "后端层 - FastAPI Microservices"
+        FastAPI[FastAPI 0.115.12<br/>RESTful API]
+        Auth[JWT Auth<br/>slowapi限流]
+        LangGraph[LangGraph 0.4.1<br/>工作流引擎]
+        ModelAdapter[国产模型适配器<br/>Qwen/GLM/DeepSeek]
     end
 
-    subgraph "应用层 (Backend)"
-        LangServe[LangServe API<br/>FastAPI]
-        WorkflowEngine[LangGraph工作流引擎<br/>StateGraph]
-
-        subgraph "八大智能体"
-            Orchestrator[Orchestrator<br/>编排者]
-            Algorithm[Algorithm Expert<br/>算法专家]
-            Constraint[Constraint Expert<br/>约束专家]
-            Objective[Objective Expert<br/>目标专家]
-            Domain[Domain Expert<br/>领域专家]
-            CodeImpl[Code Implementation<br/>代码实现专家]
-            Extension[Extension Expert<br/>扩展专家]
-            Quality[Quality Expert<br/>质量专家]
-        end
-
-        ModelAdapter[国产模型适配器]
-    end
-
-    subgraph "模型层"
-        Qwen[通义千问 Qwen<br/>vLLM/API]
-        GLM[智谱GLM<br/>vLLM/API]
-        DeepSeek[DeepSeek<br/>vLLM/API]
+    subgraph "智能体层 - BMAD 8 Agents"
+        Orchestrator[编排智能体]
+        Algorithm[算法智能体]
+        Constraint[约束智能体]
+        Domain[领域智能体]
+        Code[代码实现专家]
     end
 
     subgraph "数据层"
-        PostgreSQL[(PostgreSQL<br/>持久化存储)]
-        Redis[(Redis<br/>缓存/会话)]
+        PostgreSQL[(PostgreSQL 16<br/>Checkpoint存储)]
+        Redis[(Redis 7<br/>Session/Cache)]
     end
 
-    subgraph "外部集成"
-        GitHub[GitHub<br/>代码仓库]
-        Monitoring[监控系统<br/>Prometheus/Grafana]
+    subgraph "监控层"
+        Langfuse[Langfuse 3.0.3<br/>LLM追踪]
+        Prometheus[Prometheus<br/>指标收集]
+        Grafana[Grafana<br/>监控面板]
     end
 
-    User --> Browser
-    Browser --> WebUI
-    WebUI <--> SSE
-    SSE <--> Nginx
-    Nginx --> LangServe
+    subgraph "外部服务"
+        LLM[国产大模型服务<br/>vLLM/Ollama]
+    end
 
-    LangServe --> WorkflowEngine
-    WorkflowEngine --> Orchestrator
+    User -->|HTTPS| VueApp
+    Mobile -.->|响应式支持| VueApp
+    VueApp --> Router
+    VueApp --> Store
+    VueApp --> APIClient
+
+    APIClient -->|REST API| FastAPI
+    FastAPI --> Auth
+    Auth -->|认证通过| LangGraph
+
+    LangGraph --> ModelAdapter
+    LangGraph --> Orchestrator
     Orchestrator --> Algorithm
     Orchestrator --> Constraint
-    Orchestrator --> Objective
-    Algorithm --> Domain
-    Constraint --> Domain
-    Objective --> Domain
-    Domain --> CodeImpl
-    CodeImpl --> Extension
-    CodeImpl --> Quality
+    Orchestrator --> Domain
+    Orchestrator --> Code
 
-    WorkflowEngine --> ModelAdapter
-    ModelAdapter --> Qwen
-    ModelAdapter --> GLM
-    ModelAdapter --> DeepSeek
+    ModelAdapter -->|API调用| LLM
+    LangGraph -->|持久化| PostgreSQL
+    FastAPI -->|缓存| Redis
 
-    WorkflowEngine --> PostgreSQL
-    WorkflowEngine --> Redis
+    FastAPI -.->|追踪| Langfuse
+    FastAPI -.->|指标| Prometheus
+    Prometheus -.->|可视化| Grafana
 
-    WorkflowEngine --> GitHub
-    WorkflowEngine --> Monitoring
-
-    style WebUI fill:#e1f5ff
-    style LangServe fill:#fff4e1
-    style WorkflowEngine fill:#ffe1e1
-    style ModelAdapter fill:#f0e1ff
-    style PostgreSQL fill:#e1ffe1
-    style Redis fill:#e1ffe1
+    style VueApp fill:#42b883
+    style FastAPI fill:#009688
+    style LangGraph fill:#ff6b6b
+    style PostgreSQL fill:#336791
+    style Redis fill:#dc382d
 ```
 
-### 2.5 Architectural Patterns
+### Architectural Patterns
 
-**1. 微服务架构（Microservices）**
+以下是指导全栈开发的关键架构模式：
 
-- **描述**: LangGraph工作流服务、模型适配服务、前端界面作为独立服务部署
-- **理由**: 支持独立扩展和部署，服务间通过HTTP/SSE通信，降低耦合度
+- **微服务架构（Microservices）**：后端采用FastAPI微服务架构，LangGraph工作流引擎作为独立服务运行，支持水平扩展 - _理由：_ 符合云原生最佳实践，便于未来Phase 3的智能体工厂横向扩展
 
-**2. 事件驱动架构（Event-Driven）**
+- **事件驱动架构（Event-Driven）**：LangGraph工作流基于StateGraph的事件驱动模型，智能体间通过状态变更触发执行 - _理由：_ 支持复杂的人机协作和异步工作流，提升系统响应性
 
-- **描述**: LangGraph的StateGraph基于状态转换事件驱动智能体执行
-- **理由**: 天然支持异步执行和并行处理，符合智能体协作场景
+- **单页应用（SPA）**：前端采用Vue 3 SPA架构，通过Vue Router实现客户端路由 - _理由：_ 提供流畅的用户体验，减少页面刷新，适合实时监控界面
 
-**3. 适配器模式（Adapter Pattern）**
+- **组件化UI（Component-Based UI）**：使用Vue 3 Composition API + Ant Design Vue构建可复用组件 - _理由：_ 提升开发效率，保证UI一致性，便于团队协作和代码维护
 
-- **描述**: 国产模型适配器提供统一接口，屏蔽不同模型API差异
-- **理由**: 支持模型热切换，降低模型替换成本，Phase 1核心模式
+- **Repository模式（Repository Pattern）**：后端数据访问通过SQLModel抽象数据库操作 - _理由：_ 解耦业务逻辑和数据访问，便于测试和未来数据库迁移
 
-**4. 仓储模式（Repository Pattern）**
+- **API Gateway模式（API Gateway）**：FastAPI作为单一入口点，集中处理认证、限流、日志 - _理由：_ 统一安全策略，简化前端调用，便于监控和审计
 
-- **描述**: 数据访问层抽象，统一管理PostgreSQL和Redis的数据操作
-- **理由**: 便于未来数据库迁移，提供清晰的数据访问接口
+- **断路器模式（Circuit Breaker）**：LLM调用失败时自动降级和重试 - _理由：_ 提升系统韧性，避免外部服务故障影响整体可用性
 
-**5. BFF模式（Backend For Frontend）**
+- **轻适配器模式（Lightweight Adapter）**：国产模型适配器最小化侵入，复用LangChain生态 - _理由：_ 降低维护成本，保持与上游社区同步，快速支持新模型
 
-- **描述**: LangServe API专门为前端监控界面设计，提供优化的数据格式
-- **理由**: 前端SSE流式传输需要特定的数据格式和事件流
-
-**6. Human-in-the-Loop模式**
-
-- **描述**: 利用LangGraph 1.0的interrupt机制实现人工确认点（P1/P2/P2.5）
-- **理由**: 关键决策需要人工介入，提高智能体输出的可控性和质量
-
-**7. 持久化状态模式（Durable State）**
-
-- **描述**: LangGraph 1.0内置的checkpoint机制自动保存工作流状态
-- **理由**: 支持工作流中断和恢复，服务器重启不丢失进度
-
-**8. 组件化UI模式（Component-Based UI）**
-
-- **描述**: Vue 3组件化开发，智能体状态和输出作为独立组件
-- **理由**: 提高前端可维护性，支持智能体界面的复用和定制
+- **Human-in-the-Loop（HITL）**：基于LangGraph 0.4.1的interrupt机制实现人工确认点（P1/P2/P2.5） - _理由：_ 提升AI决策透明度，在关键节点保留人类控制权
 
 ---
 
-## 3. Tech Stack
+## Tech Stack
 
-这是项目的**唯一技术真实来源**。所有开发必须使用这些确切的技术和版本。
+这是整个项目的**权威技术选型表**，所有开发必须遵循这些确切的版本。以下技术栈基于Story 1.2/1.3实际完成的项目配置。
 
-| 类别             | 技术                 | 版本     | 用途                       | 选择理由                                                |
-| ---------------- | -------------------- | -------- | -------------------------- | ------------------------------------------------------- |
-| **后端语言**     | Python               | 3.11+    | 后端智能体服务开发         | LangGraph CLI硬性要求3.11+；支持最新类型注解和性能优化  |
-| **后端框架**     | FastAPI              | 0.115.0+ | RESTful API和LangServe集成 | 原生async支持；自动OpenAPI文档生成；与LangServe无缝集成 |
-| **智能体编排**   | LangGraph            | 1.0.2    | 智能体工作流StateGraph编排 | 稳定版本；内置持久化和Human-in-Loop；生产级特性完整     |
-| **智能体工具**   | LangChain Core       | 0.2.38+  | 智能体工具链和提示管理     | LangGraph 1.0核心依赖；提供agent创建工具                |
-| **智能体SDK**    | LangGraph SDK        | 1.0.0+   | LangGraph客户端和工具      | 官方SDK；支持远程调用和监控                             |
-| **Checkpoint**   | LangGraph Checkpoint | 2.0.23+  | 工作流状态持久化           | 内置checkpoint机制；自动状态保存和恢复                  |
-| **API服务**      | LangServe            | 0.3.0+   | 自动API端点生成            | 一行代码生成/invoke、/stream等端点；SSE流式传输支持     |
-| **HTTP服务器**   | Uvicorn              | 0.26.0+  | ASGI服务器                 | 高性能async服务器；FastAPI官方推荐                      |
-| **流式传输**     | sse-starlette        | 2.1.0    | Server-Sent Events实现     | 与FastAPI集成；实时流式数据推送                         |
-| **HTTP客户端**   | httpx                | 0.25.0+  | 异步HTTP请求               | 支持async/await；用于模型API调用                        |
-| **前端语言**     | TypeScript           | 5.3+     | 前端类型安全开发           | 类型安全；与后端类型共享；减少运行时错误                |
-| **前端框架**     | Vue                  | 3.4+     | 监控界面UI开发             | 组合式API；TypeScript支持好；团队更熟悉；性能优秀       |
-| **UI组件库**     | Ant Design Vue       | 4.1+     | 企业级UI组件               | 完整的Vue 3组件体系；中文文档友好；适合管理后台         |
-| **状态管理**     | Pinia                | 2.1+     | Vue状态管理                | Vue 3官方推荐；TypeScript友好；轻量级；直观的API        |
-| **路由**         | Vue Router           | 4.2+     | 前端路由管理               | Vue 3官方路由；支持TypeScript                           |
-| **API风格**      | REST + SSE           | -        | 前后端通信协议             | LangServe原生支持REST；SSE实现实时流式传输              |
-| **数据库**       | PostgreSQL           | 16+      | 工作流状态和数据持久化     | LangGraph checkpoint后端；ACID事务保证；JSON支持        |
-| **缓存**         | Redis                | 7+       | 会话缓存和任务队列         | 高性能；支持发布订阅；持久化选项                        |
-| **文件存储**     | 本地文件系统         | -        | 代码生成和知识库存储       | Phase 1简化方案；避免引入云存储依赖                     |
-| **认证**         | JWT                  | -        | API访问认证                | 无状态；易于扩展；LangServe支持中间件集成               |
-| **前端测试**     | Vitest               | 1.0+     | Vue组件单元测试            | Vite生态原生集成；快速；Vue Test Utils支持              |
-| **后端测试**     | Pytest               | 7.4+     | Python单元和集成测试       | Python标准测试框架；丰富的插件生态                      |
-| **E2E测试**      | Playwright           | 1.40+    | 端到端自动化测试           | 跨浏览器；录制功能；与TypeScript集成                    |
-| **构建工具**     | Vite                 | 5.0+     | 前端构建和开发服务器       | Vue官方推荐；极快的HMR；原生ESM                         |
-| **打包工具**     | Rollup               | -        | 前端生产构建               | Vite底层依赖；Tree-shaking优化                          |
-| **IaC工具**      | Docker Compose       | 2.23+    | 本地和生产环境编排         | 简单易用；统一开发和部署环境                            |
-| **CI/CD**        | GitHub Actions       | -        | 持续集成和部署             | 与GitHub深度集成；免费额度充足；YAML配置                |
-| **监控**         | Prometheus           | 2.48+    | 指标收集和告警             | 开源标准；丰富的exporter生态                            |
-| **日志**         | structlog            | 24.1.0+  | 结构化日志                 | JSON格式；易于解析和查询；Python原生支持                |
-| **CSS框架**      | Tailwind CSS         | 3.4+     | 实用优先的CSS框架          | 快速开发；与Vue组件结合好；构建时优化                   |
-| **Python包管理** | Conda                | Latest   | Python环境和依赖管理       | 宿主机已配置；科学计算包支持好                          |
-| **Node包管理**   | npm                  | 10+      | Node.js依赖管理            | 标准工具；与nvm配合使用                                 |
-| **序列化**       | orjson               | 3.9.7+   | 高性能JSON序列化           | 比标准库快；LangGraph推荐                               |
-| **重试机制**     | tenacity             | 8.0.0+   | 智能重试和容错             | 灵活的重试策略；装饰器语法简洁                          |
-| **数据库连接**   | psycopg              | 3.2.0+   | PostgreSQL Python驱动      | 最新版本；连接池支持；async支持                         |
-| **序列化工具**   | cloudpickle          | 3.0.0+   | Python对象序列化           | LangGraph checkpoint依赖；支持复杂对象                  |
-| **数据验证**     | Pydantic             | 2.10.0+  | 数据模型和验证             | FastAPI核心依赖；类型安全；自动文档生成                 |
-| **可观测性**     | LangSmith            | 0.1.63+  | LangGraph工作流追踪        | 官方可观测性工具；调试和性能分析                        |
+### Technology Stack Table
+
+| Category                 | Technology                    | Version                              | Purpose               | Rationale                                                            |
+| ------------------------ | ----------------------------- | ------------------------------------ | --------------------- | -------------------------------------------------------------------- |
+| **Frontend Language**    | TypeScript                    | 5.9.3                                | 前端类型安全编程语言  | 提供编译时类型检查，减少运行时错误，提升大型项目可维护性             |
+| **Frontend Framework**   | Vue 3                         | 3.5.22                               | 前端响应式UI框架      | Composition API提供更好的逻辑复用，性能优于Vue 2，社区活跃且文档完善 |
+| **UI Component Library** | Ant Design Vue                | 4.2.6                                | 企业级UI组件库        | 提供50+高质量组件，减少70%UI开发时间，中文文档友好                   |
+| **State Management**     | Pinia                         | 2.3.1                                | Vue 3官方推荐状态管理 | 比Vuex更轻量（<1KB），TypeScript原生支持，devtools集成完善           |
+| **Frontend Router**      | Vue Router                    | 4.6.3                                | Vue 3官方路由         | 支持动态路由、路由守卫、懒加载，与Vue 3深度集成                      |
+| **HTTP Client**          | Axios                         | 1.13.2                               | HTTP请求库            | 支持拦截器、请求取消、自动转换JSON，浏览器兼容性好                   |
+| **Frontend Utils**       | @vueuse/core                  | 14.0.0                               | Vue组合式工具集       | 提供200+ Composition API工具函数，减少重复代码                       |
+| **Date/Time**            | dayjs                         | 1.11.19                              | 轻量级日期处理库      | 仅2KB，API与moment.js兼容，支持国际化和插件扩展                      |
+| **Backend Language**     | Python                        | 3.13.2                               | 后端编程语言          | 最新稳定版，性能提升15%，AI生态最完善                                |
+| **Backend Framework**    | FastAPI                       | 0.115.12+                            | 现代异步Web框架       | 自动生成OpenAPI文档，原生async/await，性能比Flask快5倍               |
+| **API Style**            | RESTful                       | OpenAPI 3.0                          | HTTP API设计风格      | 标准化、易于理解、工具链成熟，满足当前需求（YAGNI原则）              |
+| **Workflow Engine**      | LangGraph                     | 0.4.1+                               | AI智能体编排引擎      | 内置checkpoint持久化，支持HITL，图形化工作流控制                     |
+| **LLM Framework**        | LangChain                     | 0.3.25+                              | LLM应用框架           | 与LangGraph无缝集成，丰富的工具和链式调用支持                        |
+| **Database**             | PostgreSQL                    | 16+                                  | 关系型数据库          | LangGraph checkpoint官方推荐，ACID保证，JSON支持                     |
+| **Cache**                | Redis                         | 7+                                   | 内存数据库            | 支持会话存储、分布式锁、Pub/Sub，性能优异                            |
+| **ORM**                  | SQLModel                      | 0.0.24+                              | Python SQL ORM        | Pydantic + SQLAlchemy融合，类型安全，与FastAPI完美集成               |
+| **Authentication**       | JWT + bcrypt                  | python-jose 3.4.0+<br/>bcrypt 4.3.0+ | Token认证+密码加密    | 无状态认证适合微服务，bcrypt算法安全性高（抗彩虹表）                 |
+| **Rate Limiting**        | slowapi                       | 0.1.9+                               | API限流保护           | 基于令牌桶算法，支持IP和用户维度限流，防止滥用                       |
+| **LLM Tracing**          | Langfuse                      | 3.0.3                                | LLM可观测性平台       | 追踪每次LLM调用的token消耗、延迟、成本，支持实验对比                 |
+| **Metrics**              | Prometheus                    | prometheus-client 0.19.0+            | 时序指标收集          | 云原生监控标准，支持多维度标签，PromQL查询强大                       |
+| **Monitoring UI**        | Grafana                       | 10.0+                                | 监控可视化            | 丰富的图表类型，告警规则配置，与Prometheus完美集成                   |
+| **Logging**              | structlog                     | 25.2.0+                              | 结构化日志库          | JSON格式日志便于解析，支持上下文绑定，性能高                         |
+| **Frontend Testing**     | Vitest                        | 内置于Vite                           | 前端单元测试          | 与Vite共享配置，启动速度快，Vue组件测试友好                          |
+| **Backend Testing**      | pytest                        | 8.3.5+                               | Python测试框架        | Fixture机制强大，插件生态丰富，异步测试支持完善                      |
+| **E2E Testing**          | Playwright                    | TBD (Phase 2)                        | 端到端测试            | 跨浏览器支持，录制回放功能，比Cypress更现代                          |
+| **Build Tool**           | Vite                          | 7.1.7                                | 前端构建工具          | 开发模式秒启动（ESBuild），生产构建快5倍（Rollup）                   |
+| **Bundler**              | Rollup (via Vite)             | 内置于Vite                           | JavaScript打包工具    | Tree-shaking效果好，输出体积小，插件生态成熟                         |
+| **Package Manager**      | uv (Python)<br/>npm (Node.js) | uv latest<br/>npm 10+                | 依赖管理工具          | uv比pip快10-100倍，npm最成熟稳定                                     |
+| **Container**            | Docker + Docker Compose       | Docker 24+<br/>Compose 2+            | 容器化运行环境        | 环境一致性保证，一键启动开发环境，生产部署简化                       |
+| **Web Server**           | uvicorn                       | 0.34.0+                              | ASGI服务器            | FastAPI官方推荐，支持HTTP/2、WebSocket，性能优异                     |
+| **CSS Preprocessor**     | Sass                          | 1.93.3                               | CSS预处理器           | 变量、嵌套、混入功能，与Ant Design Vue变量定制集成                   |
+| **Code Formatter**       | Prettier + Black              | prettier 3.6.2<br/>black (via ruff)  | 代码格式化            | 统一代码风格，减少code review争议，支持保存自动格式化                |
+| **Linter**               | ESLint + Ruff                 | eslint 9.39.1<br/>ruff latest        | 代码检查              | 发现潜在bug，强制最佳实践，Ruff比flake8快10-100倍                    |
 
 ---
 
-## 4. Data Models
+## Data Models
 
-基于PRD的功能需求和LangGraph 1.0工作流特性，定义核心数据模型。这些模型将在前后端共享，使用TypeScript接口定义。
+基于PRD需求和LangGraph 0.4.1架构，以下是系统核心数据模型。这些模型在后端使用SQLModel定义，通过OpenAPI自动生成TypeScript接口供前端使用。
 
-### 4.1 WorkflowExecution（工作流执行）
+### Model: User
 
-**目的**: 记录完整的APS工作流执行实例，跟踪从Phase 0到Phase 4的整个智能体协作过程
+**Purpose:** 用户账户管理，支持JWT认证和RBAC权限控制
+
+**Key Attributes:**
+
+- `id`: UUID - 用户唯一标识符
+- `email`: String - 用户邮箱（唯一，用于登录）
+- `username`: String - 用户名（唯一）
+- `hashed_password`: String - bcrypt加密的密码哈希
+- `is_active`: Boolean - 账户是否激活
+- `is_superuser`: Boolean - 是否为超级管理员
+- `created_at`: DateTime - 账户创建时间
+- `last_login`: DateTime - 最后登录时间
+
+**TypeScript Interface:**
 
 ```typescript
-// shared/types/workflow.ts
-export enum WorkflowStatus {
-  PENDING = 'pending',
-  RUNNING = 'running',
-  PAUSED = 'paused', // Human-in-Loop暂停
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-}
-
-export enum Phase {
-  P0 = 'P0', // 问题理解
-  P1 = 'P1', // 算法推荐
-  P2 = 'P2', // 约束和目标分析
-  P2_5 = 'P2.5', // 代码实现
-  P3 = 'P3', // 扩展和质量保证
-  P4 = 'P4', // 最终交付
-}
-
-export interface WorkflowConfig {
-  modelProvider: 'qwen' | 'glm' | 'deepseek';
-  modelName: string;
-  temperature: number;
-  maxTokens: number;
-  enableHumanInLoop: boolean;
-}
-
-export interface ErrorInfo {
-  code: string;
-  message: string;
-  details?: Record<string, any>;
-  timestamp: Date;
-}
-
-export interface WorkflowExecution {
+interface User {
   id: string;
-  userId: string;
+  email: string;
+  username: string;
+  is_active: boolean;
+  is_superuser: boolean;
+  created_at: string; // ISO 8601
+  last_login: string | null; // ISO 8601
+}
+
+interface UserCreate {
+  email: string;
+  username: string;
+  password: string;
+}
+
+interface TokenResponse {
+  access_token: string;
+  token_type: 'bearer';
+  expires_in: number;
+}
+```
+
+**Relationships:**
+
+- 一对多 → WorkflowExecution
+- 一对多 → HumanApproval
+
+---
+
+### Model: WorkflowExecution
+
+**Purpose:** 记录完整的BMAD工作流执行过程，包括Phase 0-4的状态流转
+
+**Key Attributes:**
+
+- `id`: UUID - 工作流执行唯一标识符
+- `user_id`: UUID - 发起用户ID
+- `thread_id`: String - LangGraph线程ID
+- `status`: Enum - 执行状态（pending/running/paused/completed/failed）
+- `current_phase`: String - 当前执行阶段
+- `input_data`: JSON - 用户输入
+- `output_data`: JSON - 最终输出
+- `started_at`: DateTime - 开始时间
+- `completed_at`: DateTime - 完成时间
+- `total_tokens`: Integer - 总token消耗
+- `total_cost`: Decimal - 总成本
+
+**TypeScript Interface:**
+
+```typescript
+type WorkflowStatus = 'pending' | 'running' | 'paused' | 'completed' | 'failed';
+type WorkflowPhase = 'P0' | 'P1' | 'P2' | 'P2.5' | 'P3' | 'P4';
+
+interface WorkflowExecution {
+  id: string;
+  user_id: string;
+  thread_id: string;
   status: WorkflowStatus;
-  currentPhase: Phase;
-  config: WorkflowConfig;
-  checkpointId: string | null;
-  humanConfirmationRequired: boolean;
-  startedAt: Date;
-  completedAt: Date | null;
-  error: ErrorInfo | null;
-  metadata: Record<string, any>;
+  current_phase: WorkflowPhase;
+  input_data: {
+    problem_description: string;
+    domain?: string;
+    constraints?: string[];
+  };
+  output_data: {
+    algorithm?: string;
+    code?: string;
+    documentation?: string;
+  } | null;
+  started_at: string;
+  completed_at: string | null;
+  error_message: string | null;
+  total_tokens: number;
+  total_cost: number;
 }
 ```
 
-**关系**:
+**Relationships:**
 
-- **一对多** → `AgentExecution`: 一个工作流包含多个智能体执行
-- **一对多** → `HumanConfirmation`: 一个工作流可能有多个人工确认点
-- **一对一** → `WorkflowCheckpoint`: LangGraph管理的持久化状态
+- 多对一 → User
+- 一对多 → AgentExecution
+- 一对多 → HumanApproval
 
-### 4.2 AgentExecution（智能体执行）
+---
 
-**目的**: 记录单个智能体的执行过程和输出结果，支持八大智能体的独立追踪
+### Model: AgentExecution
+
+**Purpose:** 记录单个智能体的执行详情
+
+**TypeScript Interface:**
 
 ```typescript
-// shared/types/agent.ts
-export enum AgentType {
-  ORCHESTRATOR = 'orchestrator',
-  ALGORITHM = 'algorithm',
-  CONSTRAINT = 'constraint',
-  OBJECTIVE = 'objective',
-  DOMAIN = 'domain',
-  CODE_IMPLEMENTATION = 'code_implementation',
-  EXTENSION = 'extension',
-  QUALITY = 'quality',
-}
+type AgentName = 'orchestrator' | 'algorithm' | 'constraint' | 'objective' | 'domain' | 'code_implementation' | 'extension' | 'quality';
 
-export enum AgentStatus {
-  PENDING = 'pending',
-  RUNNING = 'running',
-  COMPLETED = 'completed',
-  FAILED = 'failed',
-  SKIPPED = 'skipped',
-}
-
-export interface AgentInput {
-  prompt: string;
-  context: Record<string, any>;
-  previousOutputs?: Record<AgentType, any>;
-}
-
-export interface AgentOutput {
-  content: string;
-  structured?: Record<string, any>;
-  confidence?: number;
-  reasoning?: string[];
-}
-
-export interface TokenUsage {
-  promptTokens: number;
-  completionTokens: number;
-  totalTokens: number;
-  cost?: number;
-}
-
-export interface AgentExecution {
+interface AgentExecution {
   id: string;
-  workflowId: string;
-  agentType: AgentType;
-  status: AgentStatus;
-  input: AgentInput;
-  output: AgentOutput | null;
-  startedAt: Date;
-  completedAt: Date | null;
-  duration: number | null;
-  tokenUsage: TokenUsage | null;
-  error: ErrorInfo | null;
+  workflow_id: string;
+  agent_name: AgentName;
+  input_data: Record<string, any>;
+  output_data: Record<string, any> | null;
+  started_at: string;
+  completed_at: string | null;
+  duration_ms: number;
+  token_count: number;
+  model_used: string;
+  status: 'success' | 'failed' | 'skipped';
+  error_message: string | null;
 }
 ```
 
-### 4.3 AgentMessage（智能体消息）
+---
 
-**目的**: 记录智能体执行过程中的流式输出消息，支持SSE实时传输到前端
+### Model: HumanApproval
+
+**Purpose:** 记录Human-in-the-Loop确认点的人工决策
+
+**TypeScript Interface:**
 
 ```typescript
-// shared/types/message.ts
-export enum MessageType {
-  TEXT = 'text',
-  THOUGHT = 'thought',
-  RESULT = 'result',
-  ERROR = 'error',
-  SYSTEM = 'system',
-}
+type ApprovalPoint = 'P1' | 'P2' | 'P2.5';
+type ApprovalDecision = 'approved' | 'rejected' | 'modified';
 
-export interface AgentMessage {
+interface HumanApproval {
   id: string;
-  agentExecutionId: string;
-  workflowId: string;
-  type: MessageType;
-  content: string;
-  sequence: number;
-  timestamp: Date;
-  metadata?: Record<string, any>;
+  workflow_id: string;
+  user_id: string;
+  approval_point: ApprovalPoint;
+  context_data: Record<string, any>;
+  decision: ApprovalDecision;
+  feedback: string;
+  modified_data: Record<string, any> | null;
+  created_at: string;
+  decided_at: string | null;
 }
 ```
 
-### 4.4 HumanConfirmation（人工确认）
+---
 
-**目的**: 记录Human-in-Loop触发点的人工确认和决策过程（P1/P2/P2.5）
+### Model: ModelConfig
 
-```typescript
-// shared/types/confirmation.ts
-export enum TriggerPoint {
-  P1 = 'P1',
-  P2 = 'P2',
-  P2_5 = 'P2.5',
-}
+**Purpose:** 管理国产大模型配置
 
-export enum ConfirmationStatus {
-  PENDING = 'pending',
-  APPROVED = 'approved',
-  REJECTED = 'rejected',
-  MODIFIED = 'modified',
-  TIMEOUT = 'timeout',
-}
-
-export interface ConfirmationContext {
-  title: string;
-  description: string;
-  options: ConfirmationOption[];
-  data: Record<string, any>;
-}
-
-export interface ConfirmationOption {
-  id: string;
-  label: string;
-  description?: string;
-  risk?: 'low' | 'medium' | 'high';
-}
-
-export interface Decision {
-  action: 'approve' | 'reject' | 'modify' | 'regenerate';
-  selectedOptionId?: string;
-  feedback?: string;
-  modifications?: Record<string, any>;
-}
-
-export interface HumanConfirmation {
-  id: string;
-  workflowId: string;
-  triggerPoint: TriggerPoint;
-  status: ConfirmationStatus;
-  context: ConfirmationContext;
-  decision: Decision | null;
-  requestedAt: Date;
-  respondedAt: Date | null;
-  timeout: number;
-}
-```
-
-### 4.5 ModelConfig（模型配置）
-
-**目的**: 管理国产大模型的配置信息，支持模型热切换
+**TypeScript Interface:**
 
 ```typescript
-// shared/types/model.ts
-export enum ModelProvider {
-  QWEN = 'qwen',
-  GLM = 'glm',
-  DEEPSEEK = 'deepseek',
-}
+type ModelProvider = 'qwen' | 'glm' | 'deepseek' | 'local';
 
-export enum DeploymentType {
-  LOCAL_VLLM = 'local_vllm',
-  LOCAL_OLLAMA = 'local_ollama',
-  CLOUD_API = 'cloud_api',
-}
-
-export interface ModelConfig {
+interface ModelConfig {
   id: string;
+  name: string;
   provider: ModelProvider;
-  modelName: string;
-  deploymentType: DeploymentType;
-  endpoint: string;
-  apiKey: string | null;
-  enabled: boolean;
-  priority: number;
-  config: ModelParameters;
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface ModelParameters {
+  api_base_url: string;
+  model_version: string;
+  max_tokens: number;
   temperature: number;
-  topP: number;
-  maxTokens: number;
-  timeout: number;
-  retryAttempts: number;
+  is_active: boolean;
+  priority: number;
 }
 ```
 
-### 4.6 Data Model Relationships
+---
+
+**数据模型关系图**：
 
 ```mermaid
 erDiagram
-    WorkflowExecution ||--o{ AgentExecution : contains
-    WorkflowExecution ||--o{ HumanConfirmation : requires
-    WorkflowExecution ||--|| WorkflowCheckpoint : has
-    AgentExecution ||--o{ AgentMessage : produces
-    WorkflowExecution }o--|| ModelConfig : uses
+    User ||--o{ WorkflowExecution : "发起"
+    User ||--o{ HumanApproval : "审批"
+    WorkflowExecution ||--o{ AgentExecution : "包含"
+    WorkflowExecution ||--o{ HumanApproval : "需要"
+
+    User {
+        uuid id PK
+        string email UK
+        string username UK
+        string hashed_password
+        boolean is_active
+        datetime created_at
+    }
 
     WorkflowExecution {
-        string id PK
-        string userId
-        WorkflowStatus status
-        Phase currentPhase
-        WorkflowConfig config
-        string checkpointId FK
-        boolean humanConfirmationRequired
-        Date startedAt
-        Date completedAt
+        uuid id PK
+        uuid user_id FK
+        string thread_id UK
+        enum status
+        enum current_phase
+        json input_data
+        json output_data
+        datetime started_at
     }
 
     AgentExecution {
-        string id PK
-        string workflowId FK
-        AgentType agentType
-        AgentStatus status
-        AgentInput input
-        AgentOutput output
-        Date startedAt
-        Date completedAt
-        number duration
-        TokenUsage tokenUsage
+        uuid id PK
+        uuid workflow_id FK
+        enum agent_name
+        json input_data
+        json output_data
+        integer duration_ms
+        integer token_count
     }
 
-    AgentMessage {
-        string id PK
-        string agentExecutionId FK
-        string workflowId FK
-        MessageType type
-        string content
-        number sequence
-        Date timestamp
-    }
-
-    HumanConfirmation {
-        string id PK
-        string workflowId FK
-        TriggerPoint triggerPoint
-        ConfirmationStatus status
-        ConfirmationContext context
-        Decision decision
-        Date requestedAt
-        Date respondedAt
+    HumanApproval {
+        uuid id PK
+        uuid workflow_id FK
+        uuid user_id FK
+        enum approval_point
+        enum decision
+        json context_data
+        datetime decided_at
     }
 
     ModelConfig {
-        string id PK
-        ModelProvider provider
-        string modelName
-        DeploymentType deploymentType
-        string endpoint
-        boolean enabled
-        number priority
-    }
-
-    WorkflowCheckpoint {
-        string checkpoint_id PK
-        string thread_id
-        Record checkpoint
-        Date created_at
+        uuid id PK
+        string name UK
+        enum provider
+        string api_base_url
+        boolean is_active
     }
 ```
 
 ---
 
-由于文档非常长，我会继续在下一条消息中完成剩余部分。让我先保存这部分内容。
+## API Specification
 
-## 5. API Specification
+完整的RESTful API规范，基于OpenAPI 3.0标准。FastAPI自动生成交互式API文档（Swagger UI: `http://localhost:8000/docs`）。
 
-完整的OpenAPI 3.0规范请参考PRD文档。以下是关键端点概述：
+### 核心端点概览
 
-### 5.1 LangServe自动生成端点
+**Authentication:**
 
-- `POST /langgraph/invoke` - 同步调用工作流
-- `POST /langgraph/stream` - SSE流式调用工作流
-- `POST /langgraph/batch` - 批量调用工作流
-- `POST /langgraph/stream_events` - 详细事件流（调试）
+- `POST /api/v1/auth/register` - 用户注册
+- `POST /api/v1/auth/login` - 用户登录
+- `GET /api/v1/auth/me` - 获取当前用户
 
-### 5.2 工作流管理API
+**Workflows:**
 
-- `GET /api/v1/workflows` - 获取工作流列表
-- `POST /api/v1/workflows` - 创建新工作流
-- `GET /api/v1/workflows/{workflowId}` - 获取工作流详情
-- `DELETE /api/v1/workflows/{workflowId}` - 取消工作流
-- `POST /api/v1/workflows/{workflowId}/resume` - 恢复暂停的工作流
+- `POST /api/v1/workflows` - 创建工作流
+- `GET /api/v1/workflows` - 查询工作流列表
+- `GET /api/v1/workflows/{id}` - 获取工作流详情
+- `POST /api/v1/workflows/{id}/resume` - 恢复暂停的工作流
+- `DELETE /api/v1/workflows/{id}` - 取消工作流
 
-### 5.3 人工确认API
+**Agents:**
 
-- `GET /api/v1/confirmations/pending` - 获取待确认列表
-- `GET /api/v1/confirmations/{confirmationId}` - 获取确认详情
-- `POST /api/v1/confirmations/{confirmationId}/respond` - 响应人工确认
+- `GET /api/v1/workflows/{id}/agents` - 获取工作流的智能体列表
+- `GET /api/v1/agents/{id}` - 获取智能体执行详情
 
-### 5.4 模型配置API
+**Approvals:**
+
+- `GET /api/v1/approvals/pending` - 获取待确认列表
+- `GET /api/v1/approvals/{id}` - 获取确认详情
+- `POST /api/v1/approvals/{id}` - 提交确认决策
+
+**Models:**
 
 - `GET /api/v1/models` - 获取模型配置列表
-- `POST /api/v1/models` - 添加模型配置
-- `PUT /api/v1/models/{modelId}` - 更新模型配置
-- `DELETE /api/v1/models/{modelId}` - 删除模型配置
-- `POST /api/v1/models/{modelId}/test` - 测试模型连接
+- `POST /api/v1/models` - 创建模型配置（需superuser）
+- `PATCH /api/v1/models/{id}` - 更新模型配置
 
-### 5.5 认证API
+**System:**
 
-- `POST /api/v1/auth/login` - 用户登录
-- `POST /api/v1/auth/refresh` - 刷新Token
+- `GET /health` - 健康检查
+- `GET /metrics` - Prometheus指标
 
-### 5.6 健康检查
+### 认证方式
 
-- `GET /api/v1/health` - 服务健康状态
+所有需要认证的端点使用Bearer Token（JWT）：
 
----
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-## 6. Components
+### 限流规则
 
-### 6.1 核心组件列表
+- 登录端点：5次/分钟
+- 工作流创建：10次/分钟
+- 查询端点：100次/分钟
 
-**LangGraph Workflow Engine（工作流引擎）**
+### 错误响应格式
 
-- 管理八大智能体的StateGraph编排和执行
-- 处理Phase 0-4的状态转换
-- 实现Human-in-Loop的interrupt/resume机制
-- 依赖：LangGraph SDK、ModelAdapterService、DatabaseService
-
-**LangServe API Gateway（API网关）**
-
-- 自动生成RESTful API端点
-- 提供SSE流式传输支持
-- 集成OpenAPI文档和Playground UI
-- 依赖：FastAPI、WorkflowEngine、AuthMiddleware
-
-**Model Adapter Service（模型适配器）**
-
-- 统一的模型调用接口
-- 支持Qwen、GLM、DeepSeek的本地和云端API
-- 实现模型热切换和降级策略
-- 提供重试、超时、限流等容错机制
-
-**Agent Node Implementations（智能体节点）**
-
-- 实现八大智能体的具体逻辑
-- 处理智能体的输入输出转换
-- 集成Prompt模板和知识库引用
-
-**Database Service（数据库服务）**
-
-- 管理PostgreSQL和Redis的连接和操作
-- 提供Repository模式的数据访问接口
-- 实现LangGraph Checkpoint的PostgreSQL后端
-
-**Frontend Vue Application（前端应用）**
-
-- 工作流监控的用户界面
-- 实时展示智能体执行状态和输出
-- 处理人工确认交互
-- 管理用户认证和会话
-
-**SSE Client Service（SSE客户端）**
-
-- 建立和维护SSE长连接
-- 解析SSE事件流
-- 实现自动重连和心跳检测
-
-**Human Confirmation Component（人工确认组件）**
-
-- 展示待确认的上下文信息
-- 处理用户决策输入
-- 提供直观的决策界面
+```typescript
+interface ApiError {
+  error: {
+    code: string;
+    message: string;
+    details?: Record<string, any>;
+    timestamp: string;
+    request_id: string;
+  };
+}
+```
 
 ---
 
-## 7. External APIs
+## Components
 
-### 7.1 国产大模型API
+系统被划分为以下主要逻辑组件，遵循单一职责原则和低耦合高内聚原则。
 
-**Qwen（通义千问）API**
+### 后端组件
 
-- Base URL: `https://dashscope.aliyuncs.com/api/v1` (云端) 或 `http://localhost:8000/v1` (本地)
-- 认证: API Key
-- 关键端点: `POST /chat/completions`
+#### API Gateway Component
 
-**GLM（智谱AI）API**
+**Responsibility:** 提供统一的HTTP API入口，处理请求路由、认证授权、限流和错误处理
 
-- Base URL: `https://open.bigmodel.cn/api/paas/v4` (云端) 或 `http://localhost:8001/v1` (本地)
-- 认证: API Key
-- 关键端点: `POST /chat/completions`
+**实现位置**: `backend/app/api/v1/`
 
-**DeepSeek API**
+**Technology Stack:**
 
-- Base URL: `https://api.deepseek.com/v1` (云端) 或 `http://localhost:8002/v1` (本地)
-- 认证: API Key
-- 关键端点: `POST /chat/completions`
-
-### 7.2 GitHub API（Phase 2.5）
-
-- Base URL: `https://api.github.com`
-- 认证: Personal Access Token
-- 用途: 代码生成后的仓库操作
+- FastAPI 0.115.12
+- Pydantic 2.11
+- slowapi 0.1.9
+- uvicorn 0.34
 
 ---
 
-## 8. Core Workflows
+#### LangGraph Workflow Engine
 
-### 8.1 完整APS工作流执行（含Human-in-Loop）
+**Responsibility:** 编排BMAD八大智能体工作流，管理StateGraph状态流转和checkpoint持久化
+
+**Key Interfaces:**
+
+- `create_workflow(input_data)` - 创建新工作流
+- `resume_workflow(thread_id, user_input)` - 恢复暂停的工作流
+- `interrupt_workflow(thread_id, approval_point)` - 暂停工作流等待人工确认
+
+**实现位置**: `backend/app/core/langgraph/`
+
+**Technology Stack:**
+
+- LangGraph 0.4.1
+- langgraph-checkpoint-postgres 2.0.19
+- langchain-core 0.3.58
+
+---
+
+#### Model Adapter Service
+
+**Responsibility:** 提供统一的国产大模型调用接口，支持Qwen、GLM、DeepSeek等模型的热切换
+
+**实现位置**: `backend/model_adapters/`（待Story 1.4实现）
+
+---
+
+#### Database Service
+
+**Responsibility:** 管理数据库连接、事务和ORM操作
+
+**实现位置**: `backend/app/services/database.py`
+
+**Technology Stack:**
+
+- SQLModel 0.0.24
+- psycopg2-binary 2.9.10
+
+---
+
+#### Logging & Monitoring Service
+
+**Responsibility:** 结构化日志记录、Prometheus指标导出、Langfuse LLM追踪
+
+**实现位置**:
+
+- `backend/app/core/logging.py`
+- `backend/app/core/metrics.py`
+- `backend/app/core/middleware.py`
+
+**Technology Stack:**
+
+- structlog 25.2.0
+- langfuse 3.0.3
+- prometheus-client 0.19.0
+
+---
+
+### 前端组件
+
+#### Application Shell
+
+**Responsibility:** 应用主框架，包含顶部导航、侧边栏、底部栏和路由出口
+
+**实现位置**: `frontend/web/src/layouts/`
+
+**Technology Stack:**
+
+- Vue 3.5 Composition API
+- Ant Design Vue 4.2
+
+---
+
+#### Page Views
+
+**Responsibility:** 各功能页面的顶层视图组件
+
+**实现位置**: `frontend/web/src/views/`
+
+- `Dashboard.vue` - 工作流概览仪表盘
+- `WorkflowMonitor.vue` - 实时工作流监控
+- `Settings.vue` - 用户设置和模型配置
+
+---
+
+#### API Service Layer
+
+**Responsibility:** 封装所有HTTP API调用，提供类型安全的接口
+
+**实现位置**: `frontend/web/src/services/`
+
+**Technology Stack:**
+
+- Axios 1.13.2
+- TypeScript 5.9
+
+---
+
+#### State Management Stores
+
+**Responsibility:** 管理全局应用状态
+
+**实现位置**: `frontend/web/src/stores/`
+
+- `user.ts` - 用户登录状态、Token、权限
+- `app.ts` - 全局UI状态（侧边栏折叠、主题等）
+
+**Technology Stack:**
+
+- Pinia 2.3.1
+
+---
+
+### Component Interaction Diagram
+
+```mermaid
+graph TB
+    subgraph "Frontend"
+        FE[Vue 3 App] --> Router[Vue Router]
+        FE --> Store[Pinia Store]
+        FE --> API[API Service]
+    end
+
+    subgraph "Backend"
+        Gateway[API Gateway] --> Auth[Auth Service]
+        Gateway --> Workflow[LangGraph Engine]
+        Workflow --> Model[Model Adapter]
+        Workflow --> DB[Database]
+    end
+
+    API -->|REST| Gateway
+    Model --> LLM[国产大模型]
+    DB --> PG[(PostgreSQL)]
+    DB --> RD[(Redis)]
+```
+
+---
+
+## Core Workflows
+
+### 工作流1: 用户登录和Token获取
 
 ```mermaid
 sequenceDiagram
-    participant User as 用户
-    participant Frontend as Vue前端
-    participant API as LangServe API
-    participant WF as WorkflowEngine
-    participant Orch as Orchestrator
-    participant Algo as Algorithm
-    participant Code as Code Implementation
+    participant U as 用户浏览器
+    participant FE as Vue Frontend
+    participant API as FastAPI Gateway
+    participant Auth as Auth Service
     participant DB as PostgreSQL
-    participant Model as 国产模型
 
-    User->>Frontend: 提交问题描述
-    Frontend->>API: POST /workflows
-    API->>DB: 创建WorkflowExecution
-    API->>WF: 启动工作流
-
-    Note over WF: Phase 0: 问题理解
-    WF->>Orch: 执行Orchestrator
-    Orch->>Model: 调用Qwen模型
-    Model-->>Orch: 返回算法推荐
-    Orch->>DB: 保存AgentExecution
-
-    Note over WF: Phase 1: 人工确认触发点
-    WF->>DB: 创建HumanConfirmation(P1)
-    WF->>DB: 保存Checkpoint
-    WF-->>API: interrupt(等待人工确认)
-    API-->>Frontend: SSE事件: workflow_paused
-
-    Frontend->>User: 显示确认界面
-    User->>Frontend: 批准算法推荐
-    Frontend->>API: POST /confirmations/{id}/respond
-    API->>WF: resume(decision)
-
-    Note over WF: Phase 2: 约束和目标分析
-    WF->>Algo: 执行Algorithm
-    Algo->>Model: 调用模型
-    Model-->>Algo: 返回分析结果
-
-    Note over WF: Phase 2.5: 代码实现
-    WF->>Code: 执行Code Implementation
-    Code->>Model: 调用模型生成代码
-    Model-->>Code: 返回代码
-    Code->>DB: 保存代码输出
-
-    Note over WF: 工作流完成
-    WF->>DB: 更新status=completed
-    WF-->>API: 返回最终结果
-    API-->>Frontend: SSE事件: workflow_complete
-    Frontend->>User: 展示完整结果
+    U->>FE: 输入邮箱和密码
+    FE->>API: POST /api/v1/auth/login
+    API->>Auth: authenticate_user(email, password)
+    Auth->>DB: 查询用户
+    DB-->>Auth: 返回用户数据
+    Auth->>Auth: 验证密码(bcrypt)
+    Auth->>Auth: 生成JWT Token
+    Auth-->>API: 返回Token
+    API-->>FE: 200 OK + Token
+    FE->>FE: 保存Token到localStorage
+    FE->>FE: 更新Pinia userStore
+    FE-->>U: 跳转到Dashboard
 ```
 
 ---
 
-## 9. Database Schema
+### 工作流2: 创建和执行BMAD工作流（含HITL）
 
-### 9.1 PostgreSQL表结构
+```mermaid
+sequenceDiagram
+    participant U as 用户
+    participant FE as Vue Frontend
+    participant API as FastAPI Gateway
+    participant LG as LangGraph Engine
+    participant MA as Model Adapter
+    participant LLM as 国产大模型
+    participant DB as PostgreSQL
+
+    U->>FE: 输入问题描述
+    FE->>API: POST /api/v1/workflows
+    API->>LG: create_workflow(input_data)
+    LG->>DB: 创建WorkflowExecution记录
+
+    loop Phase 0-4
+        LG->>MA: 调用智能体
+        MA->>LLM: API请求
+        LLM-->>MA: 返回响应
+        MA-->>LG: 智能体输出
+        LG->>DB: 保存checkpoint
+    end
+
+    Note over LG: P1确认点
+    LG->>DB: 创建HumanApproval记录
+    LG-->>API: 返回status=paused
+    API-->>FE: 工作流已暂停
+    FE-->>U: 显示算法推荐，等待确认
+
+    U->>FE: 批准算法
+    FE->>API: POST /api/v1/approvals/{id}
+    API->>LG: resume_workflow(thread_id)
+    LG->>DB: 加载checkpoint
+
+    loop 继续执行
+        LG->>MA: 调用智能体
+    end
+
+    LG-->>API: 返回最终结果
+    API-->>FE: 工作流完成
+    FE-->>U: 显示生成的代码
+```
+
+---
+
+## Database Schema
 
 ```sql
--- workflows表
-CREATE TABLE workflows (
+-- 用户表
+CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id VARCHAR(255) NOT NULL,
-    status VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'running', 'paused', 'completed', 'failed')),
-    current_phase VARCHAR(10) CHECK (current_phase IN ('P0', 'P1', 'P2', 'P2.5', 'P3', 'P4')),
-    config JSONB NOT NULL,
-    checkpoint_id VARCHAR(255),
-    human_confirmation_required BOOLEAN DEFAULT false,
-    started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    completed_at TIMESTAMP WITH TIME ZONE,
-    error JSONB,
-    metadata JSONB DEFAULT '{}',
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    email VARCHAR(255) UNIQUE NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    hashed_password VARCHAR(255) NOT NULL,
+    is_active BOOLEAN DEFAULT TRUE,
+    is_superuser BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT NOW(),
+    last_login TIMESTAMP,
+    INDEX idx_email (email)
 );
 
-CREATE INDEX idx_workflows_user_id ON workflows(user_id);
-CREATE INDEX idx_workflows_status ON workflows(status);
-CREATE INDEX idx_workflows_started_at ON workflows(started_at DESC);
+-- 工作流执行表
+CREATE TABLE workflow_executions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    thread_id VARCHAR(255) UNIQUE NOT NULL,
+    status VARCHAR(20) NOT NULL,
+    current_phase VARCHAR(10) NOT NULL,
+    input_data JSONB NOT NULL,
+    output_data JSONB,
+    started_at TIMESTAMP DEFAULT NOW(),
+    completed_at TIMESTAMP,
+    error_message TEXT,
+    total_tokens INTEGER DEFAULT 0,
+    total_cost DECIMAL(10, 4) DEFAULT 0.0,
+    INDEX idx_user_id (user_id),
+    INDEX idx_status (status)
+);
 
--- agent_executions表
+-- 智能体执行表
 CREATE TABLE agent_executions (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    workflow_id UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
-    agent_type VARCHAR(50) NOT NULL CHECK (agent_type IN (
-        'orchestrator', 'algorithm', 'constraint', 'objective',
-        'domain', 'code_implementation', 'extension', 'quality'
-    )),
-    status VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'running', 'completed', 'failed', 'skipped')),
-    input JSONB NOT NULL,
-    output JSONB,
-    started_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    completed_at TIMESTAMP WITH TIME ZONE,
-    duration NUMERIC(10, 2),
-    token_usage JSONB,
-    error JSONB,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+    workflow_id UUID NOT NULL REFERENCES workflow_executions(id) ON DELETE CASCADE,
+    agent_name VARCHAR(50) NOT NULL,
+    input_data JSONB NOT NULL,
+    output_data JSONB,
+    started_at TIMESTAMP DEFAULT NOW(),
+    completed_at TIMESTAMP,
+    duration_ms INTEGER,
+    token_count INTEGER DEFAULT 0,
+    model_used VARCHAR(100),
+    status VARCHAR(20) NOT NULL,
+    error_message TEXT,
+    INDEX idx_workflow_id (workflow_id)
 );
 
-CREATE INDEX idx_agent_executions_workflow_id ON agent_executions(workflow_id);
-CREATE INDEX idx_agent_executions_agent_type ON agent_executions(agent_type);
-
--- agent_messages表
-CREATE TABLE agent_messages (
+-- 人工确认表
+CREATE TABLE human_approvals (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    agent_execution_id UUID NOT NULL REFERENCES agent_executions(id) ON DELETE CASCADE,
-    workflow_id UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
-    type VARCHAR(50) NOT NULL CHECK (type IN ('text', 'thought', 'result', 'error', 'system')),
-    content TEXT NOT NULL,
-    sequence INTEGER NOT NULL,
-    timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    metadata JSONB DEFAULT '{}'
+    workflow_id UUID NOT NULL REFERENCES workflow_executions(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(id),
+    approval_point VARCHAR(10) NOT NULL,
+    context_data JSONB NOT NULL,
+    decision VARCHAR(20),
+    feedback TEXT,
+    modified_data JSONB,
+    created_at TIMESTAMP DEFAULT NOW(),
+    decided_at TIMESTAMP,
+    INDEX idx_workflow_id (workflow_id)
 );
 
-CREATE INDEX idx_agent_messages_agent_execution_id ON agent_messages(agent_execution_id);
-CREATE INDEX idx_agent_messages_workflow_id ON agent_messages(workflow_id);
-
--- human_confirmations表
-CREATE TABLE human_confirmations (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    workflow_id UUID NOT NULL REFERENCES workflows(id) ON DELETE CASCADE,
-    trigger_point VARCHAR(10) NOT NULL CHECK (trigger_point IN ('P1', 'P2', 'P2.5')),
-    status VARCHAR(50) NOT NULL CHECK (status IN ('pending', 'approved', 'rejected', 'modified', 'timeout')),
-    context JSONB NOT NULL,
-    decision JSONB,
-    requested_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    responded_at TIMESTAMP WITH TIME ZONE,
-    timeout INTEGER NOT NULL DEFAULT 3600,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX idx_human_confirmations_workflow_id ON human_confirmations(workflow_id);
-CREATE INDEX idx_human_confirmations_status ON human_confirmations(status);
-
--- model_configs表
+-- 模型配置表
 CREATE TABLE model_configs (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    provider VARCHAR(50) NOT NULL CHECK (provider IN ('qwen', 'glm', 'deepseek')),
-    model_name VARCHAR(255) NOT NULL,
-    deployment_type VARCHAR(50) NOT NULL CHECK (deployment_type IN ('local_vllm', 'local_ollama', 'cloud_api')),
-    endpoint TEXT NOT NULL,
-    api_key TEXT,
-    enabled BOOLEAN DEFAULT true,
-    priority INTEGER NOT NULL DEFAULT 0,
-    config JSONB NOT NULL DEFAULT '{}',
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
-    UNIQUE(provider, model_name)
+    name VARCHAR(100) UNIQUE NOT NULL,
+    provider VARCHAR(20) NOT NULL,
+    api_base_url VARCHAR(500) NOT NULL,
+    api_key VARCHAR(500) NOT NULL,
+    model_version VARCHAR(100) NOT NULL,
+    max_tokens INTEGER DEFAULT 4096,
+    temperature DECIMAL(3, 2) DEFAULT 0.7,
+    is_active BOOLEAN DEFAULT TRUE,
+    priority INTEGER DEFAULT 10
 );
-
-CREATE INDEX idx_model_configs_enabled ON model_configs(enabled);
-CREATE INDEX idx_model_configs_priority ON model_configs(priority DESC);
 ```
 
 ---
 
-## 10. Unified Project Structure
+## Unified Project Structure
 
 ```
 BMAD-METHOD/
-├── .github/workflows/          # CI/CD
-├── backend/                    # 后端（Python）
-│   ├── langgraph_service/      # 工作流服务
-│   │   ├── main.py
-│   │   ├── workflow_engine.py
-│   │   ├── api_gateway.py
-│   │   ├── middleware/
-│   │   ├── agents/             # 八大智能体
-│   │   └── services/
-│   ├── model_adapters/         # 模型适配器
-│   ├── shared/                 # 后端共享
-│   │   ├── database/
-│   │   └── utils/
-│   └── tests/
-├── frontend/web/               # 前端（Vue）
+├── backend/                          # FastAPI + LangGraph后端
+│   ├── app/
+│   │   ├── api/v1/                  # API路由
+│   │   ├── core/                    # 核心模块
+│   │   │   ├── config.py
+│   │   │   ├── langgraph/          # LangGraph工作流
+│   │   │   ├── logging.py
+│   │   │   └── metrics.py
+│   │   ├── models/                  # SQLModel数据模型
+│   │   ├── schemas/                 # Pydantic Schema
+│   │   ├── services/                # 业务服务层
+│   │   └── main.py                  # 应用入口
+│   ├── model_adapters/              # 国产模型适配器
+│   ├── tests/                       # 后端测试
+│   ├── docker-compose.yml
+│   ├── Dockerfile
+│   ├── pyproject.toml
+│   └── README.md
+├── frontend/web/                    # Vue 3前端
 │   ├── src/
-│   │   ├── components/
-│   │   ├── views/
-│   │   ├── composables/
-│   │   ├── stores/             # Pinia
-│   │   ├── router/
-│   │   ├── services/
+│   │   ├── components/              # UI组件
+│   │   ├── layouts/                 # 布局组件
+│   │   ├── router/                  # Vue Router
+│   │   ├── services/                # API服务层
+│   │   ├── stores/                  # Pinia状态管理
+│   │   ├── views/                   # 页面视图
 │   │   └── main.ts
-│   ├── tests/
-│   └── package.json
-├── shared/types/               # 共享类型定义
-├── docker/                     # Docker配置
-├── docs/                       # 文档
-└── scripts/                    # 脚本
+│   ├── package.json
+│   ├── vite.config.ts
+│   └── README.md
+├── docs/                            # 项目文档
+│   ├── architecture.md              # 本架构文档
+│   ├── langgraph集成方案.md         # PRD v1.2
+│   └── stories/                     # 用户故事
+└── README.md
 ```
 
 ---
 
-## 11. Development Workflow
+## Development Workflow
 
-### 11.1 环境搭建
+### Prerequisites
 
 ```bash
-# 1. Python环境（conda）
-conda create -n bmad-langgraph python=3.11
-conda activate bmad-langgraph
-
-# 2. 安装依赖
-cd backend
-pip install -r requirements.txt
-
-cd ../frontend/web
-npm install
-
-# 3. 启动数据库
-cd ../../docker
-docker-compose -f docker-compose.dev.yml up -d postgres redis
-
-# 4. 配置环境变量
-cp ../.env.example .env
-# 编辑.env配置数据库和API密钥
+- Docker 24+ 和 Docker Compose 2+
+- Python 3.13.2 (通过conda管理)
+- Node.js 20+ (通过nvm管理)
+- uv (Python包管理器)
 ```
 
-### 11.2 开发命令
+### Initial Setup
 
 ```bash
-# 启动后端
-cd backend
-uvicorn langgraph_service.main:app --reload --port 8000
+# 1. 克隆仓库
+git clone <repository-url>
+cd BMAD-METHOD
 
-# 启动前端
+# 2. 后端设置
+cd backend
+conda activate bmad-langgraph
+uv sync
+cp .env.example .env
+docker-compose up -d
+
+# 3. 前端设置
+cd ../frontend/web
+source ~/.nvm/nvm.sh
+nvm use 20
+npm install
+cp .env.development .env.local
+```
+
+### Development Commands
+
+```bash
+# 启动后端 (终端1)
+cd backend
+.venv/bin/uvicorn app.main:app --reload --port 8000
+
+# 启动前端 (终端2)
 cd frontend/web
 npm run dev
 
@@ -988,222 +982,115 @@ cd frontend/web && npm run test
 
 ---
 
-## 12. Deployment Architecture
+## Security and Performance
 
-### 12.1 部署环境
+**Frontend Security:**
 
-| 环境        | 前端URL                          | 后端URL                              | 用途     |
-| ----------- | -------------------------------- | ------------------------------------ | -------- |
-| Development | http://localhost:5173            | http://localhost:8000                | 本地开发 |
-| Staging     | https://staging.bmad.example.com | https://staging-api.bmad.example.com | 预生产   |
-| Production  | https://bmad.example.com         | https://api.bmad.example.com         | 生产     |
+- XSS Prevention: Vue 3自动转义
+- Token存储: localStorage
+- HTTPS强制: 生产环境
 
-### 12.2 Docker Compose部署
+**Backend Security:**
 
-```yaml
-# docker/docker-compose.prod.yml
-version: '3.8'
-services:
-  postgres:
-    image: postgres:16-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
+- Input Validation: Pydantic自动验证
+- Rate Limiting: 5-100次/分钟
+- CORS: 仅允许前端域名
 
-  redis:
-    image: redis:7-alpine
-    volumes:
-      - redis_data:/data
+**Performance Targets:**
 
-  backend:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.backend
-    environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      - postgres
-      - redis
-
-  frontend:
-    build:
-      context: ..
-      dockerfile: docker/Dockerfile.frontend
-
-  nginx:
-    image: nginx:alpine
-    ports:
-      - '80:80'
-      - '443:443'
-    volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - backend
-      - frontend
-
-volumes:
-  postgres_data:
-  redis_data:
-```
+- Frontend Bundle: < 500KB (gzipped)
+- API Response: < 2秒（非LLM）
+- Database Query: < 100ms
 
 ---
 
-## 13. Security and Performance
+## Testing Strategy
 
-### 13.1 安全要求
+**Frontend:**
 
-**前端安全**:
+- Unit: Vitest
+- E2E: Playwright (Phase 2)
 
-- CSP Headers配置
-- XSS防护（Vue自动转义）
-- JWT存储在httpOnly cookie
+**Backend:**
 
-**后端安全**:
-
-- Pydantic输入验证
-- SQL参数化查询
-- API限流（10/minute）
-- CORS策略配置
-
-**认证安全**:
-
-- JWT Token（24小时过期）
-- Refresh Token（7天）
-
-### 13.2 性能优化
-
-**前端**:
-
-- Bundle大小 < 500KB (gzipped)
-- 路由懒加载
-- API响应缓存（Redis，5分钟）
-
-**后端**:
-
-- API响应 < 2秒
-- 模型调用 < 10秒
-- 数据库连接池（5-20）
-- Redis缓存热点数据
+- Unit: pytest
+- Integration: FastAPI TestClient
+- E2E: 登录 → 创建工作流 → HITL确认
 
 ---
 
-## 14. Testing Strategy
+## Coding Standards
 
-### 14.1 测试金字塔
+**Critical Rules:**
 
-```
-        E2E (5%)
-       /        \
-  Integration (25%)
-     /            \
-Frontend Unit  Backend Unit
-  (35%)          (35%)
-```
+- Type Sharing: TypeScript类型通过OpenAPI生成
+- API Calls: 必须通过service层，禁止直接axios
+- State Updates: 使用Pinia actions，禁止直接修改state
 
-### 14.2 测试覆盖率目标
+**Naming Conventions:**
 
-- 后端单元测试: >80%
-- 前端组件测试: >70%
-- 集成测试: 关键路径100%
-- E2E测试: 核心用户流程
+| Element    | Frontend   | Backend    |
+| ---------- | ---------- | ---------- |
+| Components | PascalCase | -          |
+| Functions  | camelCase  | snake_case |
+| API Routes | -          | kebab-case |
+| Tables     | -          | snake_case |
 
 ---
 
-## 15. Coding Standards
+## Error Handling
 
-### 15.1 关键规则
-
-1. **类型共享**: 始终在`shared/types/`定义类型
-2. **API调用**: 前端必须通过service层
-3. **环境变量**: 通过config对象访问
-4. **错误处理**: 使用标准错误处理器
-5. **状态管理**: 使用Pinia actions修改state
-
-### 15.2 命名约定
-
-| 元素        | 前端                 | 后端       | 示例                  |
-| ----------- | -------------------- | ---------- | --------------------- |
-| 组件        | PascalCase           | -          | `WorkflowMonitor.vue` |
-| Composables | camelCase with 'use' | -          | `useWorkflow.ts`      |
-| API路由     | -                    | kebab-case | `/api/user-profile`   |
-| 数据库表    | -                    | snake_case | `agent_executions`    |
-
----
-
-## 16. Error Handling Strategy
-
-### 16.1 统一错误格式
+**Error Format:**
 
 ```typescript
 interface ApiError {
   error: {
     code: string;
     message: string;
-    details?: Record<string, any>;
+    details?: any;
     timestamp: string;
-    requestId: string;
+    request_id: string;
   };
 }
 ```
 
-### 16.2 错误处理流程
-
-1. 后端抛出BMadException
-2. 中间件捕获并格式化
-3. 返回统一JSON错误响应
-4. 前端拦截器显示用户友好消息
-5. structlog记录详细错误日志
+**Frontend:** Axios拦截器统一处理
+**Backend:** FastAPI全局异常处理
 
 ---
 
-## 17. Monitoring and Observability
+## Monitoring
 
-### 17.1 监控栈
+**Stack:**
 
-- **前端**: Console + Performance API
-- **后端**: Prometheus + Grafana (Phase 2)
-- **错误追踪**: structlog
-- **性能监控**: LangSmith (可选)
+- Frontend: Vite性能监控
+- Backend: Prometheus + Grafana
+- LLM Tracing: Langfuse
+- Logging: structlog
 
-### 17.2 关键指标
-
-**前端**:
+**Key Metrics:**
 
 - Core Web Vitals
-- JavaScript错误率
 - API响应时间
-
-**后端**:
-
-- 请求速率 (RPM)
-- 错误率 (%)
-- 响应时间 (P50, P95, P99)
-- 模型调用延迟
+- LLM token消耗
+- 错误率
 
 ---
 
 ## 附录
 
-### A. 参考文档
+### 相关文档
 
-- [LangGraph 1.0 Documentation](https://langchain-ai.github.io/langgraph/)
-- [LangServe Documentation](https://python.langchain.com/docs/langserve)
-- [Vue 3 Documentation](https://vuejs.org/)
-- [Ant Design Vue Documentation](https://antdv.com/)
-- [FastAPI Documentation](https://fastapi.tiangolo.com/)
+- PRD: `docs/langgraph集成方案.md` (v1.2)
+- User Stories: `docs/stories/`
+- Quick Start: `backend/README.md`, `frontend/web/README.md`
 
-### B. 联系方式
+### 联系方式
 
-- **架构师**: Winston
-- **产品经理**: John
-- **项目仓库**: https://github.com/QQhuxuhui/BMAD-METHOD
+- 架构师: Winston (Architect)
+- 项目仓库: BMAD-METHOD
+- 文档更新: 2025-11-05
 
 ---
 
-**文档版本**: v1.0  
-**最后更新**: 2025-11-04  
-**状态**: ✅ 已完成，准备实施
+**文档结束**

@@ -18,11 +18,7 @@
   - **🚨 强制要求：所有Node.js版本相关操作必须通过nvm进行，包括版本检查、切换、安装**
   - 常用命令：`nvm list`、`nvm use <version>`、`nvm install <version>`
   - 在使用nvm命令之前，需要执行一下source命令，使环境变量生效：`source ~/.nvm/nvm.sh`
-- **anaconda**: python的版本管理工具
-  - 功能：Python环境和包管理，支持虚拟环境
-  - 用途：Python版本管理、依赖包隔离、数据科学工具集成
-  - **🚨 强制要求：所有Python环境操作必须通过conda进行，包括环境创建、激活、包安装**
-  - 常用命令：`conda env list`、`conda activate <env>`、`conda install <package>`
+- **uv**: python的虚拟环境管理工具
 - **docker**: 容器技术
   - 功能：应用容器化部署和运行
   - 用途：环境一致性、微服务部署、开发环境隔离
