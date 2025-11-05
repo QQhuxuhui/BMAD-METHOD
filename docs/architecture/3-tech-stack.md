@@ -6,9 +6,9 @@
 | ---------------- | -------------------- | -------- | -------------------------- | ------------------------------------------------------- |
 | **后端语言**     | Python               | 3.11+    | 后端智能体服务开发         | LangGraph CLI硬性要求3.11+；支持最新类型注解和性能优化  |
 | **后端框架**     | FastAPI              | 0.115.0+ | RESTful API和LangServe集成 | 原生async支持；自动OpenAPI文档生成；与LangServe无缝集成 |
-| **智能体编排**   | LangGraph            | 1.0.2    | 智能体工作流StateGraph编排 | 稳定版本；内置持久化和Human-in-Loop；生产级特性完整     |
-| **智能体工具**   | LangChain Core       | 0.2.38+  | 智能体工具链和提示管理     | LangGraph 1.0核心依赖；提供agent创建工具                |
-| **智能体SDK**    | LangGraph SDK        | 1.0.0+   | LangGraph客户端和工具      | 官方SDK；支持远程调用和监控                             |
+| **智能体编排**   | LangGraph            | 0.6.4    | 智能体工作流StateGraph编排 | 当前版本；计划Story 1.3.5升级到1.0.2获得新特性          |
+| **智能体工具**   | LangChain Core       | 0.2.38+  | 智能体工具链和提示管理     | LangGraph核心依赖；提供agent创建工具                    |
+| **智能体SDK**    | LangGraph SDK        | 0.2.0+   | LangGraph客户端和工具      | 官方SDK；支持远程调用和监控                             |
 | **Checkpoint**   | LangGraph Checkpoint | 2.0.23+  | 工作流状态持久化           | 内置checkpoint机制；自动状态保存和恢复                  |
 | **API服务**      | LangServe            | 0.3.0+   | 自动API端点生成            | 一行代码生成/invoke、/stream等端点；SSE流式传输支持     |
 | **HTTP服务器**   | Uvicorn              | 0.26.0+  | ASGI服务器                 | 高性能async服务器；FastAPI官方推荐                      |
