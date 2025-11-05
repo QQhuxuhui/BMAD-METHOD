@@ -439,8 +439,8 @@ from langchain.agents import create_openai_tools_agent, AgentExecutor
 
 **验收标准**：
 
-1. 创建完整的Python 3.11+虚拟环境配置
-2. 安装LangGraph 1.0.2及所有依赖包（包括langchain-agents替代prebuilt）
+1. 创建完整的Python 3.13+虚拟环境配置（最低3.11+，向下兼容Story 1.2模板要求）
+2. 安装LangGraph 0.6.4及核心依赖包，为Story 1.2 production-ready模板奠定基础
 3. 配置PostgreSQL和Redis的Docker Compose开发环境
 4. 验证LangGraph 1.0基础功能正常工作
 5. 提供环境验证脚本和文档
