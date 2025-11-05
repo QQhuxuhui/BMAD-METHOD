@@ -5,8 +5,8 @@ import json
 from unittest.mock import AsyncMock, MagicMock, patch, mock_open
 from langchain_core.messages import AIMessage
 
-from backend.app.core.langgraph.agents.orchestrator import orchestrator_node
-from backend.app.core.langgraph.state import WorkflowState, create_initial_state
+from app.core.langgraph.agents.orchestrator import orchestrator_node
+from app.core.langgraph.state import WorkflowState, create_initial_state
 
 
 @pytest.fixture
@@ -76,7 +76,16 @@ def sample_llm_response():
             "estimated_time": "2-3 weeks"
         }
     }
-    return AIMessage(content=json.dumps(response_data))
+    response = AIMessage(content=json.dumps(response_data))
+    # Add token usage metadata
+    response.response_metadata = {
+        'usage': {
+            'prompt_tokens': 200,
+            'completion_tokens': 150,
+            'total_tokens': 350
+        }
+    }
+    return response
 
 
 @pytest.mark.asyncio
@@ -87,21 +96,12 @@ async def test_orchestrator_node_success(
     mock_model_adapter
 ):
     """Test successful orchestrator node execution."""
-    # Mock the file read for prompt
-    mock_prompt = "You are an Orchestrator Agent..."
-
-    # Mock LangChain components
-    mock_chain = AsyncMock()
-    mock_chain.ainvoke.return_value = sample_llm_response
-
-    with patch('backend.app.core.langgraph.agents.orchestrator.ModelFactory.get_instance', return_value=mock_factory), \
-         patch('backend.app.core.langgraph.agents.orchestrator.open', mock_open(read_data=mock_prompt)), \
-         patch('backend.app.core.langgraph.agents.orchestrator.ChatPromptTemplate') as mock_prompt_template:
-
-        # Configure mock prompt template
-        mock_prompt_instance = MagicMock()
-        mock_prompt_template.from_messages.return_value = mock_prompt_instance
-        mock_prompt_instance.__or__ = lambda self, other: mock_chain
+    # Mock the retry wrapper to directly return response
+    with patch('app.core.langgraph.agents.orchestrator._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm, \
+         patch('app.core.langgraph.agents.orchestrator.ModelFactory.get_instance',
+               return_value=mock_factory):
+        mock_llm.return_value = sample_llm_response
 
         # Execute node
         result = await orchestrator_node(sample_state)
@@ -118,35 +118,28 @@ async def test_orchestrator_node_success(
         assert "workflow_plan" in output
         assert "task_assignments" in output
 
-        # Verify metrics
+        # Verify metrics (should use token metadata)
         assert "total_tokens" in result
-        assert result["total_tokens"] > 0
+        assert result["total_tokens"] == 350  # From metadata
         assert "total_cost" in result
         assert result["total_cost"] > 0.0
 
+        # Verify LLM was called
+        assert mock_llm.called
+
 
 @pytest.mark.asyncio
-async def test_orchestrator_node_json_parse_error(
-    sample_state,
-    mock_factory,
-    mock_model_adapter
-):
+async def test_orchestrator_node_json_parse_error(sample_state, mock_factory):
     """Test orchestrator handling of invalid JSON response."""
     # Mock invalid JSON response
     invalid_response = AIMessage(content="This is not valid JSON")
+    invalid_response.response_metadata = {'usage': {'total_tokens': 100}}
 
-    mock_chain = AsyncMock()
-    mock_chain.ainvoke.return_value = invalid_response
-
-    mock_prompt = "You are an Orchestrator Agent..."
-
-    with patch('backend.app.core.langgraph.agents.orchestrator.ModelFactory.get_instance', return_value=mock_factory), \
-         patch('backend.app.core.langgraph.agents.orchestrator.open', mock_open(read_data=mock_prompt)), \
-         patch('backend.app.core.langgraph.agents.orchestrator.ChatPromptTemplate') as mock_prompt_template:
-
-        mock_prompt_instance = MagicMock()
-        mock_prompt_template.from_messages.return_value = mock_prompt_instance
-        mock_prompt_instance.__or__ = lambda self, other: mock_chain
+    with patch('app.core.langgraph.agents.orchestrator._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm, \
+         patch('app.core.langgraph.agents.orchestrator.ModelFactory.get_instance',
+               return_value=mock_factory):
+        mock_llm.return_value = invalid_response
 
         # Execute node
         result = await orchestrator_node(sample_state)
@@ -155,17 +148,15 @@ async def test_orchestrator_node_json_parse_error(
         assert "orchestrator_output" in result
         assert "error" in result["orchestrator_output"]
         assert "raw_response" in result["orchestrator_output"]
+        assert result["orchestrator_output"]["raw_response"] == "This is not valid JSON"
 
 
 @pytest.mark.asyncio
-async def test_orchestrator_node_llm_failure(sample_state, mock_factory):
+async def test_orchestrator_node_llm_failure(sample_state):
     """Test orchestrator handling of LLM call failure."""
-    mock_factory.get_model.side_effect = Exception("LLM call failed")
-
-    mock_prompt = "You are an Orchestrator Agent..."
-
-    with patch('backend.app.core.langgraph.agents.orchestrator.ModelFactory.get_instance', return_value=mock_factory), \
-         patch('backend.app.core.langgraph.agents.orchestrator.open', mock_open(read_data=mock_prompt)):
+    with patch('app.core.langgraph.agents.orchestrator._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm:
+        mock_llm.side_effect = Exception("LLM call failed")
 
         # Execute node
         result = await orchestrator_node(sample_state)
@@ -178,22 +169,23 @@ async def test_orchestrator_node_llm_failure(sample_state, mock_factory):
 
 
 @pytest.mark.asyncio
-async def test_orchestrator_node_no_model(sample_state):
-    """Test orchestrator when no model adapter is available."""
-    mock_factory = MagicMock()
-    mock_factory.get_model.return_value = None
+async def test_orchestrator_token_extraction_fallback(sample_state, mock_factory):
+    """Test token extraction falls back to estimation when no metadata."""
+    # Response without metadata
+    response = AIMessage(content=json.dumps({"test": "data"}))
 
-    mock_prompt = "You are an Orchestrator Agent..."
-
-    with patch('backend.app.core.langgraph.agents.orchestrator.ModelFactory.get_instance', return_value=mock_factory), \
-         patch('backend.app.core.langgraph.agents.orchestrator.open', mock_open(read_data=mock_prompt)):
+    with patch('app.core.langgraph.agents.orchestrator._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm, \
+         patch('app.core.langgraph.agents.orchestrator.ModelFactory.get_instance',
+               return_value=mock_factory):
+        mock_llm.return_value = response
 
         # Execute node
         result = await orchestrator_node(sample_state)
 
-        # Should return error
-        assert "errors" in result
-        assert any("No model adapter available" in err for err in result["errors"])
+        # Should have estimated tokens (content length / 4)
+        assert "total_tokens" in result
+        assert result["total_tokens"] > 0
 
 
 def test_create_initial_state():
