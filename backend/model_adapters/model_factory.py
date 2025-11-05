@@ -16,6 +16,11 @@ from model_adapters.exceptions import ModelConfigurationError
 
 logger = structlog.get_logger(__name__)
 
+# Forward declaration for type hinting
+TYPE_CHECKING = False
+if TYPE_CHECKING:
+    from model_adapters.langchain_wrapper import LangChainModelAdapter
+
 
 class ModelRegistry:
     """模型适配器注册表
@@ -389,6 +394,55 @@ class ModelFactory:
                 results[name] = False
 
         return results
+
+    def get_langchain_model(
+        self, name: Optional[str] = None
+    ) -> "LangChainModelAdapter":
+        """获取LangChain包装的模型适配器
+
+        此方法返回一个LangChain兼容的模型实例，可直接用于LangGraph工作流。
+
+        Args:
+            name: 模型标识名称，如果不提供则返回默认模型
+
+        Returns:
+            LangChainModelAdapter: LangChain包装的模型适配器
+
+        Raises:
+            ModelConfigurationError: 如果模型不存在
+
+        Example:
+            >>> factory = ModelFactory.get_instance()
+            >>> llm = factory.get_langchain_model("qwen-default")
+            >>> # Use in LangChain chain
+            >>> chain = prompt | llm
+            >>> response = await chain.ainvoke(input_data)
+        """
+        from model_adapters.langchain_wrapper import LangChainModelAdapter
+
+        adapter = self.get_model(name)
+
+        # Create LangChain wrapper
+        return LangChainModelAdapter(
+            adapter=adapter,
+            model_name=adapter.model_name,
+            streaming=False
+        )
+
+    @classmethod
+    def get_instance(cls) -> "ModelFactory":
+        """获取全局ModelFactory单例实例 (类方法别名)
+
+        这是get_global_factory()的类方法别名，提供更常见的单例访问模式。
+
+        Returns:
+            ModelFactory: 全局工厂实例
+
+        Example:
+            >>> factory = ModelFactory.get_instance()
+            >>> llm = factory.get_langchain_model()
+        """
+        return get_global_factory()
 
 
 # 全局单例工厂实例
