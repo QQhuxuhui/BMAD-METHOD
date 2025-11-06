@@ -1,6 +1,7 @@
 """Workflow API endpoints for creating and managing BMAD workflows."""
 
 import uuid
+import json
 from typing import Optional
 
 from fastapi import (
@@ -10,6 +11,7 @@ from fastapi import (
     Query,
     BackgroundTasks,
 )
+from fastapi.responses import StreamingResponse
 from fastapi.security import HTTPBearer
 
 from app.api.v1.auth import get_current_user
@@ -343,3 +345,73 @@ async def cancel_workflow(
             status_code=500,
             detail=f"Failed to cancel workflow: {str(e)}"
         )
+
+
+@router.get("/{workflow_id}/stream")
+async def stream_workflow(
+    workflow_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+):
+    """Stream workflow execution progress via Server-Sent Events.
+
+    This endpoint provides real-time updates about workflow execution,
+    including agent outputs, phase changes, and HITL interrupts.
+
+    Args:
+        workflow_id: UUID of the workflow to stream
+        current_user: Current authenticated user
+
+    Returns:
+        StreamingResponse: SSE stream of workflow events
+
+    Raises:
+        HTTPException: If workflow not found or access denied
+    """
+    # First check if workflow exists and user has access
+    workflow = await workflow_service.get_workflow(workflow_id)
+
+    if not workflow:
+        raise HTTPException(status_code=404, detail="Workflow not found")
+
+    if workflow.user_id != current_user.id:
+        logger.warning(
+            "unauthorized_workflow_stream",
+            workflow_id=str(workflow_id),
+            user_id=current_user.id,
+            owner_id=workflow.user_id,
+        )
+        raise HTTPException(status_code=403, detail="Access denied")
+
+    # Create SSE event generator
+    async def event_generator():
+        """Generate SSE events from workflow stream."""
+        try:
+            async for event in workflow_service.stream_workflow(workflow_id):
+                # Format as SSE message
+                # SSE format: data: {json}\n\n
+                event_json = json.dumps(event)
+                yield f"data: {event_json}\n\n"
+
+        except Exception as e:
+            logger.error(
+                "workflow_stream_generator_error",
+                error=str(e),
+                workflow_id=str(workflow_id),
+            )
+            # Send error event
+            error_event = {
+                "event_type": "error",
+                "data": {"error": str(e)},
+                "timestamp": workflow.created_at.isoformat(),
+            }
+            yield f"data: {json.dumps(error_event)}\n\n"
+
+    return StreamingResponse(
+        event_generator(),
+        media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache",
+            "Connection": "keep-alive",
+            "X-Accel-Buffering": "no",  # Disable proxy buffering
+        },
+    )

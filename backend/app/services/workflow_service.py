@@ -1,8 +1,10 @@
 """Workflow service for managing BMAD workflow executions."""
 
 import uuid
+import asyncio
+import json
 from datetime import datetime, UTC
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, AsyncGenerator
 
 from fastapi import BackgroundTasks, HTTPException
 from sqlmodel import Session, select, and_
@@ -24,6 +26,7 @@ from app.models.human_approval import (
     HumanApprovalCreate,
     HumanApprovalUpdate,
 )
+from app.services.workflow_crud import agent_execution_crud, human_approval_crud
 
 
 class WorkflowService:
@@ -342,6 +345,151 @@ class WorkflowService:
             session.refresh(workflow)
 
             return workflow
+
+    async def stream_workflow(
+        self,
+        workflow_id: uuid.UUID,
+    ) -> AsyncGenerator[Dict[str, Any], None]:
+        """Stream workflow execution progress via Server-Sent Events.
+
+        This method generates a stream of events representing workflow progress,
+        including agent execution, phase changes, and HITL interrupts.
+
+        Args:
+            workflow_id: UUID of the workflow to stream
+
+        Yields:
+            Dict[str, Any]: SSE event data
+
+        Raises:
+            HTTPException: If workflow not found
+        """
+        # Verify workflow exists
+        workflow = await self.get_workflow(workflow_id)
+        if not workflow:
+            raise HTTPException(status_code=404, detail="Workflow not found")
+
+        logger.info("workflow_stream_started", workflow_id=str(workflow_id))
+
+        try:
+            # Send initial workflow status event
+            yield {
+                "event_type": "workflow_start",
+                "data": {
+                    "workflow_id": str(workflow.id),
+                    "status": workflow.status,
+                    "current_phase": workflow.current_phase,
+                },
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
+
+            # TODO: Integrate with LangGraph workflow.astream()
+            # For now, simulate streaming by polling workflow status
+            last_status = workflow.status
+            last_phase = workflow.current_phase
+            last_agent_count = 0
+
+            # Poll for updates (simulated streaming)
+            max_iterations = 300  # 5 minutes max (300 * 1 second)
+            for _ in range(max_iterations):
+                await asyncio.sleep(1)  # Poll every second
+
+                # Refresh workflow status
+                workflow = await self.get_workflow(workflow_id)
+                if not workflow:
+                    break
+
+                # Check for phase changes
+                if workflow.current_phase != last_phase:
+                    yield {
+                        "event_type": "phase_change",
+                        "phase": workflow.current_phase,
+                        "data": {
+                            "old_phase": last_phase,
+                            "new_phase": workflow.current_phase,
+                        },
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    }
+                    last_phase = workflow.current_phase
+
+                # Check for new agent executions
+                agent_executions = agent_execution_crud.list_by_workflow(workflow_id)
+                if len(agent_executions) > last_agent_count:
+                    # New agent execution detected
+                    new_execution = agent_executions[last_agent_count]
+                    yield {
+                        "event_type": "agent_output",
+                        "agent_name": new_execution.agent_name,
+                        "data": {
+                            "input_data": new_execution.input_data,
+                            "output_data": new_execution.output_data,
+                            "status": new_execution.status,
+                            "duration_ms": new_execution.duration_ms,
+                            "token_count": new_execution.token_count,
+                        },
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    }
+                    last_agent_count = len(agent_executions)
+
+                # Check for HITL interrupts
+                if workflow.status == "paused":
+                    pending_approval = human_approval_crud.get_pending_approval(workflow_id)
+                    if pending_approval:
+                        yield {
+                            "event_type": "interrupt",
+                            "data": {
+                                "approval_point": pending_approval.approval_point,
+                                "context_data": pending_approval.context_data,
+                                "approval_id": str(pending_approval.id),
+                            },
+                            "timestamp": datetime.now(UTC).isoformat(),
+                        }
+
+                # Check for status changes
+                if workflow.status != last_status:
+                    yield {
+                        "event_type": "status_change",
+                        "data": {
+                            "old_status": last_status,
+                            "new_status": workflow.status,
+                        },
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    }
+                    last_status = workflow.status
+
+                # Check for completion or failure
+                if workflow.status in ["completed", "failed", "cancelled", "rejected"]:
+                    yield {
+                        "event_type": "complete" if workflow.status == "completed" else "error",
+                        "data": {
+                            "status": workflow.status,
+                            "output_data": workflow.output_data,
+                            "error_message": workflow.error_message,
+                            "total_tokens": workflow.total_tokens,
+                            "total_cost": workflow.total_cost,
+                        },
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    }
+                    logger.info(
+                        "workflow_stream_completed",
+                        workflow_id=str(workflow_id),
+                        status=workflow.status,
+                    )
+                    break
+
+        except Exception as e:
+            logger.error(
+                "workflow_stream_error",
+                workflow_id=str(workflow_id),
+                error=str(e),
+            )
+            yield {
+                "event_type": "error",
+                "data": {
+                    "error": str(e),
+                },
+                "timestamp": datetime.now(UTC).isoformat(),
+            }
 
 
 # Create a singleton instance
