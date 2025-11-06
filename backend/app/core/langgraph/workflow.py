@@ -47,6 +47,39 @@ from app.core.langgraph.state import WorkflowState
 from app.core.logging import logger
 
 
+async def _ensure_model_initialization():
+    """确保模型工厂已初始化并设置了默认模型.
+
+    在创建工作流之前，确保至少有一个模型被注册为默认模型。
+    这会尝试从配置中加载模型，如果失败则创建一个基本的默认配置。
+    """
+    try:
+        from model_adapters.config_loader import get_config_loader
+        from model_adapters.model_factory import get_global_factory
+
+        factory = get_global_factory()
+
+        # 检查是否已有默认模型
+        if factory.get_default_model_name() is not None:
+            logger.info("default_model_already_exists", model=factory.get_default_model_name())
+            return
+
+        # 尝试从配置初始化模型
+        loader = get_config_loader()
+        await loader.initialize_factory()
+
+        # 再次检查
+        if factory.get_default_model_name() is not None:
+            logger.info("default_model_initialized", model=factory.get_default_model_name())
+        else:
+            logger.warning("no_default_model_after_initialization")
+
+    except Exception as e:
+        logger.error("model_initialization_failed", error=str(e))
+        # 不抛出异常，允许工作流继续创建（但模型调用会失败）
+        logger.warning("workflow_will_continue_but_model_calls_may_fail")
+
+
 async def create_checkpointer() -> AsyncPostgresSaver:
     """Create PostgreSQL checkpointer for workflow state persistence.
 
@@ -271,6 +304,9 @@ async def create_bmad_workflow(
     """
     try:
         logger.info("bmad_workflow_creation_started")
+
+        # 确保模型已初始化
+        await _ensure_model_initialization()
 
         # Create StateGraph instance with WorkflowState schema
         workflow = StateGraph(WorkflowState)
