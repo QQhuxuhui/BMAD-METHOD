@@ -31,8 +31,8 @@ class TestWorkflowCompilation:
             assert app is not None, "Workflow should be created successfully"
 
             # Check that all nodes are present
-            graph_dict = app.get_graph()
-            nodes = [node['id'] for node in graph_dict['nodes']]
+            graph = app.get_graph()
+            nodes = [node.id for node in graph.nodes]
 
             # Verify all 11 nodes (8 agents + 3 approvals)
             expected_nodes = [
