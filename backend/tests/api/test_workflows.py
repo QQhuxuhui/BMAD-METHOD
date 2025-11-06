@@ -69,7 +69,7 @@ class TestCreateWorkflow:
     ):
         """Test workflow creation with minimal required data."""
         minimal_data = {
-            "problem_description": "这是一个简单的优化问题，需要找到最优解决方案"  # Min 10 chars required
+            "problem_description": "这是一个简单的优化问题，需要找到最优解决方案"  # 22 chars - meets min 10 requirement
         }
 
         response = await client.post(
@@ -114,7 +114,8 @@ class TestCreateWorkflow:
                 json={"problem_description": "这是一个测试问题"}
             )
 
-        # Expect 403 (Forbidden) when no auth is provided
+        # FastAPI HTTPBearer returns 403 when no auth provided (not 401)
+        # This is FastAPI's design choice, though HTTP standard suggests 401
         assert response.status_code == 403
 
 
@@ -673,7 +674,7 @@ class TestConcurrentAccess:
         tasks = []
         for i in range(5):
             data = sample_workflow_data.copy()
-            data["problem_description"] = f"这是一个并发测试问题编号{i}"
+            data["problem_description"] = f"这是一个并发测试的优化问题，编号是{i}号"  # Min 10 chars required
             tasks.append(client.post("/api/v1/workflows/", json=data))
 
         responses = await asyncio.gather(*tasks)

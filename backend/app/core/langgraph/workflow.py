@@ -155,7 +155,7 @@ def add_all_nodes(workflow: StateGraph) -> StateGraph:
     workflow.add_node("objective", objective_expert_node)
 
     # Phase 2: Domain
-    workflow.add_node("domain", domain_expert_node)
+    workflow.add_node("domain_expert", domain_expert_node)
 
     # Phase 3: Code Implementation, Extension
     workflow.add_node("code_impl", code_impl_expert_node)
@@ -200,7 +200,7 @@ def add_all_edges(workflow: StateGraph) -> StateGraph:
     workflow.add_edge("constraint", "objective")
 
     # Phase 2 → Phase 3
-    workflow.add_edge("domain", "code_impl")
+    workflow.add_edge("domain_expert", "code_impl")
     workflow.add_edge("code_impl", "extension")
 
     # Phase 4 → END
@@ -227,7 +227,7 @@ def add_all_edges(workflow: StateGraph) -> StateGraph:
         "p1_approval",
         route_after_p1_approval,
         {
-            "approved": "domain",
+            "approved": "domain_expert",
             "rejected": "algorithm",
             "__end__": END
         }
@@ -235,7 +235,7 @@ def add_all_edges(workflow: StateGraph) -> StateGraph:
 
     # Phase 2 Domain → Phase 3 Code Implementation or P2 Conflict
     workflow.add_conditional_edges(
-        "domain",
+        "domain_expert",
         route_after_domain,
         {
             "code_impl": "code_impl",
