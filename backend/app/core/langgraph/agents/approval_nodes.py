@@ -53,16 +53,23 @@ async def p1_approval_node(state: WorkflowState) -> Dict[str, Any]:
             thread_id=state.get('thread_id')
         )
 
-        # Use LangGraph interrupt() to pause workflow
-        # This will save current state to checkpoint and wait for resume
-        approval_response = interrupt({
-            'approval_id': approval_id,
+        # Emit event for workflow_service to create HumanApproval record
+        # This ensures the approval checkpoint is persisted to database
+        updated_state = {
+            'pending_approval': True,
             'approval_point': 'P1',
+            'approval_checkpoint_id': approval_id,
+            'approval_id': approval_id,  # for compatibility with workflow_service
             'context_data': context_data,
             'workflow_id': state.get('workflow_id'),
             'user_id': state.get('user_id'),
             'timestamp': datetime.now(UTC).isoformat(),
-        })
+            'current_phase': 'P1_Approval_Pending'
+        }
+
+        # Use LangGraph interrupt() to pause workflow
+        # This will save current state to checkpoint and wait for resume
+        approval_response = interrupt(updated_state)
 
         # After resume, approval_response will contain user's decision
         # Extract decision from response
@@ -191,16 +198,23 @@ async def p25_approval_node(state: WorkflowState) -> Dict[str, Any]:
             thread_id=state.get('thread_id')
         )
 
-        # Use LangGraph interrupt() to pause workflow
-        # This will save current state to checkpoint and wait for resume
-        approval_response = interrupt({
-            'approval_id': approval_id,
+        # Emit event for workflow_service to create HumanApproval record
+        # This ensures the approval checkpoint is persisted to database
+        updated_state = {
+            'pending_approval': True,
             'approval_point': 'P2.5',
+            'approval_checkpoint_id': approval_id,
+            'approval_id': approval_id,  # for compatibility with workflow_service
             'context_data': context_data,
             'workflow_id': state.get('workflow_id'),
             'user_id': state.get('user_id'),
             'timestamp': datetime.now(UTC).isoformat(),
-        })
+            'current_phase': 'P2.5_Approval_Pending'
+        }
+
+        # Use LangGraph interrupt() to pause workflow
+        # This will save current state to checkpoint and wait for resume
+        approval_response = interrupt(updated_state)
 
         # After resume, approval_response will contain user's decision
         # Extract decision from response

@@ -11,7 +11,7 @@ from app.core.logging import logger
 from app.services.database import database_service
 from app.models.workflow_execution import WorkflowExecution
 from app.models.agent_execution import AgentExecution
-from app.models.human_approval import HumanApproval
+from app.models.human_approval import HumanApproval, HumanApprovalCreate, HumanApprovalUpdate
 
 
 class WorkflowCRUD:
@@ -370,6 +370,147 @@ class HumanApprovalCRUD:
         except SQLAlchemyError as e:
             logger.error("human_approval_update_failed", error=str(e))
             raise
+
+    def get_by_workflow(
+        self,
+        workflow_id: uuid.UUID,
+        include_pending: bool = True
+    ) -> List[HumanApproval]:
+        """Get all approvals for a workflow.
+
+        Args:
+            workflow_id: Workflow ID to search for
+            include_pending: Whether to include pending approvals
+
+        Returns:
+            List[HumanApproval]: List of approvals for the workflow
+        """
+        with Session(self.db_service.engine) as session:
+            statement = select(HumanApproval).where(
+                HumanApproval.workflow_id == workflow_id
+            )
+
+            if not include_pending:
+                statement = statement.where(HumanApproval.decision != None)
+
+            statement = statement.order_by(HumanApproval.created_at.asc())
+            return session.exec(statement).all()
+
+    def get_expired_approvals(self, timeout_hours: int = 24) -> List[HumanApproval]:
+        """Get approvals that have expired (created too long ago without decision).
+
+        Args:
+            timeout_hours: Number of hours after which approvals expire
+
+        Returns:
+            List[HumanApproval]: List of expired approvals
+        """
+        from datetime import timedelta
+
+        cutoff_time = datetime.now(UTC) - timedelta(hours=timeout_hours)
+
+        with Session(self.db_service.engine) as session:
+            statement = select(HumanApproval).where(
+                HumanApproval.created_at < cutoff_time,
+                HumanApproval.decision == None  # noqa: E711
+            )
+            return session.exec(statement).all()
+
+    def create(
+        self,
+        approval: HumanApprovalCreate,
+        session: Optional[Session] = None
+    ) -> HumanApproval:
+        """Create a new human approval from schema.
+
+        Args:
+            approval: HumanApprovalCreate schema instance
+            session: Optional existing session
+
+        Returns:
+            HumanApproval: The created approval with assigned ID
+
+        Raises:
+            SQLAlchemyError: If database operation fails
+        """
+        close_session = session is None
+        if close_session:
+            session = Session(self.db_service.engine)
+
+        try:
+            db_approval = HumanApproval(
+                workflow_id=approval.workflow_id,
+                user_id=approval.user_id,
+                approval_point=approval.approval_point,
+                context_data=approval.context_data
+            )
+
+            session.add(db_approval)
+            session.commit()
+            session.refresh(db_approval)
+
+            logger.info("human_approval_created", approval_id=str(db_approval.id))
+            return db_approval
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            logger.error("human_approval_creation_failed", error=str(e))
+            raise
+        finally:
+            if close_session:
+                session.close()
+
+    def update(
+        self,
+        approval_id: uuid.UUID,
+        approval_update: HumanApprovalUpdate,
+        session: Optional[Session] = None
+    ) -> HumanApproval:
+        """Update an existing human approval.
+
+        Args:
+            approval_id: UUID of the approval to update
+            approval_update: Update data
+            session: Optional existing session
+
+        Returns:
+            HumanApproval: The updated approval
+
+        Raises:
+            SQLAlchemyError: If database operation fails
+        """
+        close_session = session is None
+        if close_session:
+            session = Session(self.db_service.engine)
+
+        try:
+            approval = session.get(HumanApproval, approval_id)
+            if not approval:
+                raise ValueError(f"Approval not found: {approval_id}")
+
+            # Update fields
+            if approval_update.decision is not None:
+                approval.decision = approval_update.decision
+            if approval_update.feedback is not None:
+                approval.feedback = approval_update.feedback
+            if approval_update.modified_data is not None:
+                approval.modified_data = approval_update.modified_data
+            if approval_update.decided_at is not None:
+                approval.decided_at = approval_update.decided_at
+
+            session.commit()
+            session.refresh(approval)
+
+            logger.info("human_approval_updated", approval_id=str(approval_id))
+            return approval
+
+        except SQLAlchemyError as e:
+            session.rollback()
+            logger.error("human_approval_update_failed", error=str(e))
+            raise
+        finally:
+            if close_session:
+                session.close()
 
 
 # Create singleton instances
