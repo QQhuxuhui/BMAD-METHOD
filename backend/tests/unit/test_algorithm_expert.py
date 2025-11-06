@@ -234,3 +234,134 @@ async def test_algorithm_expert_token_extraction_fallback(sample_state, mock_fac
         # Should have estimated tokens
         assert "total_tokens" in result
         assert result["total_tokens"] > 0
+
+
+@pytest.mark.asyncio
+async def test_algorithm_expert_cost_calculation(sample_state, mock_factory):
+    """Test accurate cost calculation from token usage."""
+    # Create response with known token count
+    response = AIMessage(content=json.dumps({"algorithm_recommendations": []}))
+    response.response_metadata = {
+        'usage': {
+            'prompt_tokens': 2000,
+            'completion_tokens': 1000,
+            'total_tokens': 3000
+        }
+    }
+
+    with patch('app.core.langgraph.agents.algorithm_expert._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm, \
+         patch('app.core.langgraph.agents.algorithm_expert.ModelFactory.get_instance',
+               return_value=mock_factory):
+        mock_llm.return_value = response
+
+        result = await algorithm_expert_node(sample_state)
+
+        # Verify cost calculation: 3000 tokens * 0.00001 = 0.03
+        assert result["total_tokens"] == 3000
+        assert abs(result["total_cost"] - 0.03) < 0.0001
+
+
+@pytest.mark.asyncio
+async def test_algorithm_expert_accumulates_metrics(sample_state, sample_llm_response, mock_factory):
+    """Test that tokens and cost accumulate across calls."""
+    # Set initial state with existing metrics
+    sample_state["total_tokens"] = 1000
+    sample_state["total_cost"] = 0.01
+
+    with patch('app.core.langgraph.agents.algorithm_expert._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm, \
+         patch('app.core.langgraph.agents.algorithm_expert.ModelFactory.get_instance',
+               return_value=mock_factory):
+        mock_llm.return_value = sample_llm_response
+
+        result = await algorithm_expert_node(sample_state)
+
+        # Should accumulate on top of existing metrics
+        assert result["total_tokens"] == 1000 + 500  # existing + new
+        assert result["total_cost"] > 0.01  # existing + new cost
+
+
+@pytest.mark.asyncio
+async def test_algorithm_expert_complex_orchestrator_output(mock_factory):
+    """Test algorithm expert with complex orchestrator output."""
+    state = create_initial_state(
+        problem_description="Complex multi-objective optimization problem",
+        thread_id="test-complex-123",
+        domain="manufacturing"
+    )
+    # Complex orchestrator output with nested structures
+    state["orchestrator_output"] = {
+        "problem_analysis": {
+            "summary": "Multi-stage production scheduling",
+            "key_challenges": ["Multiple objectives", "Resource constraints", "Time windows"],
+            "complexity_level": "high"
+        },
+        "workflow_plan": {
+            "approach": "Hybrid optimization",
+            "phases": [
+                {"phase": "P1", "description": "Algorithm selection and constraint modeling"},
+                {"phase": "P2", "description": "Domain knowledge integration"}
+            ]
+        },
+        "task_assignments": {
+            "algorithm_expert": "Recommend multi-objective optimization algorithms",
+            "constraint_expert": "Model production constraints"
+        }
+    }
+
+    response_data = {
+        "problem_characteristics": {
+            "problem_type": "optimization",
+            "scale": "large"
+        },
+        "algorithm_recommendations": [
+            {"algorithm_name": "NSGA-II", "recommendation_priority": "primary"}
+        ]
+    }
+    response = AIMessage(content=json.dumps(response_data))
+    response.response_metadata = {'usage': {'total_tokens': 600}}
+
+    with patch('app.core.langgraph.agents.algorithm_expert._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm, \
+         patch('app.core.langgraph.agents.algorithm_expert.ModelFactory.get_instance',
+               return_value=mock_factory):
+        mock_llm.return_value = response
+
+        result = await algorithm_expert_node(state)
+
+        # Should handle complex orchestrator output successfully
+        assert "algorithm_output" in result
+        assert "algorithm_recommendations" in result["algorithm_output"]
+        assert len(result["algorithm_output"]["algorithm_recommendations"]) > 0
+
+
+@pytest.mark.asyncio
+async def test_algorithm_expert_empty_recommendations(sample_state, mock_factory):
+    """Test algorithm expert with empty recommendations list."""
+    response_data = {
+        "problem_characteristics": {
+            "problem_type": "unknown",
+            "scale": "unknown"
+        },
+        "algorithm_recommendations": [],  # Empty list
+        "recommendations_summary": {
+            "primary_recommendation": "Unable to recommend",
+            "justification": "Insufficient information"
+        }
+    }
+    response = AIMessage(content=json.dumps(response_data))
+    response.response_metadata = {'usage': {'total_tokens': 100}}
+
+    with patch('app.core.langgraph.agents.algorithm_expert._call_llm_with_retry',
+               new_callable=AsyncMock) as mock_llm, \
+         patch('app.core.langgraph.agents.algorithm_expert.ModelFactory.get_instance',
+               return_value=mock_factory):
+        mock_llm.return_value = response
+
+        result = await algorithm_expert_node(sample_state)
+
+        # Should handle empty recommendations gracefully
+        assert "algorithm_output" in result
+        assert "algorithm_recommendations" in result["algorithm_output"]
+        assert result["algorithm_output"]["algorithm_recommendations"] == []

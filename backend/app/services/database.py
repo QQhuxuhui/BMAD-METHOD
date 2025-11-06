@@ -249,3 +249,14 @@ class DatabaseService:
 
 # Create a singleton instance
 database_service = DatabaseService()
+
+
+# Dependency for FastAPI route handlers
+def get_session():
+    """Yield a database session for dependency injection.
+
+    Yields:
+        Session: SQLModel database session
+    """
+    with Session(database_service.engine) as session:
+        yield session

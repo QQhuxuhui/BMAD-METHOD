@@ -11,7 +11,7 @@ from fastapi.responses import StreamingResponse
 from sqlmodel import Session
 import structlog
 
-from app.core.database import get_session
+from app.services.database import get_session
 from app.models.model_config import (
     ModelConfig,
     ModelConfigCreate,
@@ -20,7 +20,7 @@ from app.models.model_config import (
 )
 from app.core.crypto import encrypt_api_key, decrypt_api_key
 from model_adapters.config_loader import get_config_loader
-from model_adapters.model_factory import get_model_factory
+from model_adapters.model_factory import get_global_factory
 from pydantic import BaseModel, Field
 
 logger = structlog.get_logger(__name__)
