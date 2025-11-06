@@ -11,7 +11,7 @@ Story 1.5.4 实现：提供高级 HITL 功能，协调中断管理、审批记�
 
 import uuid
 from datetime import datetime, UTC
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any, List, Tuple
 
 from app.core.logging import logger
 from app.core.workflow_interruption import interruption_manager
