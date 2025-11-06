@@ -8,6 +8,13 @@ from app.schemas.chat import (
     StreamResponse,
 )
 from app.schemas.graph import GraphState
+from app.schemas.workflow import (
+    CreateWorkflowRequest,
+    WorkflowResponse,
+    WorkflowListResponse,
+    ResumeWorkflowRequest,
+    SSEEvent,
+)
 
 __all__ = [
     "Token",
@@ -16,4 +23,9 @@ __all__ = [
     "Message",
     "StreamResponse",
     "GraphState",
+    "CreateWorkflowRequest",
+    "WorkflowResponse",
+    "WorkflowListResponse",
+    "ResumeWorkflowRequest",
+    "SSEEvent",
 ]
