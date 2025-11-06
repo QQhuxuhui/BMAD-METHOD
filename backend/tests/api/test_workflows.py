@@ -613,16 +613,17 @@ class TestStreamWorkflow:
         test_db_engine,
     ):
         """Test SSE stream sends initial workflow event."""
-        # Create a workflow
+        # Create a completed workflow so stream terminates quickly
         workflow_id = uuid.uuid4()
         with Session(test_db_engine) as session:
             workflow = WorkflowExecution(
                 id=workflow_id,
                 user_id=test_user.id,
                 thread_id=f"test_{workflow_id.hex[:12]}",
-                status="running",
-                current_phase="P0",
+                status="completed",
+                current_phase="P4",
                 input_data={"problem_description": "test"},
+                output_data={"result": "test completed"},
             )
             session.add(workflow)
             session.commit()
@@ -632,21 +633,27 @@ class TestStreamWorkflow:
             assert response.status_code == 200
             assert response.headers["content-type"] == "text/event-stream; charset=utf-8"
 
-            # Read first event
-            first_chunk = None
+            # Collect all events - SSE format is "data: json\n\n"
+            events = []
+            buffer = ""
             async for chunk in response.aiter_text():
-                if chunk.strip():
-                    first_chunk = chunk
-                    break
+                buffer += chunk
+                # Split by SSE message delimiter
+                while "\n\n" in buffer:
+                    message, buffer = buffer.split("\n\n", 1)
+                    if message.startswith("data: "):
+                        event_json = message[6:]  # Remove "data: " prefix
+                        try:
+                            event = json.loads(event_json)
+                            events.append(event)
+                        except json.JSONDecodeError as e:
+                            print(f"Failed to parse: {event_json}, error: {e}")
 
-            assert first_chunk is not None
-            # Parse SSE format: "data: {json}\n\n"
-            if first_chunk.startswith("data: "):
-                event_json = first_chunk[6:].strip()
-                event = json.loads(event_json)
-                assert event["event_type"] == "workflow_start"
-                assert event["data"]["workflow_id"] == str(workflow_id)
-                assert event["data"]["status"] == "running"
+            # Should have at least the workflow_start event
+            assert len(events) >= 1, f"Expected at least 1 event, got {len(events)}"
+            assert events[0]["event_type"] == "workflow_start"
+            assert events[0]["data"]["workflow_id"] == str(workflow_id)
+            assert events[0]["data"]["status"] == "completed"
 
     @pytest.mark.asyncio
     async def test_stream_workflow_not_found(
