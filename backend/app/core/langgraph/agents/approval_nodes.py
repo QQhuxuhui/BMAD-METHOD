@@ -1,15 +1,17 @@
-"""BMAD Eight-Agent System - Approval Node Implementations (HITL Placeholders).
+"""BMAD Eight-Agent System - Approval Node Implementations (HITL).
 
 This module implements approval checkpoint nodes for the BMAD workflow.
 These nodes serve as Human-in-the-Loop (HITL) points where the workflow
 pauses to wait for user input/approval before proceeding.
 
-Note: This Story implements only placeholder approval nodes.
-Actual HITL interactions will be implemented in Story 1.5.3.
+Story 1.5.3 Implementation: Real HITL using LangGraph interrupt().
 """
 
 from typing import Dict, Any, Literal
 from uuid import uuid4
+from datetime import datetime, UTC
+
+from langgraph.types import interrupt
 
 from app.core.langgraph.state import WorkflowState
 from app.core.logging import logger
@@ -21,8 +23,8 @@ async def p1_approval_node(state: WorkflowState) -> Dict[str, Any]:
     This node pauses the workflow to wait for user approval of the algorithm
     selection and approach before proceeding to Phase 2 (Domain Expert).
 
-    In Story 1.5.2, this is a placeholder that simulates approval.
-    In Story 1.5.3, actual HITL interaction will be implemented.
+    Uses LangGraph's interrupt() to pause workflow execution until user provides
+    approval decision via the resume API.
 
     Args:
         state: Current workflow state
@@ -33,29 +35,62 @@ async def p1_approval_node(state: WorkflowState) -> Dict[str, Any]:
     try:
         logger.info("p1_approval_node_started", thread_id=state.get('thread_id'))
 
-        # In Story 1.5.2, we simulate auto-approval for development/testing
-        # In Story 1.5.3, this will wait for actual user input
-
-        # Mark workflow as pending approval
-        updated_state = {
-            'pending_approval': True,
-            'approval_point': 'P1',
-            'approval_decision': 'approved',  # Auto-approve for now
-            'approval_feedback': 'Auto-approved during development (Story 1.5.2)',
-            'current_phase': 'P1_Approval'
+        # Prepare approval context data from Phase 1 outputs
+        context_data = {
+            'algorithm_output': state.get('algorithm_output'),
+            'constraint_output': state.get('constraint_output'),
+            'objective_output': state.get('objective_output'),
+            'orchestrator_output': state.get('orchestrator_output'),
         }
 
-        # Add approval checkpoint to state for tracking
+        # Generate unique approval ID for tracking
         approval_id = str(uuid4())
-        updated_state['approval_checkpoint_id'] = approval_id
 
         logger.info(
-            "p1_approval_node_completed",
+            "p1_approval_interrupt_triggered",
             approval_point='P1',
-            decision='approved',
             approval_id=approval_id,
             thread_id=state.get('thread_id')
         )
+
+        # Use LangGraph interrupt() to pause workflow
+        # This will save current state to checkpoint and wait for resume
+        approval_response = interrupt({
+            'approval_id': approval_id,
+            'approval_point': 'P1',
+            'context_data': context_data,
+            'workflow_id': state.get('workflow_id'),
+            'user_id': state.get('user_id'),
+            'timestamp': datetime.now(UTC).isoformat(),
+        })
+
+        # After resume, approval_response will contain user's decision
+        # Extract decision from response
+        decision = approval_response.get('decision', 'approved') if approval_response else 'approved'
+        feedback = approval_response.get('feedback', '') if approval_response else ''
+        modified_data = approval_response.get('modified_data') if approval_response else None
+
+        logger.info(
+            "p1_approval_resumed",
+            approval_point='P1',
+            decision=decision,
+            approval_id=approval_id,
+            thread_id=state.get('thread_id')
+        )
+
+        # Return updated state based on user decision
+        updated_state = {
+            'pending_approval': False,
+            'approval_point': 'P1',
+            'approval_decision': decision,
+            'approval_feedback': feedback,
+            'approval_checkpoint_id': approval_id,
+            'current_phase': 'P1_Approval_Completed'
+        }
+
+        # If user modified data, merge it into state
+        if modified_data:
+            updated_state['modified_data_p1'] = modified_data
 
         return updated_state
 
@@ -68,7 +103,7 @@ async def p1_approval_node(state: WorkflowState) -> Dict[str, Any]:
 
         # Return error state
         return {
-            'pending_approval': True,
+            'pending_approval': False,
             'approval_point': 'P1',
             'approval_decision': 'error',
             'approval_feedback': f'Error during P1 approval: {str(e)}',
@@ -127,6 +162,9 @@ async def p25_approval_node(state: WorkflowState) -> Dict[str, Any]:
     This node pauses the workflow for code review and approval before
     proceeding to Phase 4 (Quality Expert).
 
+    Uses LangGraph's interrupt() to pause workflow execution until user provides
+    code review decision via the resume API.
+
     Args:
         state: Current workflow state
 
@@ -136,28 +174,61 @@ async def p25_approval_node(state: WorkflowState) -> Dict[str, Any]:
     try:
         logger.info("p25_approval_node_started", thread_id=state.get('thread_id'))
 
-        # In Story 1.5.2, simulate auto-approval for development
-        # In Story 1.5.3, this will wait for actual user code review
-
-        updated_state = {
-            'pending_approval': True,
-            'approval_point': 'P2.5',
-            'approval_decision': 'approved',  # Auto-approve for now
-            'approval_feedback': 'Auto-approved during development (Story 1.5.2)',
-            'current_phase': 'P2.5_Approval'
+        # Prepare approval context data from Phase 3 outputs
+        context_data = {
+            'code_impl_output': state.get('code_impl_output'),
+            'extension_output': state.get('extension_output'),
+            'domain_output': state.get('domain_output'),
         }
 
-        # Add approval checkpoint to state for tracking
+        # Generate unique approval ID for tracking
         approval_id = str(uuid4())
-        updated_state['approval_checkpoint_id'] = approval_id
 
         logger.info(
-            "p25_approval_node_completed",
+            "p25_approval_interrupt_triggered",
             approval_point='P2.5',
-            decision='approved',
             approval_id=approval_id,
             thread_id=state.get('thread_id')
         )
+
+        # Use LangGraph interrupt() to pause workflow
+        # This will save current state to checkpoint and wait for resume
+        approval_response = interrupt({
+            'approval_id': approval_id,
+            'approval_point': 'P2.5',
+            'context_data': context_data,
+            'workflow_id': state.get('workflow_id'),
+            'user_id': state.get('user_id'),
+            'timestamp': datetime.now(UTC).isoformat(),
+        })
+
+        # After resume, approval_response will contain user's decision
+        # Extract decision from response
+        decision = approval_response.get('decision', 'approved') if approval_response else 'approved'
+        feedback = approval_response.get('feedback', '') if approval_response else ''
+        modified_data = approval_response.get('modified_data') if approval_response else None
+
+        logger.info(
+            "p25_approval_resumed",
+            approval_point='P2.5',
+            decision=decision,
+            approval_id=approval_id,
+            thread_id=state.get('thread_id')
+        )
+
+        # Return updated state based on user decision
+        updated_state = {
+            'pending_approval': False,
+            'approval_point': 'P2.5',
+            'approval_decision': decision,
+            'approval_feedback': feedback,
+            'approval_checkpoint_id': approval_id,
+            'current_phase': 'P2.5_Approval_Completed'
+        }
+
+        # If user modified data, merge it into state
+        if modified_data:
+            updated_state['modified_data_p25'] = modified_data
 
         return updated_state
 
@@ -169,7 +240,7 @@ async def p25_approval_node(state: WorkflowState) -> Dict[str, Any]:
         )
 
         return {
-            'pending_approval': True,
+            'pending_approval': False,
             'approval_point': 'P2.5',
             'approval_decision': 'error',
             'approval_feedback': f'Error during P2.5 approval: {str(e)}',

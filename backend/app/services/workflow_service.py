@@ -103,13 +103,14 @@ class WorkflowService:
                     user_id=user_id,
                 )
 
-                # TODO: Add background task to execute workflow asynchronously
-                # if background_tasks:
-                #     background_tasks.add_task(
-                #         self._execute_workflow_async,
-                #         workflow.id,
-                #         thread_id
-                #     )
+                # Add background task to execute workflow asynchronously
+                if background_tasks:
+                    background_tasks.add_task(
+                        self._execute_workflow_async,
+                        workflow.id,
+                        thread_id,
+                        input_data
+                    )
 
                 return workflow
 
@@ -262,28 +263,348 @@ class WorkflowService:
             approval.modified_data = modified_data
             approval.decided_at = datetime.now(UTC)
 
-            # Update workflow status
+            session.add(approval)
+            session.commit()
+            session.refresh(approval)
+
+            # Update workflow status based on decision
             if user_decision == "rejected":
                 workflow.status = "rejected"
                 workflow.completed_at = datetime.now(UTC)
                 workflow.error_message = f"Rejected at {approval.approval_point}: {feedback}"
-            else:
-                workflow.status = "running"
-                # TODO: Resume LangGraph workflow execution from checkpoint
 
-            session.add(approval)
-            session.add(workflow)
-            session.commit()
-            session.refresh(workflow)
+                session.add(workflow)
+                session.commit()
+                session.refresh(workflow)
+
+                logger.info(
+                    "workflow_rejected",
+                    workflow_id=str(workflow_id),
+                    approval_point=approval.approval_point,
+                )
+
+                return workflow
+            else:
+                # Update to running status
+                workflow.status = "running"
+                session.add(workflow)
+                session.commit()
+                session.refresh(workflow)
+
+                logger.info(
+                    "workflow_resuming",
+                    workflow_id=str(workflow_id),
+                    decision=user_decision,
+                    approval_point=approval.approval_point,
+                )
+
+        # Resume LangGraph workflow execution from checkpoint
+        # This runs outside the session context to avoid blocking
+        try:
+            from app.core.langgraph.workflow import create_bmad_workflow
+
+            # Create workflow instance
+            bmad_workflow = await create_bmad_workflow()
+
+            # Configure with original thread_id
+            config = {"configurable": {"thread_id": workflow.thread_id}}
+
+            # Prepare resume input with user decision
+            resume_input = {
+                'decision': user_decision,
+                'feedback': feedback,
+                'modified_data': modified_data,
+            }
 
             logger.info(
-                "workflow_resumed",
+                "workflow_resume_from_checkpoint",
                 workflow_id=str(workflow_id),
-                decision=user_decision,
-                approval_point=approval.approval_point,
+                thread_id=workflow.thread_id,
             )
 
-            return workflow
+            # Get current state to verify checkpoint exists
+            current_state = await bmad_workflow.aget_state(config)
+            if not current_state:
+                raise HTTPException(
+                    status_code=500,
+                    detail="Failed to load workflow checkpoint"
+                )
+
+            # Resume execution from checkpoint with user's decision
+            total_tokens = workflow.total_tokens
+            total_cost = workflow.total_cost
+
+            async for event in bmad_workflow.astream(resume_input, config):
+                logger.debug(
+                    "workflow_resume_event",
+                    workflow_id=str(workflow_id),
+                    event_type=type(event).__name__,
+                )
+
+                # Process events similar to _execute_workflow_async
+                if isinstance(event, dict):
+                    # Update current phase if changed
+                    if "current_phase" in event:
+                        await self.update_workflow_status(
+                            workflow_id, "running", current_phase=event["current_phase"]
+                        )
+
+                    # Track token usage
+                    if "token_count" in event:
+                        total_tokens += event.get("token_count", 0)
+                    if "cost" in event:
+                        total_cost += event.get("cost", 0.0)
+
+                    # Check for another HITL interrupt
+                    if event.get("pending_approval"):
+                        approval_point = event.get("approval_point", "unknown")
+                        context_data = event.get("context_data", {})
+
+                        # Create new HumanApproval record
+                        with Session(self.db_service.engine) as session:
+                            new_approval = HumanApprovalCreate(
+                                workflow_id=workflow_id,
+                                user_id=workflow.user_id,
+                                approval_point=approval_point,
+                                context_data=context_data,
+                            )
+                            human_approval_crud.create(new_approval)
+
+                        # Update workflow to paused
+                        await self.update_workflow_status(
+                            workflow_id,
+                            "paused",
+                            current_phase=f"{approval_point}_Approval",
+                            total_tokens=total_tokens,
+                            total_cost=total_cost,
+                        )
+
+                        logger.info(
+                            "workflow_paused_again",
+                            workflow_id=str(workflow_id),
+                            approval_point=approval_point,
+                        )
+                        return workflow
+
+                    # Record agent execution if present
+                    if "agent_name" in event and event.get("output_data"):
+                        agent_execution = AgentExecutionCreate(
+                            workflow_id=workflow_id,
+                            agent_name=event["agent_name"],
+                            input_data=event.get("input_data", {}),
+                            output_data=event.get("output_data", {}),
+                            status="completed",
+                            duration_ms=event.get("duration_ms", 0),
+                            token_count=event.get("token_count", 0),
+                            cost=event.get("cost", 0.0),
+                        )
+                        agent_execution_crud.create(agent_execution)
+
+            # Workflow completed successfully
+            final_state = await bmad_workflow.aget_state(config)
+            output_data = final_state.values if final_state else {}
+
+            await self.update_workflow_status(
+                workflow_id,
+                "completed",
+                current_phase="P4_Completed",
+                output_data=output_data,
+                total_tokens=total_tokens,
+                total_cost=total_cost,
+            )
+
+            logger.info(
+                "workflow_resumed_and_completed",
+                workflow_id=str(workflow_id),
+            )
+
+        except Exception as e:
+            logger.error(
+                "workflow_resume_failed",
+                workflow_id=str(workflow_id),
+                error=str(e),
+                exc_info=True,
+            )
+
+            # Update workflow to failed
+            await self.update_workflow_status(
+                workflow_id, "failed", error_message=f"Resume failed: {str(e)}"
+            )
+
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to resume workflow: {str(e)}"
+            )
+
+        # Return updated workflow
+        return await self.get_workflow(workflow_id)
+
+    async def _execute_workflow_async(
+        self,
+        workflow_id: uuid.UUID,
+        thread_id: str,
+        input_data: Dict[str, Any],
+    ) -> None:
+        """Execute BMAD workflow asynchronously in background.
+
+        This method runs the actual LangGraph workflow, handling:
+        - Workflow state streaming
+        - Agent execution recording
+        - HITL interrupt detection
+        - Status updates
+        - Error handling
+
+        Args:
+            workflow_id: UUID of the workflow execution
+            thread_id: LangGraph thread identifier
+            input_data: Input data for the workflow
+        """
+        try:
+            from app.core.langgraph.workflow import create_bmad_workflow
+
+            logger.info(
+                "workflow_execution_started",
+                workflow_id=str(workflow_id),
+                thread_id=thread_id,
+            )
+
+            # Update workflow status to running
+            await self.update_workflow_status(workflow_id, "running", current_phase="P0")
+
+            # Create BMAD workflow instance
+            workflow = await create_bmad_workflow()
+
+            # Prepare initial state
+            initial_state = {
+                "workflow_id": str(workflow_id),
+                "thread_id": thread_id,
+                "problem_description": input_data.get("problem_description", ""),
+                "domain": input_data.get("domain"),
+                "constraints": input_data.get("constraints", []),
+                "user_id": None,  # Will be set from workflow record
+                "errors": [],
+            }
+
+            # Get user_id from workflow record
+            workflow_record = await self.get_workflow(workflow_id)
+            if workflow_record:
+                initial_state["user_id"] = workflow_record.user_id
+
+            # Configure LangGraph with thread_id for checkpoint persistence
+            config = {"configurable": {"thread_id": thread_id}}
+
+            # Execute workflow with streaming
+            total_tokens = 0
+            total_cost = 0.0
+            current_phase = "P0"
+
+            async for event in workflow.astream(initial_state, config):
+                logger.debug(
+                    "workflow_event_received",
+                    workflow_id=str(workflow_id),
+                    event_type=type(event).__name__,
+                )
+
+                # Extract phase and state updates from event
+                if isinstance(event, dict):
+                    # Update current phase if changed
+                    if "current_phase" in event:
+                        current_phase = event["current_phase"]
+                        await self.update_workflow_status(
+                            workflow_id, "running", current_phase=current_phase
+                        )
+
+                    # Track token usage
+                    if "token_count" in event:
+                        total_tokens += event.get("token_count", 0)
+                    if "cost" in event:
+                        total_cost += event.get("cost", 0.0)
+
+                    # Detect HITL interrupt
+                    if event.get("pending_approval"):
+                        approval_point = event.get("approval_point", "unknown")
+                        context_data = event.get("context_data", {})
+
+                        logger.info(
+                            "workflow_interrupt_detected",
+                            workflow_id=str(workflow_id),
+                            approval_point=approval_point,
+                        )
+
+                        # Create HumanApproval record
+                        if workflow_record:
+                            approval = HumanApprovalCreate(
+                                workflow_id=workflow_id,
+                                user_id=workflow_record.user_id,
+                                approval_point=approval_point,
+                                context_data=context_data,
+                            )
+                            human_approval_crud.create(approval)
+
+                        # Update workflow status to paused
+                        await self.update_workflow_status(
+                            workflow_id,
+                            "paused",
+                            current_phase=f"{approval_point}_Approval",
+                            total_tokens=total_tokens,
+                            total_cost=total_cost,
+                        )
+
+                        # Workflow will pause here until resume_workflow is called
+                        logger.info(
+                            "workflow_paused_for_approval",
+                            workflow_id=str(workflow_id),
+                            approval_point=approval_point,
+                        )
+                        return  # Exit background task, will resume later
+
+                    # Record agent execution if present
+                    if "agent_name" in event and event.get("output_data"):
+                        agent_execution = AgentExecutionCreate(
+                            workflow_id=workflow_id,
+                            agent_name=event["agent_name"],
+                            input_data=event.get("input_data", {}),
+                            output_data=event.get("output_data", {}),
+                            status="completed",
+                            duration_ms=event.get("duration_ms", 0),
+                            token_count=event.get("token_count", 0),
+                            cost=event.get("cost", 0.0),
+                        )
+                        agent_execution_crud.create(agent_execution)
+
+            # Workflow completed successfully
+            # Get final state to extract output
+            final_state = await workflow.aget_state(config)
+            output_data = final_state.values if final_state else {}
+
+            await self.update_workflow_status(
+                workflow_id,
+                "completed",
+                current_phase="P4_Completed",
+                output_data=output_data,
+                total_tokens=total_tokens,
+                total_cost=total_cost,
+            )
+
+            logger.info(
+                "workflow_execution_completed",
+                workflow_id=str(workflow_id),
+                total_tokens=total_tokens,
+                total_cost=total_cost,
+            )
+
+        except Exception as e:
+            logger.error(
+                "workflow_execution_failed",
+                workflow_id=str(workflow_id),
+                error=str(e),
+                exc_info=True,
+            )
+
+            # Update workflow to failed status
+            await self.update_workflow_status(
+                workflow_id, "failed", error_message=str(e)
+            )
 
     async def update_workflow_status(
         self,
