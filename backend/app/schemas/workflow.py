@@ -2,7 +2,7 @@
 
 import uuid
 from datetime import datetime
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -105,7 +105,7 @@ class ResumeWorkflowRequest(BaseModel):
         modified_data: Modified data if decision was 'modified'
     """
 
-    decision: str = Field(
+    decision: Literal["approved", "rejected", "modified"] = Field(
         ...,
         description="User decision (approved/rejected/modified)",
     )
