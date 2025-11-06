@@ -13,7 +13,7 @@ Phase Flow:
 
 from typing import Literal
 
-from backend.app.core.langgraph.state import WorkflowState
+from app.core.langgraph.state import WorkflowState
 
 
 def route_after_orchestrator(state: WorkflowState) -> Literal['algorithm']:
