@@ -152,6 +152,121 @@ POST /api/v1/workflows/{id}/resume
 GET /api/v1/workflows/{id}/stream
 ```
 
+### LangServe集成 (Story 1.6)
+
+**自动生成的LangServe端点**:
+
+```bash
+# 同步执行工作流 (阻塞直到完成)
+POST /api/v1/bmad-workflow/invoke
+
+# 批量执行多个工作流
+POST /api/v1/bmad-workflow/batch
+
+# SSE流式执行 (推荐)
+POST /api/v1/bmad-workflow/stream
+
+# SSE流式执行 + 中间步骤日志
+POST /api/v1/bmad-workflow/stream_log
+
+# 结构化事件流 (最推荐)
+POST /api/v1/bmad-workflow/stream_events
+
+# Web UI测试界面
+GET /api/v1/bmad-workflow/playground/
+```
+
+**特性**:
+
+- ✅ 自动生成OpenAPI文档和Swagger UI
+- ✅ JWT认证集成 (Bearer Token)
+- ✅ SSE流式输出支持
+- ✅ Web Playground测试界面
+- ✅ 用户上下文自动注入
+
+**curl示例**:
+
+```bash
+# 获取JWT Token (需要先注册/登录)
+curl -X POST http://localhost:8000/api/v1/auth/login \
+  -H "Content-Type: application/x-www-form-urlencoded" \
+  -d "username=your_email@example.com&password=your_password"
+
+# 使用LangServe invoke端点
+curl -X POST http://localhost:8000/api/v1/bmad-workflow/invoke \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": {
+      "problem_description": "优化100辆车的配送路线",
+      "domain": "logistics",
+      "constraints": ["时间窗口", "车辆容量"]
+    }
+  }'
+
+# 使用LangServe stream端点 (SSE)
+curl -N -X POST http://localhost:8000/api/v1/bmad-workflow/stream \
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "input": {
+      "problem_description": "优化配送路线",
+      "domain": "logistics"
+    }
+  }'
+```
+
+**Python客户端示例** (使用RemoteRunnable):
+
+```python
+from langserve import RemoteRunnable
+
+# 创建RemoteRunnable实例
+runnable = RemoteRunnable(
+    url="http://localhost:8000/api/v1/bmad-workflow",
+    headers={"Authorization": f"Bearer {jwt_token}"}
+)
+
+# 同步调用
+result = runnable.invoke({
+    "problem_description": "优化配送路线",
+    "domain": "logistics",
+    "constraints": ["时间窗口", "车辆容量"]
+})
+
+# 异步流式调用
+async for event in runnable.astream(input_data):
+    print(f"Event: {event['event']}, Data: {event['data']}")
+
+# 完整示例请参考: examples/langserve_client.py
+```
+
+**前端集成示例** (Vue 3 + TypeScript):
+
+```typescript
+import { useBMADWorkflow } from '@/composables/useBMADWorkflow';
+
+// 在Vue组件中使用
+const { runWorkflowStream, isStreaming, events, result } = useBMADWorkflow();
+
+// 流式执行工作流
+await runWorkflowStream({
+  problem_description: '优化配送路线',
+  domain: 'logistics',
+  constraints: ['时间窗口', '车辆容量'],
+});
+
+// 完整示例请参考:
+// - frontend/web/src/composables/useBMADWorkflow.ts
+// - frontend/web/src/examples/WorkflowStreamDemo.vue
+```
+
+**OpenAPI文档访问**:
+
+- Swagger UI: http://localhost:8000/docs
+- ReDoc: http://localhost:8000/redoc
+- Playground: http://localhost:8000/api/v1/bmad-workflow/playground/
+
 ### 相关Story
 
 - **Story 1.1**: PostgreSQL + Redis基础设施 ✅
