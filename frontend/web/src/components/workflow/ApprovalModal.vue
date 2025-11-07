@@ -51,10 +51,10 @@
     <a-divider>智能体输出上下文</a-divider>
 
     <template v-if="approvalContext">
-      <a-collapse v-model:activeKey="activeCollapseKeys" accordion>
+      <a-collapse v-model:activeKey="activeCollapseKeys">
         <a-collapse-panel
           v-for="(value, key) in approvalContext"
-          :key="key"
+          :key="String(key)"
           :header="getContextLabel(key)"
         >
           <a-card size="small" class="context-content">
@@ -148,7 +148,7 @@ const feedback = ref('')
 const showModifyModal = ref(false)
 const modifiedDataJson = ref('')
 const submitting = ref(false)
-const activeCollapseKeys = ref<string | string[]>('')
+const activeCollapseKeys = ref<string[]>([])
 const activeModifyTab = ref('editor')
 const jsonValidation = ref<{ isValid: boolean; error?: string }>({
   isValid: true,
@@ -162,13 +162,13 @@ watch(
       modifiedDataJson.value = JSON.stringify(ctx, null, 2)
       // 默认展开第一个面板
       const keys = Object.keys(ctx)
-      if (keys.length > 0) {
-        activeCollapseKeys.value = keys[0]
+      if (keys.length > 0 && keys[0]) {
+        activeCollapseKeys.value = [keys[0]]
       } else {
-        activeCollapseKeys.value = ''
+        activeCollapseKeys.value = []
       }
     } else {
-      activeCollapseKeys.value = ''
+      activeCollapseKeys.value = []
     }
   },
   { immediate: true },

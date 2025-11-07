@@ -30,9 +30,9 @@
 
       <div class="form-group">
         <label>Constraints (Optional):</label>
-        <div v-for="(constraint, index) in input.constraints" :key="index" class="constraint-row">
+        <div v-for="(_, index) in input.constraints" :key="index" class="constraint-row">
           <input
-            v-model="input.constraints[index]"
+            v-model="input.constraints![index]"
             type="text"
             placeholder="输入约束条件..."
             :disabled="isStreaming"
