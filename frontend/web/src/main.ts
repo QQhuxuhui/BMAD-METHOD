@@ -14,6 +14,7 @@ const pinia = createPinia()
 
 app.use(pinia)
 app.use(router)
+// @ts-ignore - Ant Design Vue locale configuration
 app.use(Antd, { locale: zhCN })
 
 app.mount('#app')

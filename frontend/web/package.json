@@ -12,6 +12,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@antv/g6": "^5.0.50",
     "@vueuse/core": "^14.0.0",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.13.2",

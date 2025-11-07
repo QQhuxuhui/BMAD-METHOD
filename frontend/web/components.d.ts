@@ -17,6 +17,7 @@ declare module 'vue' {
     ADivider: typeof import('ant-design-vue/es')['Divider']
     AForm: typeof import('ant-design-vue/es')['Form']
     AFormItem: typeof import('ant-design-vue/es')['FormItem']
+    AgentExecutionList: typeof import('./src/components/workflow/AgentExecutionList.vue')['default']
     AInput: typeof import('ant-design-vue/es')['Input']
     AInputSearch: typeof import('ant-design-vue/es')['InputSearch']
     ALayout: typeof import('ant-design-vue/es')['Layout']
@@ -26,6 +27,7 @@ declare module 'vue' {
     ALayoutSider: typeof import('ant-design-vue/es')['LayoutSider']
     AMenu: typeof import('ant-design-vue/es')['Menu']
     AMenuItem: typeof import('ant-design-vue/es')['MenuItem']
+    ApprovalModal: typeof import('./src/components/workflow/ApprovalModal.vue')['default']
     AResult: typeof import('ant-design-vue/es')['Result']
     ARow: typeof import('ant-design-vue/es')['Row']
     ASelect: typeof import('ant-design-vue/es')['Select']
@@ -37,7 +39,11 @@ declare module 'vue' {
     ATabs: typeof import('ant-design-vue/es')['Tabs']
     ATypographyTitle: typeof import('ant-design-vue/es')['TypographyTitle']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
+    RealTimeLog: typeof import('./src/components/workflow/RealTimeLog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    WorkflowHistory: typeof import('./src/components/workflow/WorkflowHistory.vue')['default']
+    WorkflowStatusCard: typeof import('./src/components/workflow/WorkflowStatusCard.vue')['default']
+    WorkflowTopologyView: typeof import('./src/components/workflow/WorkflowTopologyView.vue')['default']
   }
 }
