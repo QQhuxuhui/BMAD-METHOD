@@ -92,12 +92,74 @@ backend/
 3. **API Key**: 开发环境使用占位符密钥，生产环境需配置真实密钥
 4. **监控**: Langfuse、Prometheus、Grafana配置已保留，需配置密钥启用
 
+### 工作流系统 (Story 1.5.x)
+
+**八智能体工作流架构**:
+
+```
+P0 (Orchestrator) → P1 (Algorithm/Constraint/Objective) → P1 Approval (HITL)
+  → P2 (Domain) → P3 (Code Impl/Extension) → P2.5 Approval (HITL)
+  → P4 (Quality) → END
+```
+
+**关键特性**:
+
+- ✅ StateGraph 编排器 (LangGraph 0.6.6)
+- ✅ PostgreSQL Checkpoint 持久化
+- ✅ HITL 人机交互 (P1, P2.5 审批点)
+- ✅ SSE 流式输出
+- ✅ RESTful API (6个端点)
+
+**运行集成测试**:
+
+```bash
+# 启动数据库 (Docker Compose)
+docker-compose up -d postgres
+
+# 运行所有集成测试
+.venv/bin/pytest tests/integration/ -v
+
+# 运行特定测试
+.venv/bin/pytest tests/integration/test_hitl_workflow.py -v
+.venv/bin/pytest tests/api/test_workflows.py -v
+```
+
+**已知限制** (Story 1.5.5):
+
+- User表迁移假设已存在（需手动创建或通过其他Story）
+- P2.5审批点端到端测试覆盖不完整
+- 并发resume操作缺少防护机制（计划Story 1.5.6处理）
+
+**API使用示例**:
+
+```python
+# 创建工作流
+POST /api/v1/workflows
+{
+  "problem_description": "优化配送路线",
+  "domain": "logistics",
+  "constraints": ["时间窗口", "车辆容量"]
+}
+
+# 恢复工作流（P1审批）
+POST /api/v1/workflows/{id}/resume
+{
+  "decision": "approved",
+  "feedback": "算法选择合理"
+}
+
+# 流式监控
+GET /api/v1/workflows/{id}/stream
+```
+
 ### 相关Story
 
 - **Story 1.1**: PostgreSQL + Redis基础设施 ✅
-- **Story 1.2**: FastAPI + LangGraph后端初始化 ✅ (本项目)
-- **Story 1.3**: Agent系统架构设计
-- **Story 1.4**: 模型适配器实现
+- **Story 1.2**: FastAPI + LangGraph后端初始化 ✅
+- **Story 1.3**: Agent系统架构设计 ✅
+- **Story 1.4**: 模型适配器实现 ✅
+- **Story 1.5.0-1.5.4**: 工作流系统实现 ✅
+- **Story 1.5.5**: 工作流系统集成验证 ✅
 
 ---
 
