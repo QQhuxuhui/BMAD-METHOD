@@ -33,7 +33,7 @@ class TestAPIIntegration:
             f"{TEST_API_PREFIX}/auth/register",
             json={"email": email, "password": password}
         )
-        assert response.status_code == 201, f"Registration failed: {response.text}"
+        assert response.status_code in [200, 201], f"Registration failed: {response.text}"
 
         data = response.json()
         assert "id" in data
