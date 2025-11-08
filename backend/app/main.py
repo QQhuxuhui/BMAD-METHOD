@@ -111,10 +111,16 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],  # Required for LangServe SSE streaming
 )
 
 # Include API router
 app.include_router(api_router, prefix=settings.API_V1_STR)
+
+# Register LangServe routes for BMAD workflow
+from app.api.v1.langserve_routes import register_langserve_routes
+
+register_langserve_routes(app)
 
 
 @app.get("/")
