@@ -188,9 +188,30 @@ class BMADWorkflowRunnable(Runnable):
 
         Returns:
             Dict containing workflow execution results
+
+        Note:
+            This method attempts to use the existing event loop if available,
+            otherwise creates a new one. This prevents RuntimeError in FastAPI context.
         """
-        # Run async method in sync context
-        return asyncio.run(self.ainvoke(input, config))
+        # Try to get existing event loop, or create new one
+        try:
+            loop = asyncio.get_running_loop()
+            # If we're in an async context (FastAPI), we can't use asyncio.run()
+            # LangServe will call this from async context, so this shouldn't happen
+            logger.warning(
+                "invoke_called_from_async_context",
+                message="invoke() should not be called from async context. Use ainvoke() instead.",
+            )
+            # Create a new task and wait for it
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                future = executor.submit(
+                    lambda: asyncio.run(self.ainvoke(input, config))
+                )
+                return future.result()
+        except RuntimeError:
+            # No event loop running, safe to use asyncio.run()
+            return asyncio.run(self.ainvoke(input, config))
 
     async def astream(
         self,
@@ -302,23 +323,66 @@ class BMADWorkflowRunnable(Runnable):
 
         Yields:
             Dict: Workflow execution events
+
+        Note:
+            This method handles both cases: when called from sync context
+            (creates new loop) and when called from async context (uses thread pool).
         """
-        # Create async generator
-        async_gen = self.astream(input, config)
-
-        # Run async generator in sync context using asyncio.run
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-
+        # Try to get existing event loop
         try:
-            while True:
+            loop = asyncio.get_running_loop()
+            # In async context (FastAPI), use thread pool to run in separate loop
+            logger.warning(
+                "stream_called_from_async_context",
+                message="stream() called from async context. Consider using astream() instead.",
+            )
+            import concurrent.futures
+            import queue
+
+            # Use queue to pass events between threads
+            event_queue = queue.Queue()
+            exception_holder = []
+
+            def run_async_stream():
                 try:
-                    event = loop.run_until_complete(async_gen.__anext__())
+                    new_loop = asyncio.new_event_loop()
+                    asyncio.set_event_loop(new_loop)
+                    async def stream_events():
+                        async for event in self.astream(input, config):
+                            event_queue.put(event)
+                        event_queue.put(None)  # Signal completion
+                    new_loop.run_until_complete(stream_events())
+                    new_loop.close()
+                except Exception as e:
+                    exception_holder.append(e)
+                    event_queue.put(None)
+
+            with concurrent.futures.ThreadPoolExecutor() as executor:
+                executor.submit(run_async_stream)
+
+                while True:
+                    event = event_queue.get()
+                    if event is None:
+                        if exception_holder:
+                            raise exception_holder[0]
+                        break
                     yield event
-                except StopAsyncIteration:
-                    break
-        finally:
-            loop.close()
+
+        except RuntimeError:
+            # No event loop running, create new one
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+
+            try:
+                async_gen = self.astream(input, config)
+                while True:
+                    try:
+                        event = loop.run_until_complete(async_gen.__anext__())
+                        yield event
+                    except StopAsyncIteration:
+                        break
+            finally:
+                loop.close()
 
 
 # Create singleton instance for LangServe registration

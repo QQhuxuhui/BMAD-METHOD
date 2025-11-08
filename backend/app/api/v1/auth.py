@@ -47,11 +47,13 @@ db_service = DatabaseService()
 
 
 async def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(security),
 ) -> User:
     """Get the current user ID from the token.
 
     Args:
+        request: The FastAPI request object (used to store user in state).
         credentials: The HTTP authorization credentials containing the JWT token.
 
     Returns:
@@ -59,6 +61,10 @@ async def get_current_user(
 
     Raises:
         HTTPException: If the token is invalid or missing.
+
+    Note:
+        This function stores the authenticated user in request.state.user
+        to avoid duplicate authentication in downstream handlers.
     """
     try:
         # Sanitize token
@@ -83,6 +89,10 @@ async def get_current_user(
                 detail="User not found",
                 headers={"WWW-Authenticate": "Bearer"},
             )
+
+        # Store user in request state to avoid duplicate authentication
+        # This is used by LangServe's per_req_config_modifier
+        request.state.user = user
 
         return user
     except ValueError as ve:

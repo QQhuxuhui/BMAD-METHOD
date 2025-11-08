@@ -23,7 +23,7 @@ vi.mock('ant-design-vue', async () => {
 
 // Mock dayjs
 vi.mock('dayjs', () => {
-  const dayjs: any = (date?: any) => ({
+  const dayjs: any = (_date?: any) => ({
     format: () => '2025-01-01 00:00:00',
   })
   dayjs.extend = vi.fn()

@@ -44,6 +44,7 @@
   - 确保所有测试通过 ✅
 
 - [ ] **Task 1.5**: 验证覆盖率
+
   ```bash
   npm run test:coverage -- useWorkflowStream
   ```

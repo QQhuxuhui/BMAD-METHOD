@@ -4,7 +4,7 @@ import { useWorkflowStream } from '../useWorkflowStream'
 
 // Mock @vueuse/core
 vi.mock('@vueuse/core', () => ({
-  useEventSource: vi.fn((url, events, options) => {
+  useEventSource: vi.fn((_url, _events, _options) => {
     const data = ref(null)
     const status = ref('CLOSED')
     const error = ref(null)

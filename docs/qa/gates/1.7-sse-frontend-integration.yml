@@ -4,10 +4,10 @@
 schema: 1
 story: "1.7"
 story_title: "实现SSE流式传输前端集成"
-gate: FAIL
-status_reason: "所有功能AC已实现且代码质量良好,但完全缺少测试(Tasks 17-19未实现),违反testing strategy。团队选择稳健路径,阻塞发布直到补充核心测试。"
+gate: PASS
+status_reason: "核心测试已补充(16个测试全部通过),TypeScript编译错误已修复,构建成功。所有功能AC已实现,代码质量良好。存在技术债务(bundle size, Sass @import)但不阻塞发布,已记录跟踪。"
 reviewer: "Quinn (Test Architect)"
-updated: "2025-11-07T08:30:00Z"
+updated: "2025-11-07T16:45:00Z"
 
 # Waiver状态 (如果团队接受风险可激活)
 waiver:
@@ -20,13 +20,13 @@ waiver:
 # 主要问题列表
 top_issues:
   - id: "TEST-001"
-    severity: high
-    finding: "完全缺少测试 - Phase 7 (Tasks 17-19)未实现,违反testing strategy"
-    impact: "无法验证代码正确性,回归风险高,生产环境bug难以发现"
-    suggested_action: "至少添加useWorkflowStream和ApprovalModal的单元测试(预计1-2天)"
+    severity: resolved
+    finding: "✅ 已解决 - 核心测试已补充(16个测试全部通过)"
+    impact: "测试覆盖核心功能,回归风险已降低"
+    suggested_action: "无需进一步操作。后续可考虑补充边缘场景测试。"
     refs:
-      - "Story 1.7 Task 17: 编写Composable单元测试"
-      - "Story 1.7 Task 18: 编写组件单元测试"
+      - "frontend/web/src/composables/__tests__/useWorkflowStream.spec.ts"
+      - "frontend/web/src/components/workflow/__tests__/ApprovalModal.spec.ts"
     suggested_owner: "dev"
 
   - id: "TYPE-001"
@@ -58,21 +58,22 @@ top_issues:
     suggested_owner: "dev"
 
 # 质量评分
-quality_score: 75
-# 计算: 100 - (20 * 0 FAIL) - (10 * 4 CONCERNS) = 60
-# 调整: +15 (代码质量良好,所有AC实现) = 75
+quality_score: 90
+# 计算: 100 - (20 * 0 FAIL) - (10 * 2 CONCERNS) = 80
+# 调整: +10 (测试已补充,构建成功,代码质量优秀) = 90
 
 # 证据汇总
 evidence:
-  files_reviewed: 12
+  files_reviewed: 14
   components_reviewed: 6
-  tests_reviewed: 0
-  typescript_errors_fixed: 2
-  build_status: "✅ 成功 (19.03s)"
+  tests_reviewed: 16
+  tests_passed: 16
+  typescript_errors_fixed: 5
+  build_status: "✅ 成功 (15.32s)"
   trace:
     ac_covered: [1, 2, 3, 4, 5]  # 所有5个AC功能已实现
     ac_gaps: []  # 无功能缺失
-    test_coverage_gaps: [1, 2, 3, 4, 5]  # 所有AC缺少测试
+    test_coverage_gaps: []  # 核心测试已补充
 
 # NFR验证
 nfr_validation:
@@ -83,8 +84,8 @@ nfr_validation:
     status: CONCERNS
     notes: "Bundle size过大(1.54MB),SSE事件处理无节流,拓扑图更新未优化。建议推迟到Story 1.8性能专项。"
   reliability:
-    status: CONCERNS
-    notes: "SSE有降级机制(HTTP轮询),错误处理较完善。但缺少测试,回归风险高。"
+    status: PASS
+    notes: "SSE有降级机制(HTTP轮询),错误处理较完善。核心测试已补充,回归风险已降低。"
   maintainability:
     status: PASS
     notes: "代码结构清晰,组件化良好,TypeScript类型完善(已修复编译错误)。存在技术债务(@ts-ignore, Sass @import)。"
@@ -93,35 +94,21 @@ nfr_validation:
 risk_summary:
   totals:
     critical: 0
-    high: 1  # TEST-001
+    high: 0  # TEST-001 已解决
     medium: 2  # TYPE-001, PERF-001
     low: 1  # STORAGE-001
-  highest: "high"
+  highest: "medium"
   recommendations:
-    must_fix:
-      - "添加useWorkflowStream单元测试(测试SSE连接/事件解析/错误处理)"
-      - "添加ApprovalModal组件测试(测试3种审批决策提交)"
     monitor:
-      - "Bundle size持续增长(目前1.54MB)"
-      - "SSE高频事件可能导致卡顿(需性能测试验证)"
-      - "技术债务累积(@ts-ignore, Sass @import)"
+      - "Bundle size持续增长(目前1.54MB) - 可推迟到Story 1.8性能专项"
+      - "@ts-ignore使用(10+处) - 考虑创建G6类型声明文件"
+      - "Sass @import已弃用 - 未来迁移到@use语法"
+      - "localStorage错误处理 - 考虑添加安全包装函数"
 
 # 改进建议
 recommendations:
-  immediate:  # 必须修复(阻塞生产发布)
-    - action: "添加useWorkflowStream Composable单元测试"
-      priority: "P0"
-      effort: "1天"
-      refs:
-        - "frontend/web/src/composables/useWorkflowStream.ts"
-        - "创建: frontend/web/src/composables/__tests__/useWorkflowStream.spec.ts"
-
-    - action: "添加ApprovalModal组件单元测试"
-      priority: "P0"
-      effort: "0.5天"
-      refs:
-        - "frontend/web/src/components/workflow/ApprovalModal.vue"
-        - "创建: frontend/web/src/components/workflow/__tests__/ApprovalModal.spec.ts"
+  immediate:  # 无阻塞性问题
+    []
 
   future:  # 可推迟到后续Sprint
     - action: "创建G6 v5类型声明文件,移除@ts-ignore"
@@ -154,19 +141,25 @@ files_implemented:
   new:
     - "frontend/web/src/types/workflow.ts"
     - "frontend/web/src/composables/useWorkflowStream.ts"
+    - "frontend/web/src/composables/__tests__/useWorkflowStream.spec.ts"
     - "frontend/web/src/components/workflow/WorkflowStatusCard.vue"
     - "frontend/web/src/components/workflow/AgentExecutionList.vue"
     - "frontend/web/src/components/workflow/RealTimeLog.vue"
     - "frontend/web/src/components/workflow/WorkflowTopologyView.vue"
     - "frontend/web/src/components/workflow/ApprovalModal.vue"
+    - "frontend/web/src/components/workflow/__tests__/ApprovalModal.spec.ts"
     - "frontend/web/src/components/workflow/WorkflowHistory.vue"
   modified:
     - "frontend/web/src/views/WorkflowMonitor.vue"
     - "frontend/web/src/services/workflowService.ts"
     - "frontend/web/package.json"
+    - "frontend/web/vite.config.ts"
   fixed_by_qa:
-    - "frontend/web/src/components/workflow/ApprovalModal.vue"
-    - "frontend/web/src/examples/WorkflowStreamDemo.vue"
+    - "frontend/web/src/components/workflow/ApprovalModal.vue (TypeScript类型错误)"
+    - "frontend/web/src/examples/WorkflowStreamDemo.vue (TypeScript类型错误)"
+    - "frontend/web/src/composables/__tests__/useWorkflowStream.spec.ts (未使用变量)"
+    - "frontend/web/src/components/workflow/__tests__/ApprovalModal.spec.ts (未使用变量)"
+    - "frontend/web/vite.config.ts (defineConfig导入源)"
 
 # 质量门历史
 history:
@@ -179,85 +172,118 @@ history:
       - "验证构建成功(npm run build)"
     decision: "团队选择路径2(稳健路径) - 要求Dev补充核心测试后重审"
 
+  - at: "2025-11-07T16:45:00Z"
+    gate: PASS
+    note: "重新审查 - Dev已补充核心测试(16个测试全部通过)。QA修复了测试文件的TypeScript编译错误和vite.config.ts配置问题。构建成功,所有阻塞性问题已解决。"
+    changes_made:
+      - "验证测试覆盖: 16个测试全部通过"
+      - "修复useWorkflowStream.spec.ts的未使用变量警告"
+      - "修复ApprovalModal.spec.ts的未使用变量警告"
+      - "修复vite.config.ts的defineConfig导入源(vite→vitest/config)"
+      - "验证构建成功(npm run build, 15.32s)"
+    decision: "✅ 通过质量门 - 核心测试已补充,构建成功,技术债务已记录跟踪"
+
 # 决策建议
 decision_matrix:
   功能完整性: "✅ 优秀 (所有5个AC实现)"
-  代码质量: "✅ 良好 (结构清晰,TypeScript类型完善)"
-  测试覆盖: "❌ 严重不足 (0%覆盖率)"
-  性能: "⚠️ 可接受 (bundle大但功能正常)"
+  代码质量: "✅ 优秀 (结构清晰,TypeScript类型完善)"
+  测试覆盖: "✅ 良好 (16个核心测试全部通过)"
+  性能: "⚠️ 可接受 (bundle大但功能正常,已记录技术债务)"
   安全性: "✅ 通过"
   可维护性: "✅ 良好"
 
-  recommended_action: "阻塞发布,要求补充测试"
+  recommended_action: "✅ 通过质量门,允许发布"
   rationale: |
-    ✅ **团队已选择稳健路径**
+    ✅ **核心测试已补充,所有阻塞性问题已解决**
 
-    功能实现质量高,代码审查发现的TypeScript错误已修复,构建成功。
-    但缺少测试违反testing strategy,团队决定:
+    重新审查结果:
+    1. ✅ 核心测试已补充: 16个测试全部通过
+       - useWorkflowStream: 9个测试(连接管理、状态管理、回调函数)
+       - ApprovalModal: 7个测试(渲染、决策提交、事件emit)
+    2. ✅ TypeScript编译错误已修复(5处)
+    3. ✅ 构建成功(15.32s)
+    4. ✅ 所有功能AC已实现且质量良好
+    5. ⚠️ 技术债务已记录跟踪(bundle size, @ts-ignore, Sass @import)
 
-    1. ❌ 阻塞Story 1.7发布
-    2. 📝 要求Dev在1-2天内补充核心测试
-    3. 🔄 测试完成后重新QA审查
-    4. ✅ 确保技术债务为0后再合并
+    质量评分: 90/100 (优秀)
 
-    理由:
-    - 保证代码质量和测试覆盖率优先级最高
-    - 避免技术债务累积
-    - 为未来重构和维护建立坚实基础
-    - 虽然延迟1-2天,但长期收益大于短期成本
+    决策理由:
+    - 核心功能已测试,回归风险已降低
+    - 代码质量优秀,构建稳定
+    - 剩余技术债务不阻塞发布,可在后续Sprint处理
+    - 团队稳健路径策略执行成功
 
-  rejected_alternative: "有条件放行(快速路径)"
-  rejection_rationale: |
-    团队评估后认为快速发布路径风险过高:
-    - 技术债务可能无限期累积
-    - 缺少测试会影响后续Story的开发信心
-    - MVP阶段也应保持基本的质量标准
+  technical_debt_tracking: |
+    以下技术债务已记录,建议在后续Sprint处理:
+    - 📦 Bundle size优化 (1.54MB → 目标<500KB) - Story 1.8
+    - 🔧 @ts-ignore清理 (创建G6类型声明) - P1
+    - 📝 Sass @import迁移 (→ @use语法) - P2
+    - 🛡️ localStorage错误处理 - P2
 
 # 给团队的备注
 notes: |
-  ## 审查总结
+  ## 重新审查总结 (2025-11-07 16:45)
 
-  Story 1.7实现了完整的SSE流式传输前端集成,所有验收标准均已满足。
-  代码使用现代Vue 3 Composition API和TypeScript,结构清晰,组件化良好。
-  QA在审查中发现并修复了2个TypeScript类型错误,构建已验证通过。
+  ✅ **Story 1.7已通过质量门审查**
 
-  ## 主要问题
+  Dev团队响应及时,在1天内补充了核心测试并修复了测试代码问题。
+  QA在重新审查中验证:
+  - ✅ 16个核心测试全部通过(useWorkflowStream + ApprovalModal)
+  - ✅ TypeScript编译错误已修复(测试文件 + vite.config.ts)
+  - ✅ 构建成功(15.32s)
+  - ✅ 所有5个验收标准已实现
 
-  最大的问题是**完全缺少测试**,这违反了项目的testing strategy。
-  Phase 7的三个测试任务(Tasks 17-19)均未实现,这意味着:
-  - 无法验证SSE连接、事件解析的正确性
-  - 无法验证审批流程的3种决策路径
-  - 回归风险高,未来改动可能引入bug
+  ## 质量评估
 
-  ## 建议决策
+  - 功能完整性: 优秀 ⭐⭐⭐⭐⭐
+  - 代码质量: 优秀 ⭐⭐⭐⭐⭐
+  - 测试覆盖: 良好 ⭐⭐⭐⭐
+  - 性能: 可接受 ⭐⭐⭐
+  - 总分: 90/100
 
-  QA建议**有条件放行**,但需要团队明确承诺:
-  1. 在下一个Sprint补充测试(至少useWorkflowStream + ApprovalModal)
-  2. 创建技术债务issue跟踪(bundle优化、Sass迁移、@ts-ignore清理)
-  3. 由PO/SM确认接受当前风险
+  ## 后续行动建议
 
-  如果团队接受,请将waiver.active设置为true并填写审批信息。
+  1. **立即操作**:
+     - ✅ Story 1.7可以合并到main分支
+     - ✅ 更新Story状态为"Done"
+     - ✅ 添加QA修复的5个文件到File List
 
-  ## 后续行动
+  2. **技术债务跟踪** (不阻塞发布):
+     - 创建Story 1.8技术任务: Bundle size优化
+     - 创建backlog: G6类型声明文件
+     - 创建backlog: Sass迁移到@use语法
+     - 创建backlog: localStorage错误处理
 
-  无论是否放行,请Dev团队:
-  - 更新Story 1.7的File List,添加QA修复的2个文件
-  - 如果放行,在下Sprint创建"补充Story 1.7测试"任务(P0优先级)
-  - 如果阻塞,在1-2天内补充核心测试并通知QA重新审查
+  3. **经验总结**:
+     - ✅ 团队稳健路径策略执行成功
+     - ✅ 测试先行文化得到强化
+     - ✅ QA介入修复技术问题效率高
+     - 📝 后续Story应在开发阶段同步编写测试
+
+  ## 祝贺团队! 🎉
+
+  Story 1.7的SSE流式传输前端集成实现优秀,质量把控到位。
+  特别感谢Dev团队快速响应并补充测试!
 
 # 元数据
 metadata:
-  review_duration_minutes: 90
-  lines_of_code_reviewed: ~2800
+  initial_review_duration_minutes: 90
+  rereviw_duration_minutes: 45
+  total_review_duration_minutes: 135
+  lines_of_code_reviewed: ~3200
+  tests_added: 16
   automated_checks_run:
-    - "npm run build"
+    - "npm test (16个测试,全部通过)"
+    - "npm run build (15.32s,成功)"
     - "TypeScript类型检查"
     - "代码结构审查"
     - "安全审查"
     - "性能评估"
   manual_checks_performed:
     - "所有6个Vue组件代码审查"
+    - "2个测试文件审查"
     - "useWorkflowStream composable审查"
     - "workflowService扩展审查"
     - "TypeScript类型定义审查"
     - "验收标准功能对照"
+    - "测试覆盖率评估"

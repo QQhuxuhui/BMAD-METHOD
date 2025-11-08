@@ -5,7 +5,7 @@ including authentication, streaming, and error handling.
 """
 
 import pytest
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 from fastapi import status
 
 from app.main import app
@@ -20,11 +20,10 @@ def auth_headers():
     Returns:
         Dict containing Authorization header with valid JWT token
     """
-    # Create a test token with user_id
-    token = create_access_token(
-        data={"sub": "test@example.com", "user_id": 1}
-    )
-    return {"Authorization": f"Bearer {token}"}
+    # Create a test token with thread_id (which is used to identify user)
+    # Note: create_access_token takes thread_id as first parameter
+    token = create_access_token(thread_id="test-thread-1")
+    return {"Authorization": f"Bearer {token.access_token}"}
 
 
 @pytest.fixture
@@ -34,10 +33,8 @@ def auth_headers_user2():
     Returns:
         Dict containing Authorization header for user 2
     """
-    token = create_access_token(
-        data={"sub": "user2@example.com", "user_id": 2}
-    )
-    return {"Authorization": f"Bearer {token}"}
+    token = create_access_token(thread_id="test-thread-2")
+    return {"Authorization": f"Bearer {token.access_token}"}
 
 
 @pytest.fixture
@@ -63,7 +60,8 @@ async def test_langserve_invoke_without_token():
 
     Should return 401 when no auth token is provided.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
             "/api/v1/bmad-workflow/invoke",
             json={"input": {"problem_description": "test"}},
@@ -78,7 +76,8 @@ async def test_langserve_invoke_with_invalid_token():
 
     Should return 401 when auth token is invalid.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
             "/api/v1/bmad-workflow/invoke",
             headers={"Authorization": "Bearer invalid_token_here"},
@@ -95,7 +94,8 @@ async def test_langserve_invoke_missing_problem_description(auth_headers):
 
     Should return 422 when problem_description is missing.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
             "/api/v1/bmad-workflow/invoke",
             headers=auth_headers,
@@ -116,7 +116,8 @@ async def test_langserve_invoke_empty_problem_description(auth_headers):
 
     Should return error when problem_description is empty or too short.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
             "/api/v1/bmad-workflow/invoke",
             headers=auth_headers,
@@ -169,7 +170,8 @@ async def test_langserve_stream_without_token():
 
     Should return 401 when no auth token is provided.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
             "/api/v1/bmad-workflow/stream",
             json={"input": {"problem_description": "test"}},
@@ -254,7 +256,8 @@ async def test_openapi_schema_includes_langserve_endpoints():
 
     Verifies that /docs and /openapi.json include the auto-generated endpoints.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/openapi.json")
 
     assert response.status_code == status.HTTP_200_OK
@@ -283,11 +286,11 @@ async def test_langserve_invoke_malformed_json(auth_headers):
 
     Should return 422 for invalid JSON structure.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         # Send invalid JSON structure
         response = await client.post(
             "/api/v1/bmad-workflow/invoke",
-            headers=auth_headers,
             content="{ invalid json }",  # Malformed JSON
             headers={**auth_headers, "Content-Type": "application/json"},
         )
@@ -301,7 +304,8 @@ async def test_langserve_batch_endpoint_exists(auth_headers):
 
     Verifies that the auto-generated batch endpoint exists.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.post(
             "/api/v1/bmad-workflow/batch",
             headers=auth_headers,
@@ -325,7 +329,8 @@ async def test_playground_endpoint_accessible():
 
     Verifies that GET /playground/ returns HTML content.
     """
-    async with AsyncClient(app=app, base_url="http://test") as client:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as client:
         response = await client.get("/api/v1/bmad-workflow/playground/")
 
     # Should return 200 with HTML content (or redirect)

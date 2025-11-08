@@ -21,33 +21,39 @@ async def inject_user_context(
 ) -> RunnableConfig:
     """Inject user context into RunnableConfig from JWT token.
 
-    This config modifier extracts the authenticated user from the request
+    This config modifier extracts the authenticated user from the request state
     (which has already been validated by the dependencies) and injects
     the user_id into the RunnableConfig for use in the workflow execution.
 
     Args:
-        request: FastAPI Request object containing the JWT token
+        request: FastAPI Request object containing the authenticated user
         config: Original RunnableConfig from LangServe
 
     Returns:
         RunnableConfig: Updated config with user_id in configurable section
 
     Note:
-        This function assumes JWT authentication has already been validated
-        by the dependencies=[Depends(get_current_user)] parameter.
+        This function retrieves the user from request.state, which was set
+        by the dependencies=[Depends(get_current_user)] parameter. This avoids
+        duplicate JWT authentication and improves performance.
     """
-    # Extract user from request state (set by get_current_user dependency)
-    # Since dependencies are executed before per_req_config_modifier,
-    # we can safely call get_current_user here
     try:
-        from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+        # Retrieve user from request state (set by dependency)
+        # This avoids re-authenticating the JWT token
+        user: User = getattr(request.state, "user", None)
 
-        security = HTTPBearer()
-        credentials: HTTPAuthorizationCredentials = await security(request)
+        if not user:
+            # Fallback: Re-authenticate if user not in state
+            # This should not happen if dependencies are configured correctly
+            logger.warning(
+                "user_not_in_request_state",
+                message="User not found in request.state. Falling back to token authentication.",
+            )
+            from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
-        # Re-authenticate to get user object
-        # (This is safe as the token has already been validated by dependencies)
-        user: User = await get_current_user(credentials)
+            security = HTTPBearer()
+            credentials: HTTPAuthorizationCredentials = await security(request)
+            user: User = await get_current_user(credentials)
 
         # Inject user_id into config
         updated_config = {
@@ -72,7 +78,8 @@ async def inject_user_context(
             error=str(e),
         )
         # Return original config if injection fails
-        # (The request will still be authenticated by dependencies)
+        # The request will still be authenticated by dependencies,
+        # but user_id won't be available in the workflow
         return config or {}
 
 
@@ -109,8 +116,6 @@ def register_langserve_routes(app: FastAPI) -> None:
             dependencies=[Depends(get_current_user)],
             # Inject user context into RunnableConfig
             per_req_config_modifier=inject_user_context,
-            # Configure tags for OpenAPI documentation
-            tags=["LangServe - BMAD Workflow"],
         )
 
         logger.info(
