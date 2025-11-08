@@ -154,7 +154,7 @@ async def get_current_session(
         )
 
 
-@router.post("/register", response_model=UserResponse)
+@router.post("/register", response_model=UserResponse, status_code=201)
 @limiter.limit(settings.RATE_LIMIT_ENDPOINTS["register"][0])
 async def register_user(request: Request, user_data: UserCreate):
     """Register a new user.
@@ -184,7 +184,7 @@ async def register_user(request: Request, user_data: UserCreate):
         # Create access token
         token = create_access_token(str(user.id))
 
-        return UserResponse(id=user.id, email=user.email, token=token)
+        return UserResponse(id=user.id, email=user.email, token=token.access_token)
     except ValueError as ve:
         logger.error("user_registration_validation_failed", error=str(ve), exc_info=True)
         raise HTTPException(status_code=422, detail=str(ve))

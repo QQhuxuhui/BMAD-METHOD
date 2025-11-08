@@ -92,12 +92,12 @@ class UserResponse(BaseModel):
     Attributes:
         id: User's ID
         email: User's email address
-        token: Authentication token
+        token: Authentication token (JWT string)
     """
 
     id: int = Field(..., description="User's ID")
     email: str = Field(..., description="User's email address")
-    token: Token = Field(..., description="Authentication token")
+    token: str = Field(..., description="Authentication token (JWT string)")
 
 
 class SessionResponse(BaseModel):
