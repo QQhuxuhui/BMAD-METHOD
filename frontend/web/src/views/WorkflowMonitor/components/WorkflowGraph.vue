@@ -271,6 +271,7 @@ const initGraph = () => {
       rankdir: 'TB', // 从上到下
       nodesep: 90,
       ranksep: 140,
+      align: 'DL', // 左对齐,避免偏移
     },
     defaultNode: {
       type: 'agent-node',
@@ -292,7 +293,7 @@ const initGraph = () => {
       default: ['drag-canvas', 'zoom-canvas', 'drag-node'],
     },
     fitView: true,
-    fitViewPadding: 40,
+    fitViewPadding: [20, 50, 20, 50], // 减小padding,更好利用空间
   })
 
   const data = createGraphData()
@@ -345,7 +346,7 @@ watch(
  */
 const handleFitView = () => {
   if (graph) {
-    graph.fitView(40)
+    graph.fitView([20, 50, 20, 50])
     message.success('已适应画布')
   }
 }
