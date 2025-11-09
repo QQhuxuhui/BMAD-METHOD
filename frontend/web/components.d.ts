@@ -61,6 +61,7 @@ declare module 'vue' {
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
     ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATypographyTitle: typeof import('ant-design-vue/es')['TypographyTitle']
+    CountUp: typeof import('./src/components/CountUp.vue')['default']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RealTimeLog: typeof import('./src/components/workflow/RealTimeLog.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

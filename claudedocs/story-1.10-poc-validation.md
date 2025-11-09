@@ -56,6 +56,7 @@
 - 节点视觉效果符合设计要求
 
 **关键代码**:
+
 ```typescript
 G6.registerNode('agent-node', {
   draw(cfg, group) {
@@ -63,8 +64,8 @@ G6.registerNode('agent-node', {
   },
   setState(name, value, item) {
     // 状态颜色和动画
-  }
-})
+  },
+});
 ```
 
 ### ✅ 验证点3: 智能体中文化
@@ -73,16 +74,16 @@ G6.registerNode('agent-node', {
 
 智能体配置成功实现双语支持和图标映射:
 
-| ID | 英文名 | 中文名 | 图标 |
-|----|--------|--------|------|
-| orchestrator | Orchestrator | 总指挥 | 🎯 |
-| algorithm | Algorithm Expert | 算法专家 | 🧮 |
-| constraint | Constraint Expert | 约束专家 | ⚖️ |
-| objective | Objective Expert | 目标专家 | 🎯 |
-| domain | Domain Expert | 领域专家 | 🏢 |
-| python | Code Implementation Expert | Python专家 | 🐍 |
-| extension | Extension Expert | 扩展专家 | 🔌 |
-| quality | Quality Expert | 质量专家 | ✅ |
+| ID           | 英文名                     | 中文名     | 图标 |
+| ------------ | -------------------------- | ---------- | ---- |
+| orchestrator | Orchestrator               | 总指挥     | 🎯   |
+| algorithm    | Algorithm Expert           | 算法专家   | 🧮   |
+| constraint   | Constraint Expert          | 约束专家   | ⚖️   |
+| objective    | Objective Expert           | 目标专家   | 🎯   |
+| domain       | Domain Expert              | 领域专家   | 🏢   |
+| python       | Code Implementation Expert | Python专家 | 🐍   |
+| extension    | Extension Expert           | 扩展专家   | 🔌   |
+| quality      | Quality Expert             | 质量专家   | ✅   |
 
 **特别说明**: 用户要求将 "Code Implementation Expert" 映射为 "Python专家" 而非 "代码实现专家"，已按要求实现。
 
@@ -110,6 +111,7 @@ G6.registerNode('agent-node', {
    - 当前执行提示: 实时显示当前执行的智能体信息
 
 **控制台输出**:
+
 ```
 [执行] 总指挥 (Orchestrator)
 [执行] 算法专家 (Algorithm Expert)
@@ -122,6 +124,7 @@ G6.registerNode('agent-node', {
 ```
 
 **截图**:
+
 - `g6-poc-running.png`: 执行中状态（部分节点绿色completed）
 - `g6-poc-reset.png`: 重置后状态（所有节点灰色pending）
 
@@ -130,6 +133,7 @@ G6.registerNode('agent-node', {
 ### 问题1: Vue组件无法解析
 
 **现象**:
+
 ```
 [Vue warn]: Failed to resolve component: workflow-graph-poc
 ```
@@ -137,6 +141,7 @@ G6.registerNode('agent-node', {
 **原因**: Vue 3 `<script setup>` 中，模板应使用PascalCase而非kebab-case
 
 **解决**:
+
 ```vue
 <!-- 错误 -->
 <workflow-graph-poc />
@@ -148,6 +153,7 @@ G6.registerNode('agent-node', {
 ### 问题2: @antv/g6 导入失败
 
 **现象**:
+
 ```
 SyntaxError: The requested module '@antv/g6' does not provide an export named 'default'
 ```
@@ -155,6 +161,7 @@ SyntaxError: The requested module '@antv/g6' does not provide an export named 'd
 **原因**: 初始安装的是G6 v5.0.50，但POC代码基于v4 API编写
 
 **解决**:
+
 ```bash
 npm install @antv/g6@^4.8.0
 ```
@@ -166,6 +173,7 @@ npm install @antv/g6@^4.8.0
 ### 问题3: Vite依赖优化失败
 
 **现象**:
+
 ```
 Error: ENOENT: no such file or directory, open 'node_modules/marked/lib/marked.esm.js'
 ```
@@ -173,6 +181,7 @@ Error: ENOENT: no such file or directory, open 'node_modules/marked/lib/marked.e
 **原因**: OutputStream.vue中使用了marked和highlight.js但未安装依赖
 
 **解决**:
+
 ```bash
 npm install marked highlight.js
 rm -rf node_modules/.vite
@@ -191,18 +200,18 @@ npm run dev
 ### ✅ TypeScript类型支持
 
 ```typescript
-import G6, { Graph } from '@antv/g6'
+import G6, { Graph } from '@antv/g6';
 
 interface AgentConfig {
-  id: string
-  nameEn: string
-  nameCn: string
-  icon: string
-  phase: number
-  dependencies: string[]
+  id: string;
+  nameEn: string;
+  nameCn: string;
+  icon: string;
+  phase: number;
+  dependencies: string[];
 }
 
-let graph: Graph | null = null
+let graph: Graph | null = null;
 ```
 
 类型定义清晰，无类型错误。
@@ -227,6 +236,7 @@ let graph: Graph | null = null
 ✅ **建议使用 AntV G6 v4** 作为Story 1.10的图形引擎
 
 **理由**:
+
 - POC验证完全通过
 - 与Vue 3集成无问题
 - 性能满足需求
@@ -237,6 +247,7 @@ let graph: Graph | null = null
 **当前**: v4.8.0
 
 **v5考虑**:
+
 - v5架构完全重写，API不兼容
 - 需要重写所有节点注册和布局代码
 - 性能提升约30%，但学习成本高
@@ -246,6 +257,7 @@ let graph: Graph | null = null
 ### 3. 节点可见性优化
 
 当前POC中，节点上的emoji和文字在截图中显示较小。建议正式开发时:
+
 - 增大emoji字体到32px
 - 增加节点半径到50-60px
 - 优化文字排版和间距
@@ -253,6 +265,7 @@ let graph: Graph | null = null
 ### 4. 交互功能扩展
 
 POC验证了基础交互，Story 1.10可扩展:
+
 - 节点点击查看智能体详情
 - 节点悬停显示Tooltip
 - 拖拽画布和缩放
@@ -261,6 +274,7 @@ POC验证了基础交互，Story 1.10可扩展:
 ### 5. 实时数据集成
 
 POC使用模拟数据，正式开发需要:
+
 - 对接Pinia Store中的workflow状态
 - 监听SSE事件更新节点状态
 - 实现真实的依赖关系计算

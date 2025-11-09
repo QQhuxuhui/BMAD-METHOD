@@ -13,25 +13,25 @@
             </template>
             开发模式 (Mock数据)
           </a-tag>
-          <a-button v-if="isDev" @click="handleStart">
+          <a-button v-ripple v-if="isDev" @click="handleStart">
             <template #icon>
               <PlayCircleOutlined />
             </template>
             启动
           </a-button>
-          <a-button v-if="isDev" @click="handleStop">
+          <a-button v-ripple v-if="isDev" @click="handleStop">
             <template #icon>
               <PauseCircleOutlined />
             </template>
             停止
           </a-button>
-          <a-button v-if="isDev" @click="handleReset">
+          <a-button v-ripple v-if="isDev" @click="handleReset">
             <template #icon>
               <ReloadOutlined />
             </template>
             重置
           </a-button>
-          <a-button type="primary" @click="handleRefresh">
+          <a-button v-ripple type="primary" @click="handleRefresh">
             <template #icon>
               <ReloadOutlined />
             </template>
@@ -66,7 +66,7 @@
             <DeploymentUnitOutlined />
             工作流协作图
           </span>
-          <a-button size="small" type="text" @click="toggleGraph">
+          <a-button v-ripple size="small" type="text" @click="toggleGraph">
             <template #icon>
               <UpOutlined v-if="!graphCollapsed" />
               <DownOutlined v-else />
@@ -87,8 +87,16 @@
       width="80%"
       :footer="null"
       :destroy-on-close="true"
+      :transition-name="'modal-fade'"
     >
-      <div v-if="selectedAgent && selectedAgentConfig" class="agent-output-detail">
+      <div
+        v-if="selectedAgent && selectedAgentConfig"
+        v-motion
+        :initial="{ opacity: 0, y: 20 }"
+        :enter="{ opacity: 1, y: 0, transition: { duration: 300, ease: 'easeOut' } }"
+        :leave="{ opacity: 0, y: -20, transition: { duration: 200 } }"
+        class="agent-output-detail"
+      >
         <!-- 智能体基本信息 -->
         <div class="agent-header">
           <span class="agent-icon">{{ selectedAgentConfig.icon }}</span>
@@ -162,6 +170,7 @@ import {
 import { marked } from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
+import { vRipple } from '@/directives/ripple'
 
 // Configure marked with highlight.js
 marked.setOptions({
@@ -416,6 +425,17 @@ const formatAgentOutput = (output: any): string => {
 </script>
 
 <style scoped lang="scss">
+// Modal淡入淡出动画
+:deep(.modal-fade-enter-active),
+:deep(.modal-fade-leave-active) {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+:deep(.modal-fade-enter-from),
+:deep(.modal-fade-leave-to) {
+  opacity: 0;
+}
+
 .workflow-monitor {
   // 全屏布局,抵消MainLayout的padding和margin
   // 上下: -24px (抵消内层div padding)

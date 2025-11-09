@@ -4,7 +4,7 @@
     <div class="graph-toolbar">
       <a-space>
         <a-tooltip title="适应画布">
-          <a-button size="small" @click="handleFitView">
+          <a-button v-ripple size="small" @click="handleFitView">
             <template #icon>
               <FullscreenOutlined />
             </template>
@@ -12,7 +12,7 @@
         </a-tooltip>
 
         <a-tooltip title="放大">
-          <a-button size="small" @click="handleZoomIn">
+          <a-button v-ripple size="small" @click="handleZoomIn">
             <template #icon>
               <ZoomInOutlined />
             </template>
@@ -20,7 +20,7 @@
         </a-tooltip>
 
         <a-tooltip title="缩小">
-          <a-button size="small" @click="handleZoomOut">
+          <a-button v-ripple size="small" @click="handleZoomOut">
             <template #icon>
               <ZoomOutOutlined />
             </template>
@@ -28,7 +28,7 @@
         </a-tooltip>
 
         <a-tooltip title="重置视图">
-          <a-button size="small" @click="handleReset">
+          <a-button v-ripple size="small" @click="handleReset">
             <template #icon>
               <ReloadOutlined />
             </template>
@@ -55,6 +55,7 @@ import G6, { Graph } from '@antv/g6'
 import { useWorkflowStore } from '@/stores/workflow'
 import { AGENTS_CONFIG, getAgentDependencies } from '@/config/agents'
 import type { AgentStatus } from '@/types/workflow'
+import { vRipple } from '@/directives/ripple'
 
 // Props
 interface Props {

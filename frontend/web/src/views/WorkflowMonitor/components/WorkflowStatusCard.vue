@@ -14,7 +14,9 @@
       <div class="progress-section">
         <div class="progress-header">
           <span class="progress-label">整体进度</span>
-          <span class="progress-value">{{ progress }}%</span>
+          <span class="progress-value">
+            <count-up :end-val="progress" :duration="1" suffix="%" />
+          </span>
         </div>
         <a-progress
           :percent="progress"
@@ -51,15 +53,13 @@
         </a-col>
 
         <a-col :span="8">
-          <a-statistic
-            title="完成智能体"
-            :value="`${completedCount}/${totalCount}`"
-            :value-style="{ color: '#722ed1', fontSize: '20px' }"
-          >
-            <template #prefix>
-              <CheckCircleOutlined />
-            </template>
-          </a-statistic>
+          <div class="custom-statistic">
+            <div class="statistic-title">完成智能体</div>
+            <div class="statistic-content" style="color: #722ed1">
+              <CheckCircleOutlined class="statistic-prefix" />
+              <count-up :end-val="completedCount" :duration="1" /><span class="count-separator">/</span><span>{{ totalCount }}</span>
+            </div>
+          </div>
         </a-col>
       </a-row>
 
@@ -116,6 +116,7 @@ import {
   StopOutlined,
   ReloadOutlined
 } from '@ant-design/icons-vue'
+import CountUp from '@/components/CountUp.vue'
 
 // Props
 interface Props {
@@ -316,6 +317,32 @@ const handleReset = () => {
 
   :deep(.ant-statistic-content) {
     font-size: 20px;
+  }
+
+  // 自定义统计组件样式
+  .custom-statistic {
+    .statistic-title {
+      font-size: 14px;
+      color: rgba(0, 0, 0, 0.45);
+      margin-bottom: 4px;
+    }
+
+    .statistic-content {
+      display: flex;
+      align-items: center;
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.35;
+
+      .statistic-prefix {
+        margin-right: 8px;
+        font-size: 18px;
+      }
+
+      .count-separator {
+        margin: 0 2px;
+      }
+    }
   }
 }
 </style>

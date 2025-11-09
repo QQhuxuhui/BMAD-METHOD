@@ -70,5 +70,6 @@ aps-outputs/*
 
 .claude
 .cursor.playwright-mcp/
+.playwright-mcp/
 .cursor/
 

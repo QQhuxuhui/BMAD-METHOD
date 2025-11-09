@@ -17,8 +17,10 @@
   "dependencies": {
     "@antv/g6": "^4.8.25",
     "@vueuse/core": "^14.0.0",
+    "@vueuse/motion": "^3.0.3",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.13.2",
+    "countup.js": "^2.9.0",
     "dayjs": "^1.11.19",
     "highlight.js": "^11.11.1",
     "marked": "^17.0.0",
