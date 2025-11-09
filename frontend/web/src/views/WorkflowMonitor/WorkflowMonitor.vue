@@ -395,9 +395,12 @@ const formatAgentOutput = (output: any): string => {
 
 <style scoped lang="scss">
 .workflow-monitor {
-  // 全屏布局,抵消MainLayout的padding
-  margin: -24px;
-  height: calc(100vh - 64px - 70px); // 屏幕高度 - Header - Footer
+  // 全屏布局,抵消MainLayout的padding和margin
+  // 上下: -24px (抵消内层div padding)
+  // 左右: -40px (抵消内层div padding 24px + 外层layout-content margin 16px)
+  margin: -24px -40px;
+  // 高度计算: 100vh - Header(64px) - layoutContent上下margin(32px) - Footer(90px)
+  height: calc(100vh - 186px);
   display: flex;
   flex-direction: column;
   background-color: #f0f2f5;
