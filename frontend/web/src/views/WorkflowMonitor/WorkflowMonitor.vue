@@ -51,7 +51,7 @@
       <div class="bottom-section">
         <a-row :gutter="[16, 16]">
           <!-- 左侧：工作流状态卡片（简化版） -->
-          <a-col :xs="24" :lg="6">
+          <a-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6">
             <workflow-status-card
               :show-actions="false"
               compact
@@ -62,8 +62,8 @@
           </a-col>
 
           <!-- 右侧：输出流 -->
-          <a-col :xs="24" :lg="18">
-            <output-stream :max-height="300" />
+          <a-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18">
+            <output-stream :max-height="outputStreamHeight" />
           </a-col>
         </a-row>
       </div>
@@ -177,16 +177,69 @@ const outputModalVisible = ref(false)
 const selectedAgent = ref<AgentExecution | null>(null)
 const selectedAgentConfig = ref<AgentConfig | null>(null)
 
+// 响应式屏幕尺寸(带防抖)
+const windowWidth = ref(window.innerWidth)
+const windowHeight = ref(window.innerHeight)
+
+/**
+ * 防抖函数
+ */
+const debounce = <T extends (...args: any[]) => void>(fn: T, delay: number) => {
+  let timeoutId: ReturnType<typeof setTimeout>
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId)
+    timeoutId = setTimeout(() => fn(...args), delay)
+  }
+}
+
+/**
+ * 处理窗口大小变化(防抖300ms)
+ */
+const handleResize = debounce(() => {
+  windowWidth.value = window.innerWidth
+  windowHeight.value = window.innerHeight
+}, 300)
+
 /**
  * 计算图形高度
  * 屏幕高度 - Header高度 - 底部区域高度 - padding
+ * 使用防抖后的窗口尺寸
  */
 const graphHeight = computed(() => {
-  const screenHeight = window.innerHeight
-  const headerHeight = 120 // 约120px
-  const bottomHeight = 350 // 底部区域约350px
-  const padding = 48 // 上下padding
-  return Math.max(500, screenHeight - headerHeight - bottomHeight - padding)
+  // 移动端优化
+  if (windowWidth.value < 768) {
+    // 小屏幕：减少图形高度,为底部面板留更多空间
+    const headerHeight = 120
+    const bottomHeight = 500 // 移动端底部需要更多空间(垂直布局)
+    const padding = 32
+    return Math.max(400, windowHeight.value - headerHeight - bottomHeight - padding)
+  }
+
+  // 桌面端
+  const headerHeight = 120
+  const bottomHeight = 350
+  const padding = 48
+  return Math.max(500, windowHeight.value - headerHeight - bottomHeight - padding)
+})
+
+/**
+ * 计算输出流高度
+ * 根据屏幕尺寸动态调整
+ * 使用防抖后的窗口宽度
+ */
+const outputStreamHeight = computed(() => {
+  // 移动端：更高的输出流
+  if (windowWidth.value < 768) {
+    return 400
+  }
+
+  // 平板端
+  if (windowWidth.value < 1024) {
+    return 350
+  }
+
+  // 桌面端
+  return 300
 })
 
 // Workflow Stream Hook
@@ -210,10 +263,14 @@ const { status: streamStatus, connect, disconnect, reconnect } = useWorkflowStre
 // Lifecycle
 onMounted(() => {
   console.log('[WorkflowMonitor] Component mounted')
+  // 添加窗口大小变化监听器
+  window.addEventListener('resize', handleResize)
 })
 
 onBeforeUnmount(() => {
   disconnect()
+  // 移除窗口大小变化监听器
+  window.removeEventListener('resize', handleResize)
   console.log('[WorkflowMonitor] Component unmounted')
 })
 
@@ -363,6 +420,29 @@ const formatAgentOutput = (output: any): string => {
       flex-shrink: 0;
       max-height: 350px;
     }
+
+    // 移动端优化
+    @media (max-width: 768px) {
+      padding: 12px;
+      gap: 12px;
+
+      .graph-section {
+        min-height: 400px;
+      }
+
+      .bottom-section {
+        max-height: none; // 移动端不限制高度
+      }
+    }
+
+    // 平板端优化
+    @media (min-width: 769px) and (max-width: 1024px) {
+      padding: 14px;
+
+      .graph-section {
+        min-height: 450px;
+      }
+    }
   }
 
   .agent-output-detail {
@@ -402,6 +482,35 @@ const formatAgentOutput = (output: any): string => {
           font-size: 14px;
           color: rgba(0, 0, 0, 0.65);
           line-height: 1.6;
+        }
+      }
+
+      // 移动端优化
+      @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 12px;
+        gap: 12px;
+
+        .agent-icon {
+          font-size: 40px;
+        }
+
+        .agent-info {
+          .agent-name {
+            font-size: 18px;
+
+            .agent-name-en {
+              display: block;
+              margin-left: 0;
+              margin-top: 4px;
+            }
+          }
+
+          .agent-description {
+            font-size: 13px;
+          }
         }
       }
     }
