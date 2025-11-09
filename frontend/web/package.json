@@ -1,25 +1,27 @@
 {
   "name": "bmad-frontend",
-  "private": true,
   "version": "1.0.0",
+  "private": true,
   "description": "BMAD工作流监控平台前端",
   "type": "module",
   "scripts": {
-    "dev": "vite",
     "build": "vue-tsc -b && vite build",
+    "dev": "vite",
+    "format": "prettier --write src/",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "preview": "vite preview",
     "test": "vitest",
-    "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "test:ui": "vitest --ui"
   },
   "dependencies": {
-    "@antv/g6": "^5.0.50",
+    "@antv/g6": "^4.8.25",
     "@vueuse/core": "^14.0.0",
     "ant-design-vue": "^4.2.6",
     "axios": "^1.13.2",
     "dayjs": "^1.11.19",
+    "highlight.js": "^11.11.1",
+    "marked": "^17.0.0",
     "pinia": "^2.3.1",
     "vue": "^3.5.22",
     "vue-router": "^4.6.3"

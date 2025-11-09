@@ -21,6 +21,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '工作流监控' },
       },
       {
+        path: 'workflow-poc',
+        name: 'WorkflowGraphPOC',
+        component: () => import('@/views/WorkflowMonitor/WorkflowGraphPOCPage.vue'),
+        meta: { title: 'G6 POC测试' },
+      },
+      {
         path: 'settings',
         name: 'Settings',
         component: () => import('@/views/Settings.vue'),
