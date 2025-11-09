@@ -83,39 +83,97 @@ const graphContainer = ref<HTMLDivElement>()
 let graph: Graph | null = null
 
 /**
- * 注册自定义智能体节点
+ * 注册自定义智能体节点（现代化卡片式设计）
  */
 const registerAgentNode = () => {
   G6.registerNode('agent-node', {
     draw(cfg, group) {
       const { id, nameCn, icon, status = 'pending' } = cfg as any
 
-      // 节点状态颜色配置
-      const colorMap = {
-        pending: '#d9d9d9',
-        running: '#1890ff',
-        completed: '#52c41a',
-        failed: '#ff4d4f',
+      // 节点状态渐变色配置（使用线性渐变）
+      const gradientMap = {
+        pending: {
+          color1: '#e0e0e0',
+          color2: '#bdbdbd',
+          shadowColor: 'rgba(0, 0, 0, 0.15)',
+          glowColor: 'rgba(189, 189, 189, 0.3)',
+        },
+        running: {
+          color1: '#42a5f5',
+          color2: '#1976d2',
+          shadowColor: 'rgba(25, 118, 210, 0.3)',
+          glowColor: 'rgba(66, 165, 245, 0.5)',
+        },
+        completed: {
+          color1: '#66bb6a',
+          color2: '#388e3c',
+          shadowColor: 'rgba(56, 142, 60, 0.25)',
+          glowColor: 'rgba(102, 187, 106, 0.4)',
+        },
+        failed: {
+          color1: '#ef5350',
+          color2: '#c62828',
+          shadowColor: 'rgba(198, 40, 40, 0.3)',
+          glowColor: 'rgba(239, 83, 80, 0.4)',
+        },
       }
 
-      const fillColor = colorMap[status as keyof typeof colorMap] || colorMap.pending
+      const gradient = gradientMap[status as keyof typeof gradientMap] || gradientMap.pending
 
-      // 圆形背景
+      // 外层光晕（仅running状态）
+      if (status === 'running') {
+        group!.addShape('circle', {
+          attrs: {
+            x: 0,
+            y: 0,
+            r: 58,
+            fill: gradient.glowColor,
+            opacity: 0.6,
+          },
+          name: 'glow-outer',
+        })
+      }
+
+      // 外阴影圆（增加层次感）
+      group!.addShape('circle', {
+        attrs: {
+          x: 0,
+          y: 2,
+          r: 52,
+          fill: 'rgba(0, 0, 0, 0.1)',
+          opacity: 0.3,
+        },
+        name: 'shadow-circle',
+      })
+
+      // 主圆形背景（使用径向渐变）
       const circle = group!.addShape('circle', {
         attrs: {
           x: 0,
           y: 0,
           r: 50,
-          fill: fillColor,
+          fill: `l(45) 0:${gradient.color1} 1:${gradient.color2}`, // G6渐变语法：l(角度) 位置:颜色
           stroke: '#fff',
-          lineWidth: 3,
-          shadowColor: 'rgba(0, 0, 0, 0.15)',
-          shadowBlur: 8,
-          shadowOffsetX: 2,
-          shadowOffsetY: 2,
+          lineWidth: 4,
+          shadowColor: gradient.shadowColor,
+          shadowBlur: 12,
+          shadowOffsetX: 0,
+          shadowOffsetY: 4,
           cursor: 'pointer',
         },
         name: 'circle-shape',
+      })
+
+      // 高光效果（顶部半透明白色）
+      group!.addShape('circle', {
+        attrs: {
+          x: 0,
+          y: -15,
+          r: 20,
+          fill: 'rgba(255, 255, 255, 0.25)',
+          opacity: 0.8,
+        },
+        name: 'highlight',
       })
 
       // Emoji图标
@@ -129,6 +187,7 @@ const registerAgentNode = () => {
           textBaseline: 'middle',
           fontFamily: 'Arial',
           cursor: 'pointer',
+          textShadow: '0 2px 4px rgba(0, 0, 0, 0.2)', // 图标阴影
         },
         name: 'icon-shape',
       })
@@ -145,6 +204,7 @@ const registerAgentNode = () => {
           textBaseline: 'middle',
           fill: '#fff',
           cursor: 'pointer',
+          textShadow: '0 1px 3px rgba(0, 0, 0, 0.3)', // 文字阴影增强可读性
         },
         name: 'name-shape',
       })
@@ -153,7 +213,7 @@ const registerAgentNode = () => {
       group!.addShape('text', {
         attrs: {
           x: 0,
-          y: 60,
+          y: 62,
           text: id,
           fontSize: 10,
           textAlign: 'center',
@@ -166,41 +226,123 @@ const registerAgentNode = () => {
       return circle
     },
 
-    // 节点状态更新
+    // 节点状态更新（支持渐变色和光晕）
     setState(name, value, item) {
       const group = item!.getContainer()
-      const shape = group!.get('children')[0] // circle
+      const children = group!.get('children')
 
-      const colorMap = {
-        pending: '#d9d9d9',
-        running: '#1890ff',
-        completed: '#52c41a',
-        failed: '#ff4d4f',
+      // 节点状态渐变色配置
+      const gradientMap = {
+        pending: {
+          color1: '#e0e0e0',
+          color2: '#bdbdbd',
+          glowColor: 'rgba(189, 189, 189, 0.3)',
+        },
+        running: {
+          color1: '#42a5f5',
+          color2: '#1976d2',
+          glowColor: 'rgba(66, 165, 245, 0.5)',
+        },
+        completed: {
+          color1: '#66bb6a',
+          color2: '#388e3c',
+          glowColor: 'rgba(102, 187, 106, 0.4)',
+        },
+        failed: {
+          color1: '#ef5350',
+          color2: '#c62828',
+          glowColor: 'rgba(239, 83, 80, 0.4)',
+        },
+      }
+
+      // 找到主圆形（名称为circle-shape）
+      let circleShape = null
+      let glowShape = null
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i]
+        if (child.get('name') === 'circle-shape') {
+          circleShape = child
+        }
+        if (child.get('name') === 'glow-outer') {
+          glowShape = child
+        }
       }
 
       if (name === 'pending' && value) {
-        shape.attr('fill', colorMap.pending)
-        shape.stopAnimate()
+        const gradient = gradientMap.pending
+        circleShape?.attr('fill', `l(45) 0:${gradient.color1} 1:${gradient.color2}`)
+        circleShape?.stopAnimate()
+        // 移除光晕
+        if (glowShape) {
+          glowShape.attr('opacity', 0)
+        }
       } else if (name === 'running' && value) {
-        shape.attr('fill', colorMap.running)
-        // 呼吸灯动画
-        shape.animate(
+        const gradient = gradientMap.running
+        circleShape?.attr('fill', `l(45) 0:${gradient.color1} 1:${gradient.color2}`)
+
+        // 添加光晕（如果不存在）
+        if (!glowShape) {
+          glowShape = group!.addShape('circle', {
+            attrs: {
+              x: 0,
+              y: 0,
+              r: 58,
+              fill: gradient.glowColor,
+              opacity: 0.6,
+            },
+            name: 'glow-outer',
+          })
+          // 将光晕移到最底层
+          glowShape.toBack()
+        } else {
+          glowShape.attr({
+            fill: gradient.glowColor,
+            opacity: 0.6,
+          })
+        }
+
+        // 光晕呼吸动画
+        glowShape?.animate(
           (ratio: number) => {
-            const opacity = 0.6 + Math.sin(ratio * Math.PI * 2) * 0.4
+            const scale = 1 + Math.sin(ratio * Math.PI * 2) * 0.1
+            return {
+              r: 58 * scale,
+              opacity: 0.4 + Math.sin(ratio * Math.PI * 2) * 0.2,
+            }
+          },
+          {
+            duration: 2000,
+            repeat: true,
+          }
+        )
+
+        // 主圆形轻微呼吸
+        circleShape?.animate(
+          (ratio: number) => {
+            const opacity = 0.9 + Math.sin(ratio * Math.PI * 2) * 0.1
             return { opacity }
           },
           {
             duration: 1500,
             repeat: true,
-            easing: 'easeCubic',
           }
         )
       } else if (name === 'completed' && value) {
-        shape.attr('fill', colorMap.completed)
-        shape.stopAnimate()
+        const gradient = gradientMap.completed
+        circleShape?.attr('fill', `l(45) 0:${gradient.color1} 1:${gradient.color2}`)
+        circleShape?.stopAnimate()
+        glowShape?.stopAnimate()
+        if (glowShape) {
+          glowShape.attr('opacity', 0)
+        }
       } else if (name === 'failed' && value) {
-        shape.attr('fill', colorMap.failed)
-        shape.stopAnimate()
+        const gradient = gradientMap.failed
+        circleShape?.attr('fill', `l(45) 0:${gradient.color1} 1:${gradient.color2}`)
+        circleShape?.stopAnimate()
+        glowShape?.stopAnimate()
+        if (glowShape) {
+          glowShape.attr('opacity', 0)
+        }
       }
     },
 
@@ -283,13 +425,18 @@ const initGraph = () => {
     defaultEdge: {
       type: 'polyline',
       style: {
-        stroke: '#999',
-        lineWidth: 2,
+        stroke: 'l(0) 0:#a0a0a0 1:#7a7a7a', // 渐变灰色连线
+        lineWidth: 3,
+        opacity: 0.8,
         endArrow: {
-          path: G6.Arrow.triangle(10, 12, 0),
-          fill: '#999',
+          path: G6.Arrow.triangle(12, 15, 0), // 更大更明显的箭头
+          fill: 'l(0) 0:#7a7a7a 1:#5a5a5a', // 箭头渐变
+          opacity: 0.9,
         },
-        radius: 12,
+        radius: 15, // 更圆滑的转角
+        shadowColor: 'rgba(0, 0, 0, 0.1)',
+        shadowBlur: 4,
+        lineDash: [8, 4], // 虚线效果（流动感）
       },
     },
     modes: {
@@ -302,6 +449,27 @@ const initGraph = () => {
   const data = createGraphData()
   graph.data(data)
   graph.render()
+
+  // 连线流动动画
+  const edges = graph.getEdges()
+  edges.forEach((edge) => {
+    edge.toFront() // 将边移到节点前面，避免被节点遮挡
+    const edgeShape = edge.get('keyShape')
+    edgeShape.animate(
+      (ratio: number) => {
+        // lineDashOffset循环从0到12（8+4=12是lineDash的周期）
+        const offset = ratio * 12
+        return {
+          lineDashOffset: -offset, // 负值让虚线向前流动
+        }
+      },
+      {
+        duration: 2000, // 2秒一个循环
+        repeat: true,
+        // 不使用easing，默认线性动画
+      }
+    )
+  })
 
   // 节点点击事件
   graph.on('node:click', (evt) => {
