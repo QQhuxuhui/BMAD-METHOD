@@ -72,15 +72,33 @@
     <!-- 智能体输出详情Modal -->
     <a-modal
       v-model:open="outputModalVisible"
-      title="智能体输出详情"
+      :title="`智能体详情 - ${selectedAgentConfig?.nameCn || ''}`"
       width="80%"
       :footer="null"
       :destroy-on-close="true"
     >
-      <div v-if="selectedAgent" class="agent-output-detail">
+      <div v-if="selectedAgent && selectedAgentConfig" class="agent-output-detail">
+        <!-- 智能体基本信息 -->
+        <div class="agent-header">
+          <span class="agent-icon">{{ selectedAgentConfig.icon }}</span>
+          <div class="agent-info">
+            <h3 class="agent-name">
+              {{ selectedAgentConfig.nameCn }}
+              <span class="agent-name-en">({{ selectedAgentConfig.nameEn }})</span>
+            </h3>
+            <p class="agent-description">{{ selectedAgentConfig.description }}</p>
+          </div>
+        </div>
+
+        <a-divider />
+
+        <!-- 执行状态信息 -->
         <a-descriptions :column="2" bordered size="small">
-          <a-descriptions-item label="智能体名称">
-            {{ selectedAgent.name }}
+          <a-descriptions-item label="所属阶段">
+            <a-tag color="blue">
+              {{ getPhaseConfig(selectedAgentConfig.phase)?.name }}
+            </a-tag>
+            {{ getPhaseConfig(selectedAgentConfig.phase)?.description }}
           </a-descriptions-item>
           <a-descriptions-item label="执行状态">
             <a-tag :color="getAgentStatusColor(selectedAgent.status)">
@@ -97,8 +115,13 @@
 
         <a-divider />
 
+        <!-- 输出内容 -->
         <h4>输出内容：</h4>
-        <pre class="output-content">{{ formatAgentOutput(selectedAgent.output) }}</pre>
+        <div v-if="selectedAgent.output"
+             class="output-content markdown-body"
+             v-html="formatAgentOutput(selectedAgent.output)">
+        </div>
+        <a-empty v-else description="暂无输出内容" />
       </div>
     </a-modal>
   </div>
@@ -111,6 +134,8 @@ import { message } from 'ant-design-vue'
 import { useWorkflowStore } from '@/stores/workflow'
 import { useWorkflowStream } from '@/hooks/useWorkflowStream'
 import type { AgentExecution } from '@/types/workflow'
+import { getAgentConfig, type AgentConfig } from '@/config/agents'
+import { getPhaseConfig } from '@/config/phases'
 import WorkflowStatusCard from './components/WorkflowStatusCard.vue'
 import OutputStream from './components/OutputStream.vue'
 import WorkflowGraph from './components/WorkflowGraph.vue'
@@ -120,6 +145,25 @@ import {
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from '@ant-design/icons-vue'
+import { marked } from 'marked'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
+
+// Configure marked with highlight.js
+marked.setOptions({
+  highlight: (code, lang) => {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(code, { language: lang }).value
+      } catch (err) {
+        console.error('Highlight error:', err)
+      }
+    }
+    return hljs.highlightAuto(code).value
+  },
+  breaks: true,
+  gfm: true
+})
 
 // Router
 const router = useRouter()
@@ -131,6 +175,7 @@ const workflowStore = useWorkflowStore()
 const isDev = computed(() => import.meta.env.DEV)
 const outputModalVisible = ref(false)
 const selectedAgent = ref<AgentExecution | null>(null)
+const selectedAgentConfig = ref<AgentConfig | null>(null)
 
 /**
  * 计算图形高度
@@ -219,10 +264,14 @@ const handleReset = () => {
 const handleNodeClick = (agentId: string) => {
   console.log('[WorkflowMonitor] Node clicked:', agentId)
 
-  // 从Store获取智能体数据
+  // 从Store获取智能体执行数据
   const agent = workflowStore.agents.find((a) => a.id === agentId)
-  if (agent) {
+  // 从配置获取智能体静态信息
+  const agentConfig = getAgentConfig(agentId)
+
+  if (agent && agentConfig) {
     selectedAgent.value = agent
+    selectedAgentConfig.value = agentConfig
     outputModalVisible.value = true
   } else {
     message.warning('未找到智能体信息')
@@ -262,12 +311,28 @@ const getAgentStatusText = (status: string) => {
 }
 
 /**
- * 格式化智能体输出
+ * 格式化智能体输出（支持Markdown）
  */
-const formatAgentOutput = (output: any) => {
-  if (!output) return '暂无输出'
-  if (typeof output === 'string') return output
-  return JSON.stringify(output, null, 2)
+const formatAgentOutput = (output: any): string => {
+  if (!output) return ''
+
+  let text = ''
+  if (typeof output === 'object') {
+    if (output.content) {
+      text = output.content
+    } else {
+      text = '```json\n' + JSON.stringify(output, null, 2) + '\n```'
+    }
+  } else {
+    text = String(output)
+  }
+
+  try {
+    return marked.parse(text) as string
+  } catch (err) {
+    console.error('Markdown parse error:', err)
+    return text
+  }
 }
 </script>
 
@@ -301,6 +366,46 @@ const formatAgentOutput = (output: any) => {
   }
 
   .agent-output-detail {
+    .agent-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      border-radius: 8px;
+      margin-bottom: 16px;
+
+      .agent-icon {
+        font-size: 48px;
+        line-height: 1;
+      }
+
+      .agent-info {
+        flex: 1;
+
+        .agent-name {
+          margin: 0 0 8px 0;
+          font-size: 20px;
+          font-weight: 600;
+          color: rgba(0, 0, 0, 0.85);
+
+          .agent-name-en {
+            font-size: 14px;
+            font-weight: 400;
+            color: rgba(0, 0, 0, 0.45);
+            margin-left: 8px;
+          }
+        }
+
+        .agent-description {
+          margin: 0;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.65);
+          line-height: 1.6;
+        }
+      }
+    }
+
     .output-content {
       margin-top: 12px;
       padding: 16px;
@@ -313,6 +418,38 @@ const formatAgentOutput = (output: any) => {
       overflow-y: auto;
       white-space: pre-wrap;
       word-wrap: break-word;
+
+      // Markdown样式增强
+      :deep(h1),
+      :deep(h2),
+      :deep(h3),
+      :deep(h4) {
+        margin-top: 16px;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+
+      :deep(pre) {
+        background-color: #282c34;
+        border-radius: 4px;
+        padding: 12px;
+        overflow-x: auto;
+      }
+
+      :deep(code) {
+        font-family: 'Courier New', monospace;
+        font-size: 12px;
+      }
+
+      :deep(p) {
+        margin: 8px 0;
+      }
+
+      :deep(ul),
+      :deep(ol) {
+        padding-left: 24px;
+        margin: 8px 0;
+      }
     }
   }
 }
