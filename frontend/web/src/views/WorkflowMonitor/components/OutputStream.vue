@@ -53,7 +53,7 @@
 
           <!-- 事件内容 -->
           <div v-if="event.event === 'agent_output'" class="event-content">
-            <pre class="output-text">{{ formatOutput(event.data.agent_output) }}</pre>
+            <div class="output-text markdown-body" v-html="formatOutput(event.data.agent_output)"></div>
           </div>
 
           <div v-else-if="event.data.error_message" class="event-content error">
@@ -92,6 +92,25 @@ import {
   InfoCircleOutlined
 } from '@ant-design/icons-vue'
 import dayjs from 'dayjs'
+import { marked } from 'marked'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/github-dark.css'
+
+// Configure marked with highlight.js
+marked.setOptions({
+  highlight: (code, lang) => {
+    if (lang && hljs.getLanguage(lang)) {
+      try {
+        return hljs.highlight(code, { language: lang }).value
+      } catch (err) {
+        console.error('Highlight error:', err)
+      }
+    }
+    return hljs.highlightAuto(code).value
+  },
+  breaks: true,
+  gfm: true
+})
 
 // Store
 const workflowStore = useWorkflowStore()
@@ -199,17 +218,28 @@ const formatTime = (timestamp: string) => {
 }
 
 /**
- * 格式化输出内容
+ * 格式化输出内容（支持Markdown）
  */
-const formatOutput = (output: any) => {
+const formatOutput = (output: any): string => {
   if (!output) return ''
 
+  let text = ''
   if (typeof output === 'object') {
-    if (output.content) return output.content
-    return JSON.stringify(output, null, 2)
+    if (output.content) {
+      text = output.content
+    } else {
+      text = '```json\n' + JSON.stringify(output, null, 2) + '\n```'
+    }
+  } else {
+    text = String(output)
   }
 
-  return String(output)
+  try {
+    return marked.parse(text) as string
+  } catch (err) {
+    console.error('Markdown parse error:', err)
+    return text
+  }
 }
 
 /**
