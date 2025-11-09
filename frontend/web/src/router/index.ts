@@ -17,7 +17,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'workflows',
         name: 'WorkflowMonitor',
-        component: () => import('@/views/WorkflowMonitor.vue'),
+        component: () => import('@/views/WorkflowMonitor/WorkflowMonitor.vue'),
         meta: { title: '工作流监控' },
       },
       {
