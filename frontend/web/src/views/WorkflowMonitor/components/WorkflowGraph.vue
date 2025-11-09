@@ -60,10 +60,13 @@ import type { AgentStatus } from '@/types/workflow'
 interface Props {
   /** 图形高度 */
   height?: number
+  /** 是否横向布局 */
+  horizontal?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
   height: 600,
+  horizontal: false,
 })
 
 // Emits
@@ -268,14 +271,14 @@ const initGraph = () => {
     height,
     layout: {
       type: 'dagre',
-      rankdir: 'TB', // 从上到下
-      nodesep: 90,
-      ranksep: 140,
-      align: 'DL', // 左对齐,避免偏移
+      rankdir: props.horizontal ? 'LR' : 'TB', // 横向：从左到右 | 竖向：从上到下
+      nodesep: props.horizontal ? 60 : 90, // 横向时节点间距更紧凑
+      ranksep: props.horizontal ? 120 : 140, // 横向时层级间距
+      align: props.horizontal ? 'UL' : 'DL', // 横向：上对齐 | 竖向：左对齐
     },
     defaultNode: {
       type: 'agent-node',
-      size: 100,
+      size: props.horizontal ? 80 : 100, // 横向时节点更小以节省空间
     },
     defaultEdge: {
       type: 'polyline',
@@ -293,7 +296,7 @@ const initGraph = () => {
       default: ['drag-canvas', 'zoom-canvas', 'drag-node'],
     },
     fitView: true,
-    fitViewPadding: [20, 50, 20, 50], // 减小padding,更好利用空间
+    fitViewPadding: props.horizontal ? [10, 30, 10, 30] : [20, 50, 20, 50], // 横向时减小padding
   })
 
   const data = createGraphData()
@@ -346,7 +349,8 @@ watch(
  */
 const handleFitView = () => {
   if (graph) {
-    graph.fitView([20, 50, 20, 50])
+    const padding = props.horizontal ? [10, 30, 10, 30] : [20, 50, 20, 50]
+    graph.fitView(padding)
     message.success('已适应画布')
   }
 }

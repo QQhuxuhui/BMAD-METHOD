@@ -42,30 +42,41 @@
     </a-page-header>
 
     <div class="monitor-content">
-      <!-- 主要区域：工作流协作图 -->
-      <div class="graph-section">
-        <workflow-graph :height="graphHeight" @node-click="handleNodeClick" />
+      <!-- 顶部：紧凑状态栏 -->
+      <div class="status-bar">
+        <workflow-status-card
+          :show-actions="false"
+          compact
+          :horizontal="true"
+          @start="handleStart"
+          @stop="handleStop"
+          @reset="handleReset"
+        />
       </div>
 
-      <!-- 底部区域：状态 + 输出流 -->
-      <div class="bottom-section">
-        <a-row :gutter="[16, 16]">
-          <!-- 左侧：工作流状态卡片（简化版） -->
-          <a-col :xs="24" :sm="24" :md="8" :lg="6" :xl="6">
-            <workflow-status-card
-              :show-actions="false"
-              compact
-              @start="handleStart"
-              @stop="handleStop"
-              @reset="handleReset"
-            />
-          </a-col>
+      <!-- 主体：实时输出流（占主要区域） -->
+      <div class="main-section">
+        <output-stream />
+      </div>
 
-          <!-- 右侧：输出流 -->
-          <a-col :xs="24" :sm="24" :md="16" :lg="18" :xl="18">
-            <output-stream :max-height="outputStreamHeight" />
-          </a-col>
-        </a-row>
+      <!-- 底部：横向流程图（可折叠） -->
+      <div class="graph-section" :class="{ collapsed: graphCollapsed }">
+        <div class="graph-header">
+          <span class="graph-title">
+            <DeploymentUnitOutlined />
+            工作流协作图
+          </span>
+          <a-button size="small" type="text" @click="toggleGraph">
+            <template #icon>
+              <UpOutlined v-if="!graphCollapsed" />
+              <DownOutlined v-else />
+            </template>
+            {{ graphCollapsed ? '展开' : '收起' }}
+          </a-button>
+        </div>
+        <div v-show="!graphCollapsed" class="graph-container">
+          <workflow-graph :height="graphHeight" :horizontal="true" @node-click="handleNodeClick" />
+        </div>
       </div>
     </div>
 
@@ -144,6 +155,9 @@ import {
   ReloadOutlined,
   PlayCircleOutlined,
   PauseCircleOutlined,
+  DeploymentUnitOutlined,
+  UpOutlined,
+  DownOutlined,
 } from '@ant-design/icons-vue'
 import { marked } from 'marked'
 import hljs from 'highlight.js'
@@ -176,6 +190,7 @@ const isDev = computed(() => import.meta.env.DEV)
 const outputModalVisible = ref(false)
 const selectedAgent = ref<AgentExecution | null>(null)
 const selectedAgentConfig = ref<AgentConfig | null>(null)
+const graphCollapsed = ref(false) // 流程图折叠状态
 
 // 响应式屏幕尺寸(带防抖)
 const windowWidth = ref(window.innerWidth)
@@ -316,6 +331,13 @@ const handleReset = () => {
 }
 
 /**
+ * 切换流程图展开/收起
+ */
+const toggleGraph = () => {
+  graphCollapsed.value = !graphCollapsed.value
+}
+
+/**
  * 处理节点点击（从WorkflowGraph emit）
  */
 const handleNodeClick = (agentId: string) => {
@@ -410,42 +432,82 @@ const formatAgentOutput = (output: any): string => {
     padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     overflow: hidden;
 
-    .graph-section {
+    // 顶部状态栏（紧凑）
+    .status-bar {
+      flex-shrink: 0;
+      height: auto;
+    }
+
+    // 主体区域（输出流，占据主要空间）
+    .main-section {
       flex: 1;
-      min-height: 500px;
-      background: white;
-      border-radius: 4px;
+      min-height: 0; // 重要：允许flex子元素正确收缩
       overflow: hidden;
     }
 
-    .bottom-section {
+    // 底部流程图区域（可折叠）
+    .graph-section {
       flex-shrink: 0;
-      max-height: 350px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+      &:not(.collapsed) {
+        height: 250px; // 默认展开高度
+      }
+
+      &.collapsed {
+        height: 48px; // 折叠时只显示header
+      }
+
+      .graph-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 16px;
+        background: linear-gradient(135deg, #f5f7fa 0%, #e8edf5 100%);
+        border-bottom: 1px solid #e8e8e8;
+        cursor: pointer;
+        user-select: none;
+
+        .graph-title {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-weight: 500;
+          font-size: 14px;
+          color: rgba(0, 0, 0, 0.85);
+
+          .anticon {
+            color: #1890ff;
+          }
+        }
+
+        &:hover {
+          background: linear-gradient(135deg, #e8edf5 0%, #dce5f2 100%);
+        }
+      }
+
+      .graph-container {
+        height: calc(100% - 48px);
+        overflow: hidden;
+      }
     }
 
     // 移动端优化
     @media (max-width: 768px) {
       padding: 12px;
-      gap: 12px;
+      gap: 8px;
 
       .graph-section {
-        min-height: 400px;
-      }
-
-      .bottom-section {
-        max-height: none; // 移动端不限制高度
-      }
-    }
-
-    // 平板端优化
-    @media (min-width: 769px) and (max-width: 1024px) {
-      padding: 14px;
-
-      .graph-section {
-        min-height: 450px;
+        &:not(.collapsed) {
+          height: 200px; // 移动端减小高度
+        }
       }
     }
   }

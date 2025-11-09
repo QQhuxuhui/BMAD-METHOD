@@ -69,4 +69,4 @@ test/.cursor
 aps-outputs/*
 
 .claude
-.cursor
+.cursor.playwright-mcp/
