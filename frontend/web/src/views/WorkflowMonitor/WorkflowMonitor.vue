@@ -2,7 +2,7 @@
   <div class="workflow-monitor">
     <a-page-header
       title="工作流监控面板"
-      sub-title="实时查看智能体执行状态和输出"
+      sub-title="智能体协作可视化 - 实时查看执行状态"
       @back="handleBack"
     >
       <template #extra>
@@ -13,6 +13,24 @@
             </template>
             开发模式 (Mock数据)
           </a-tag>
+          <a-button v-if="isDev" @click="handleStart">
+            <template #icon>
+              <PlayCircleOutlined />
+            </template>
+            启动
+          </a-button>
+          <a-button v-if="isDev" @click="handleStop">
+            <template #icon>
+              <PauseCircleOutlined />
+            </template>
+            停止
+          </a-button>
+          <a-button v-if="isDev" @click="handleReset">
+            <template #icon>
+              <ReloadOutlined />
+            </template>
+            重置
+          </a-button>
           <a-button type="primary" @click="handleRefresh">
             <template #icon>
               <ReloadOutlined />
@@ -24,28 +42,31 @@
     </a-page-header>
 
     <div class="monitor-content">
-      <a-row :gutter="[16, 16]">
-        <!-- 左侧列：状态卡片 + 智能体列表 -->
-        <a-col :xs="24" :lg="8">
-          <a-space direction="vertical" :size="16" style="width: 100%">
-            <!-- 工作流状态卡片 -->
+      <!-- 主要区域：工作流协作图 -->
+      <div class="graph-section">
+        <workflow-graph :height="graphHeight" @node-click="handleNodeClick" />
+      </div>
+
+      <!-- 底部区域：状态 + 输出流 -->
+      <div class="bottom-section">
+        <a-row :gutter="[16, 16]">
+          <!-- 左侧：工作流状态卡片（简化版） -->
+          <a-col :xs="24" :lg="6">
             <workflow-status-card
-              :show-actions="isDev"
+              :show-actions="false"
+              compact
               @start="handleStart"
               @stop="handleStop"
               @reset="handleReset"
             />
+          </a-col>
 
-            <!-- 智能体状态列表 -->
-            <agent-status-list @agent-click="handleAgentClick" @view-output="handleViewOutput" />
-          </a-space>
-        </a-col>
-
-        <!-- 右侧列：输出流 -->
-        <a-col :xs="24" :lg="16">
-          <output-stream />
-        </a-col>
-      </a-row>
+          <!-- 右侧：输出流 -->
+          <a-col :xs="24" :lg="18">
+            <output-stream :max-height="300" />
+          </a-col>
+        </a-row>
+      </div>
     </div>
 
     <!-- 智能体输出详情Modal -->
@@ -91,9 +112,14 @@ import { useWorkflowStore } from '@/stores/workflow'
 import { useWorkflowStream } from '@/hooks/useWorkflowStream'
 import type { AgentExecution } from '@/types/workflow'
 import WorkflowStatusCard from './components/WorkflowStatusCard.vue'
-import AgentStatusList from './components/AgentStatusList.vue'
 import OutputStream from './components/OutputStream.vue'
-import { BugOutlined, ReloadOutlined } from '@ant-design/icons-vue'
+import WorkflowGraph from './components/WorkflowGraph.vue'
+import {
+  BugOutlined,
+  ReloadOutlined,
+  PlayCircleOutlined,
+  PauseCircleOutlined,
+} from '@ant-design/icons-vue'
 
 // Router
 const router = useRouter()
@@ -105,6 +131,18 @@ const workflowStore = useWorkflowStore()
 const isDev = computed(() => import.meta.env.DEV)
 const outputModalVisible = ref(false)
 const selectedAgent = ref<AgentExecution | null>(null)
+
+/**
+ * 计算图形高度
+ * 屏幕高度 - Header高度 - 底部区域高度 - padding
+ */
+const graphHeight = computed(() => {
+  const screenHeight = window.innerHeight
+  const headerHeight = 120 // 约120px
+  const bottomHeight = 350 // 底部区域约350px
+  const padding = 48 // 上下padding
+  return Math.max(500, screenHeight - headerHeight - bottomHeight - padding)
+})
 
 // Workflow Stream Hook
 const { status: streamStatus, connect, disconnect, reconnect } = useWorkflowStream(
@@ -176,22 +214,19 @@ const handleReset = () => {
 }
 
 /**
- * 处理智能体点击
+ * 处理节点点击（从WorkflowGraph emit）
  */
-const handleAgentClick = (agent: AgentExecution) => {
-  console.log('[WorkflowMonitor] Agent clicked:', agent.name)
-  if (agent.output) {
+const handleNodeClick = (agentId: string) => {
+  console.log('[WorkflowMonitor] Node clicked:', agentId)
+
+  // 从Store获取智能体数据
+  const agent = workflowStore.agents.find((a) => a.id === agentId)
+  if (agent) {
     selectedAgent.value = agent
     outputModalVisible.value = true
+  } else {
+    message.warning('未找到智能体信息')
   }
-}
-
-/**
- * 处理查看输出
- */
-const handleViewOutput = (agent: AgentExecution) => {
-  selectedAgent.value = agent
-  outputModalVisible.value = true
 }
 
 /**
@@ -246,7 +281,23 @@ const formatAgentOutput = (output: any) => {
   .monitor-content {
     flex: 1;
     padding: 16px;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    overflow: hidden;
+
+    .graph-section {
+      flex: 1;
+      min-height: 500px;
+      background: white;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .bottom-section {
+      flex-shrink: 0;
+      max-height: 350px;
+    }
   }
 
   .agent-output-detail {

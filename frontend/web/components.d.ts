@@ -59,6 +59,7 @@ declare module 'vue' {
     ATabs: typeof import('ant-design-vue/es')['Tabs']
     ATag: typeof import('ant-design-vue/es')['Tag']
     ATextarea: typeof import('ant-design-vue/es')['Textarea']
+    ATooltip: typeof import('ant-design-vue/es')['Tooltip']
     ATypographyTitle: typeof import('ant-design-vue/es')['TypographyTitle']
     HelloWorld: typeof import('./src/components/HelloWorld.vue')['default']
     RealTimeLog: typeof import('./src/components/workflow/RealTimeLog.vue')['default']

@@ -96,6 +96,16 @@ import { marked } from 'marked'
 import hljs from 'highlight.js'
 import 'highlight.js/styles/github-dark.css'
 
+// Props
+interface Props {
+  /** 流容器最大高度 */
+  maxHeight?: number
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  maxHeight: 500,
+})
+
 // Configure marked with highlight.js
 marked.setOptions({
   highlight: (code, lang) => {
@@ -270,7 +280,7 @@ const handleScrollToBottom = () => {
   flex-direction: column;
 
   .stream-container {
-    height: 500px;
+    height: v-bind('`${props.maxHeight}px`');
     overflow-y: auto;
     padding: 12px;
     background-color: #fafafa;
