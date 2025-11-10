@@ -1,5 +1,4 @@
-#!/usr/bin/env node
-/* eslint-disable unicorn/prefer-module, n/no-process-exit, unicorn/no-process-exit, unicorn/prefer-top-level-await */
+/* eslint-disable unicorn/prefer-module, n/no-process-exit, unicorn/prefer-top-level-await */
 
 /**
  * APS Module Build Script - v2.0 (YAML Architecture)
@@ -55,7 +54,7 @@ function calculateHash(filePath) {
     hash.update(fs.readFileSync(filePath));
   }
 
-  return hash.digest('hex').substring(0, 8);
+  return hash.digest('hex').slice(0, 8);
 }
 
 /**
@@ -237,10 +236,10 @@ async function build() {
 // Run build
 if (require.main === module) {
   build()
-    .then((code) => process.exit(code)) // eslint-disable-line unicorn/no-process-exit
+    .then((code) => process.exit(code))
     .catch((error) => {
       console.error(error);
-      process.exit(1); // eslint-disable-line unicorn/no-process-exit
+      process.exit(1);
     });
 }
 

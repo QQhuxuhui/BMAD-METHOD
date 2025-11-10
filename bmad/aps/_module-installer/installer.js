@@ -12,7 +12,7 @@ const { XmlHandler } = require('../../../../tools/cli/lib/xml-handler');
 function resolvePath(pathStr) {
   if (!pathStr) return pathStr;
   // Remove {project-root} placeholder - config paths should be relative to project root
-  return pathStr.replace(/\{project-root\}\/?/g, '');
+  return pathStr.replaceAll(/\{project-root\}\/?/g, '');
 }
 
 /**

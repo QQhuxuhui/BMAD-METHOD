@@ -1,12 +1,12 @@
 # Quality Gate Decision for Story 1.5.2
 
 schema: 1
-story: '1.5.2'
-story_title: 'StateGraph编排和Checkpoint持久化'
+story: "1.5.2"
+story_title: "StateGraph编排和Checkpoint持久化"
 gate: PASS
-status_reason: '所有关键问题已修复，核心功能完整实现并通过验证'
-reviewer: 'Quinn (Test Architect)'
-updated: '2025-11-06T05:25:00Z'
+status_reason: "所有关键问题已修复，核心功能完整实现并通过验证"
+reviewer: "Quinn (Test Architect)"
+updated: "2025-11-06T05:25:00Z"
 
 waiver: { active: false }
 

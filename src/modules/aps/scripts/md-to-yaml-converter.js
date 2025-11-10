@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /* eslint-disable unicorn/prefer-module, unicorn/prefer-string-slice, unicorn/prefer-top-level-await */
 
 /**
@@ -268,11 +267,9 @@ async function main() {
 
   if (results.some((r) => r.status === 'error')) {
     console.log('\nFailed files:');
-    results
-      .filter((r) => r.status === 'error')
-      .forEach((r) => {
-        console.log(`  - ${r.file}: ${r.error}`);
-      });
+    for (const r of results.filter((r) => r.status === 'error')) {
+      console.log(`  - ${r.file}: ${r.error}`);
+    }
   }
 
   console.log('');
