@@ -14,6 +14,13 @@ export default [
       'test/template-test-generator/**',
       'test/template-test-generator/**/*.js',
       'test/template-test-generator/**/*.md',
+      'backend/**',
+      'frontend/**',
+      'tests/**',
+      'node_modules/**',
+      '**/.venv/**',
+      '**/venv/**',
+      '**/__pycache__/**',
     ],
   },
 
@@ -37,14 +44,8 @@ export default [
     rules: {
       // Allow console for CLI tools in this repo
       'no-console': 'off',
-      // Enforce .yaml file extension for consistency
-      'yml/file-extension': [
-        'error',
-        {
-          extension: 'yaml',
-          caseSensitive: true,
-        },
-      ],
+      // Allow both .yaml and .yml extensions for flexibility
+      'yml/file-extension': 'off',
       // Prefer double quotes in YAML wherever quoting is used, but allow the other to avoid escapes
       'yml/quotes': [
         'error',
@@ -99,6 +100,14 @@ export default [
       'unicorn/prefer-module': 'off',
       'n/no-missing-require': 'off',
       'n/no-unpublished-require': 'off',
+    },
+  },
+
+  // APS build scripts are CLI apps
+  {
+    files: ['**/aps/build.js', 'src/modules/aps/build.js', 'test/bmad/aps/build.js'],
+    rules: {
+      'unicorn/no-process-exit': 'off',
     },
   },
 

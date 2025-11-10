@@ -125,7 +125,7 @@ def sample_problem_simple() -> Dict:
     return {
         "problem_description": "给定数组 [3, 1, 4, 1, 5, 9]，找出最大值",
         "domain": "算法基础",
-        "constraints": {}
+        "constraints": []  # No constraints for simple problem
     }
 
 
@@ -135,11 +135,11 @@ def sample_problem_medium() -> Dict:
     return {
         "problem_description": "优化物流配送路径，有10个配送点，需要最小化总行驶距离",
         "domain": "物流优化",
-        "constraints": {
-            "vehicle_capacity": 100,
-            "time_windows": [[8, 18]] * 10,
-            "max_distance": 200
-        }
+        "constraints": [
+            "车辆容量限制：100kg",
+            "配送时间窗口：8:00-18:00",
+            "最大行驶距离：200km"
+        ]
     }
 
 
@@ -153,12 +153,12 @@ def sample_problem_complex() -> Dict:
         约束：每个作业必须按指定顺序经过多台机器。
         """,
         "domain": "制造业调度",
-        "constraints": {
-            "machines": 3,
-            "jobs": 8,
-            "precedence_constraints": True,
-            "priorities": [1, 2, 3, 1, 2, 3, 1, 2]
-        }
+        "constraints": [
+            "机器数量：3台",
+            "作业数量：8个",
+            "存在优先级约束（作业必须按顺序经过多台机器）",
+            "作业优先级分布：[1, 2, 3, 1, 2, 3, 1, 2]"
+        ]
     }
 
 

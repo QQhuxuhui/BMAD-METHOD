@@ -1,10 +1,10 @@
-import js from '@eslint/js';
-import typescript from '@typescript-eslint/eslint-plugin';
-import tsParser from '@typescript-eslint/parser';
-import vue from 'eslint-plugin-vue';
-import vueParser from 'vue-eslint-parser';
-import prettier from 'eslint-plugin-prettier';
-import prettierConfig from 'eslint-config-prettier';
+import js from '@eslint/js'
+import typescript from '@typescript-eslint/eslint-plugin'
+import tsParser from '@typescript-eslint/parser'
+import vue from 'eslint-plugin-vue'
+import vueParser from 'vue-eslint-parser'
+import prettier from 'eslint-plugin-prettier'
+import prettierConfig from 'eslint-config-prettier'
 
 export default [
   js.configs.recommended,
@@ -32,4 +32,4 @@ export default [
       'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     },
   },
-];
+]
