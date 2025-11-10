@@ -663,7 +663,9 @@ class WorkflowService:
 
             session.add(workflow)
             session.commit()
-            session.refresh(workflow)
+            # NOTE: Removed session.refresh() as it causes psycopg.InterfaceError
+            # "row must be included between 0 and 0" in async environment.
+            # The workflow object already has the latest values after commit.
 
             return workflow
 
