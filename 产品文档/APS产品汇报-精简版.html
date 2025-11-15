@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APS调度智能体系统 - 产品汇报</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 30px;
+        }
+
+        .page {
+            max-width: 1600px;
+            height: 900px;
+            margin: 0 auto 40px;
+            background: white;
+            border-radius: 15px;
+            padding: 50px 60px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+            page-break-after: always;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 3.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .page-subtitle {
+            font-size: 1.3em;
+            color: #666;
+        }
+
+        /* ============ 第一页:产品方案 ============ */
+
+        .solution-layout {
+            flex: 1;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 25px;
+        }
+
+        /* 核心定位 */
+        .core-position {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.6;
+        }
+
+        /* 紧凑型架构图 */
+        .compact-arch {
+            display: grid;
+            grid-template-columns: 200px 1fr 200px;
+            gap: 20px;
+            background: linear-gradient(180deg, #f8f9fa 0%, #e9ecef 100%);
+            padding: 25px;
+            border-radius: 12px;
+        }
+
+        .arch-column {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .mini-box {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.85em;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-left: 3px solid #667eea;
+        }
+
+        .mini-box.user { border-left-color: #f093fb; }
+        .mini-box.data { border-left-color: #ffa726; }
+
+        .mini-box strong {
+            display: block;
+            color: #2c3e50;
+            font-size: 1em;
+            margin-bottom: 4px;
+        }
+
+        .mini-box span {
+            color: #7f8c8d;
+            font-size: 0.85em;
+        }
+
+        /* 中间核心区 */
+        .core-area {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .orchestrator-mini {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .agents-compact {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .agent-mini {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.8em;
+        }
+
+        .agent-mini strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .agent-mini .token {
+            background: rgba(231, 76, 60, 0.9);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.85em;
+            display: inline-block;
+        }
+
+        .workflow-compact {
+            display: flex;
+            gap: 8px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .phase-mini {
+            flex: 1;
+            background: white;
+            padding: 8px 5px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.75em;
+        }
+
+        .phase-mini strong {
+            display: block;
+            color: #e74c3c;
+            font-size: 1.1em;
+            margin-bottom: 2px;
+        }
+
+        /* 核心特色 */
+        .key-features {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .feature-mini {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .feature-mini .icon {
+            font-size: 2em;
+            margin-bottom: 8px;
+        }
+
+        .feature-mini h4 {
+            color: #1a5f3f;
+            font-size: 1em;
+            margin-bottom: 6px;
+        }
+
+        .feature-mini p {
+            color: #2c5f5d;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        /* ============ 第二页:产品价值 ============ */
+
+        .value-layout {
+            flex: 1;
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 25px;
+        }
+
+        /* 核心数据看板 */
+        .metrics-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .metric-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .metric-number {
+            font-size: 3em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+        }
+
+        .metric-detail {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        /* ROI对比 - 极简版 */
+        .roi-compact {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 25px;
+            align-items: center;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 30px;
+            border-radius: 12px;
+        }
+
+        .roi-box {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .roi-box.old {
+            border-top: 5px solid #e74c3c;
+        }
+
+        .roi-box.new {
+            border-top: 5px solid #27ae60;
+        }
+
+        .roi-box h4 {
+            font-size: 1.3em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .roi-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .roi-value.old { color: #e74c3c; }
+        .roi-value.new { color: #27ae60; }
+
+        .roi-desc {
+            font-size: 0.9em;
+            color: #7f8c8d;
+        }
+
+        .vs-icon {
+            font-size: 3em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* 竞争优势 - 紧凑版 */
+        .advantages-compact {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .advantage-mini {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-top: 4px solid #667eea;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .advantage-mini h4 {
+            color: #2c3e50;
+            font-size: 1.1em;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .advantage-mini ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .advantage-mini li {
+            font-size: 0.85em;
+            color: #555;
+            padding: 6px 0;
+            line-height: 1.4;
+        }
+
+        .advantage-mini li::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        /* 发展愿景 */
+        .vision-compact {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px 40px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .vision-compact h4 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .vision-timeline {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+        }
+
+        .timeline-item {
+            text-align: center;
+        }
+
+        .timeline-item strong {
+            display: block;
+            font-size: 2em;
+            color: #ffd700;
+            margin-bottom: 5px;
+        }
+
+        .timeline-item span {
+            font-size: 0.9em;
+            opacity: 0.95;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+    <!-- ==================== 第一页:产品方案 ==================== -->
+    <div class="page">
+        <div class="page-header">
+            <h1 class="page-title">产品方案</h1>
+            <p class="page-subtitle">APS调度智能体系统 - 让调度优化从4周到2小时</p>
+        </div>
+
+        <div class="solution-layout">
+            <!-- 核心定位 -->
+            <div class="core-position">
+                <strong>7大专家智能体协作</strong> | 自然语言输入 → 十要素建模 → 可执行代码 |
+                <strong>开发效率↑85%</strong> <strong>成本↓94.5%</strong> <strong>代码可用率92%</strong>
+            </div>
+
+            <!-- 紧凑架构图 -->
+            <div class="compact-arch">
+                <!-- 左:用户层 -->
+                <div class="arch-column">
+                    <div class="mini-box user">
+                        <strong>💬 输入</strong>
+                        <span>自然语言需求</span>
+                    </div>
+                    <div class="mini-box user">
+                        <strong>🤝 交互</strong>
+                        <span>P0-P4分级确认</span>
+                    </div>
+                    <div class="mini-box user">
+                        <strong>📋 追踪</strong>
+                        <span>Todo实时监控</span>
+                    </div>
+                    <div class="mini-box user">
+                        <strong>📦 交付</strong>
+                        <span>代码+文档+报告</span>
+                    </div>
+                </div>
+
+                <!-- 中:核心系统 -->
+                <div class="core-area">
+                    <div class="orchestrator-mini">
+                        🎯 总指挥 | Phase 0-4编排 | 专家协调 | 状态管理
+                    </div>
+
+                    <div class="agents-compact">
+                        <div class="agent-mini">
+                            <strong>🏭 领域</strong>
+                            <span class="token">-56%</span>
+                        </div>
+                        <div class="agent-mini">
+                            <strong>🔒 约束</strong>
+                            <span class="token">-60%</span>
+                        </div>
+                        <div class="agent-mini">
+                            <strong>🎯 目标</strong>
+                            <span class="token">-67%</span>
+                        </div>
+                        <div class="agent-mini">
+                            <strong>⚡ 算法</strong>
+                            <span class="token">-87%</span>
+                        </div>
+                        <div class="agent-mini">
+                            <strong>💻 编码</strong>
+                            <span class="token">-65%</span>
+                        </div>
+                        <div class="agent-mini">
+                            <strong>✅ 质量</strong>
+                            <span class="token">6层门禁</span>
+                        </div>
+                    </div>
+
+                    <div class="workflow-compact">
+                        <div class="phase-mini">
+                            <strong>P0</strong>
+                            <span>任务规划</span>
+                        </div>
+                        <div class="phase-mini">
+                            <strong>P1</strong>
+                            <span>需求分析</span>
+                        </div>
+                        <div class="phase-mini">
+                            <strong>P1.5</strong>
+                            <span>建模</span>
+                        </div>
+                        <div class="phase-mini">
+                            <strong>P2</strong>
+                            <span>专家协调</span>
+                        </div>
+                        <div class="phase-mini">
+                            <strong>P3</strong>
+                            <span>方案集成</span>
+                        </div>
+                        <div class="phase-mini">
+                            <strong>P4</strong>
+                            <span>质量保证</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 右:数据服务 -->
+                <div class="arch-column">
+                    <div class="mini-box data">
+                        <strong>🔌 MCP</strong>
+                        <span>ERP/CRM/数据库</span>
+                    </div>
+                    <div class="mini-box data">
+                        <strong>📚 知识库</strong>
+                        <span>100+模板</span>
+                    </div>
+                    <div class="mini-box data">
+                        <strong>🛡️ 质量</strong>
+                        <span>6层验证</span>
+                    </div>
+                    <div class="mini-box data">
+                        <strong>💾 状态</strong>
+                        <span>持久化+续传</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心特色 -->
+            <div class="key-features">
+                <div class="feature-mini">
+                    <div class="icon">📚</div>
+                    <h4>Agent as Doc</h4>
+                    <p>智能体=角色+动态加载<br>Token↑75-87%</p>
+                </div>
+                <div class="feature-mini">
+                    <div class="icon">🔄</div>
+                    <h4>Theory-to-Code</h4>
+                    <p>需求→建模→代码<br>92%可用率</p>
+                </div>
+                <div class="feature-mini">
+                    <div class="icon">🎯</div>
+                    <h4>TenElementModel</h4>
+                    <p>统一真相源<br>100%可追溯</p>
+                </div>
+                <div class="feature-mini">
+                    <div class="icon">🤝</div>
+                    <h4>Human-in-Loop</h4>
+                    <p>P0-P4分级交互<br>关键决策人机协作</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== 第二页:产品价值 ==================== -->
+    <div class="page">
+        <div class="page-header">
+            <h1 class="page-title">产品价值</h1>
+            <p class="page-subtitle">革命性的效率提升与成本降低</p>
+        </div>
+
+        <div class="value-layout">
+            <!-- 核心数据看板 -->
+            <div class="metrics-board">
+                <div class="metric-card">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-number">↑85%</div>
+                    <div class="metric-label">效率提升</div>
+                    <div class="metric-detail">3-4周 → 2小时</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-number">↓94.5%</div>
+                    <div class="metric-label">成本降低</div>
+                    <div class="metric-detail">2万 → 1100元</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">✅</div>
+                    <div class="metric-number">92%</div>
+                    <div class="metric-label">代码可用率</div>
+                    <div class="metric-detail">直接可用 业界领先</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">📚</div>
+                    <div class="metric-number">92.5%</div>
+                    <div class="metric-label">知识复用率</div>
+                    <div class="metric-detail">持续积累 资产盘活</div>
+                </div>
+            </div>
+
+            <!-- ROI对比 -->
+            <div class="roi-compact">
+                <div class="roi-box old">
+                    <h4>传统方式</h4>
+                    <div class="roi-value old">≈2万元</div>
+                    <div class="roi-desc">专家10天 + 3-4周开发</div>
+                </div>
+
+                <div class="vs-icon">→</div>
+
+                <div class="roi-box new">
+                    <h4>APS系统</h4>
+                    <div class="roi-value new">≈1100元</div>
+                    <div class="roi-desc">AI 2小时 + 专家审核0.5天</div>
+                </div>
+            </div>
+
+            <!-- 核心竞争优势 -->
+            <div class="advantages-compact">
+                <div class="advantage-mini">
+                    <h4><span>💡</span> 技术创新</h4>
+                    <ul>
+                        <li>Agent as Doc业界首创</li>
+                        <li>Sidecar动态加载</li>
+                        <li>Theory-to-Code引擎</li>
+                        <li>状态持久化+断点续传</li>
+                    </ul>
+                </div>
+
+                <div class="advantage-mini">
+                    <h4><span>🎓</span> 专业深度</h4>
+                    <ul>
+                        <li>7大专家智能体体系</li>
+                        <li>100+验证知识模板</li>
+                        <li>TenElementModel真相源</li>
+                        <li>15年行业经验沉淀</li>
+                    </ul>
+                </div>
+
+                <div class="advantage-mini">
+                    <h4><span>🛡️</span> 质量保证</h4>
+                    <ul>
+                        <li>6层质量门禁验证</li>
+                        <li>Guardrails强约束</li>
+                        <li>80%+自动化测试</li>
+                        <li>100%引用完整性</li>
+                    </ul>
+                </div>
+
+                <div class="advantage-mini">
+                    <h4><span>🚀</span> 应用场景</h4>
+                    <ul>
+                        <li>物流:配送成本↓15%</li>
+                        <li>制造:生产周期↓20%</li>
+                        <li>排班:人力成本↓12%</li>
+                        <li>覆盖20+行业领域</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 发展愿景 -->
+            <div class="vision-compact">
+                <h4>🎯 战略目标:成为AI原生调度优化的行业标准</h4>
+                <div class="vision-timeline">
+                    <div class="timeline-item">
+                        <strong>6个月</strong>
+                        <span>100+试用用户<br>知识库100+模板</span>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>12个月</strong>
+                        <span>200+付费客户<br>平台化+生态建设</span>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>24个月</strong>
+                        <span>1000+企业客户<br>产品矩阵+行业方案</span>
+                    </div>
+                    <div class="timeline-item">
+                        <strong>愿景</strong>
+                        <span>覆盖20+行业<br>1000+模板 100万+实例</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="text-align: center; color: white; padding: 20px; font-size: 0.9em;">
+        <p>APS调度智能体系统 v4.3 | 汇报日期: 2025年 | 保密文档</p>
+    </div>
+</body>
+</html>
