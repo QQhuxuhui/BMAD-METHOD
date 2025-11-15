@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APS调度智能体系统 - 产品方案</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            max-width: 1600px;
+            height: 900px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px 40px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .page-subtitle {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .solution-layout {
+            flex: 1;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 12px;
+        }
+
+        /* 痛点 - 精简版 */
+        .pain-points {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .pain-card {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .pain-card .icon {
+            font-size: 2em;
+        }
+
+        .pain-content h3 {
+            font-size: 0.95em;
+            margin-bottom: 3px;
+        }
+
+        .pain-content .stat {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        /* 中间主体：架构图+工作流程图 */
+        .main-content {
+            display: grid;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+        }
+
+        /* 系统架构图 */
+        .system-architecture {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .arch-title {
+            text-align: center;
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .arch-title .highlight {
+            color: #667eea;
+        }
+
+        /* 架构布局 - 无连接线 */
+        .arch-layout {
+            display: grid;
+            grid-template-columns: 140px 1fr 140px;
+            gap: 15px;
+        }
+
+        .input-column, .output-column {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .flow-box {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid #667eea;
+        }
+
+        .flow-box.input {
+            border-color: #f093fb;
+        }
+
+        .flow-box.output {
+            border-color: #27ae60;
+        }
+
+        .flow-box .box-icon {
+            font-size: 1.5em;
+            margin-bottom: 4px;
+        }
+
+        .flow-box h4 {
+            font-size: 0.85em;
+            color: #2c3e50;
+            margin-bottom: 3px;
+            font-weight: bold;
+        }
+
+        .flow-box p {
+            font-size: 0.65em;
+            color: #666;
+            line-height: 1.2;
+        }
+
+        /* 核心系统 - 缩小智能体，放大知识库 */
+        .core-system {
+            display: grid;
+            grid-template-rows: auto auto 1fr;
+            gap: 8px;
+        }
+
+        .orchestrator-box {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 8px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        /* 智能体网格 - 缩小 */
+        .agents-compact {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 5px;
+        }
+
+        .agent-mini {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 6px 4px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 0.65em;
+        }
+
+        .agent-mini strong {
+            display: block;
+            margin-bottom: 2px;
+            font-size: 0.95em;
+        }
+
+        .agent-mini .token {
+            background: rgba(231, 76, 60, 0.9);
+            padding: 1px 4px;
+            border-radius: 5px;
+            font-size: 0.85em;
+            display: inline-block;
+        }
+
+        /* 知识库 - 放大并详细展示 */
+        .knowledge-libraries {
+            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
+            padding: 12px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(132, 250, 176, 0.3);
+        }
+
+        .kb-title {
+            text-align: center;
+            font-size: 1em;
+            color: #1a5f3f;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .kb-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+        }
+
+        .kb-card {
+            background: white;
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #27ae60;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .kb-card .kb-icon {
+            font-size: 1.5em;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .kb-card h4 {
+            font-size: 0.85em;
+            color: #1a5f3f;
+            margin-bottom: 3px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .kb-card .kb-count {
+            text-align: center;
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 4px;
+        }
+
+        .kb-card .kb-items {
+            font-size: 0.65em;
+            color: #555;
+            line-height: 1.3;
+        }
+
+        .kb-card .kb-items div {
+            margin: 2px 0;
+        }
+
+        .kb-card .kb-items div::before {
+            content: "▸";
+            color: #27ae60;
+            margin-right: 3px;
+        }
+
+        /* 工作流程图 - 白色背景 */
+        .workflow-process {
+            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid #e9ecef;
+        }
+
+        .workflow-title {
+            text-align: center;
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .phases-flow {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+            position: relative;
+        }
+
+        .phases-flow::before {
+            content: '';
+            position: absolute;
+            top: 40px;
+            left: 8%;
+            right: 8%;
+            height: 3px;
+            background: linear-gradient(90deg, #9c27b0, #2196F3, #ff9800, #4caf50, #f44336, #00bcd4);
+            z-index: 0;
+        }
+
+        .phase-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 10px 8px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .phase-card.p0 { border-color: #9c27b0; }
+        .phase-card.p1 { border-color: #2196F3; }
+        .phase-card.p1-5 { border-color: #ff9800; }
+        .phase-card.p2 { border-color: #4caf50; }
+        .phase-card.p3 { border-color: #f44336; }
+        .phase-card.p4 { border-color: #00bcd4; }
+
+        .phase-header {
+            text-align: center;
+            margin-bottom: 6px;
+        }
+
+        .phase-number {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            line-height: 28px;
+            font-weight: bold;
+            font-size: 0.85em;
+            margin-bottom: 4px;
+        }
+
+        .phase-name {
+            color: #2c3e50;
+            font-size: 0.75em;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .phase-time {
+            color: #e74c3c;
+            font-size: 0.65em;
+            margin-bottom: 6px;
+        }
+
+        /* 参与智能体标记 */
+        .phase-agents {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px;
+            border-radius: 5px;
+            margin-bottom: 6px;
+            font-size: 0.6em;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .phase-tasks {
+            font-size: 0.6em;
+            color: #555;
+            line-height: 1.3;
+        }
+
+        .phase-tasks div {
+            margin: 2px 0;
+        }
+
+        .phase-tasks div::before {
+            content: "▸";
+            color: #667eea;
+            margin-right: 3px;
+        }
+
+        .interaction-badge {
+            position: absolute;
+            top: -8px;
+            right: 8px;
+            background: #e74c3c;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 8px;
+            font-size: 0.6em;
+            font-weight: bold;
+        }
+
+        .interaction-badge.p1 {
+            background: #ff9800;
+        }
+
+        /* 核心能力 - 精简版 */
+        .core-capabilities {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .capability-mini {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .capability-mini .cap-icon {
+            font-size: 1.8em;
+            margin-bottom: 4px;
+        }
+
+        .capability-mini h4 {
+            font-size: 0.95em;
+            margin-bottom: 4px;
+        }
+
+        .capability-mini .cap-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffd700;
+            margin: 3px 0;
+        }
+
+        .capability-mini p {
+            font-size: 0.7em;
+            opacity: 0.95;
+            line-height: 1.2;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 12px;
+            font-size: 0.8em;
+            margin-top: 20px;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; margin-bottom: 0; }
+            .footer { color: #666; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="page-header">
+            <h1 class="page-title">产品方案</h1>
+            <p class="page-subtitle">APS调度智能体系统 - 重新定义调度优化的研发方式</p>
+        </div>
+
+        <div class="solution-layout">
+            <!-- 痛点 - 精简为一行 -->
+            <div class="pain-points">
+                <div class="pain-card">
+                    <div class="icon">⏰</div>
+                    <div class="pain-content">
+                        <h3>周期过长</h3>
+                        <div class="stat">3-4周</div>
+                    </div>
+                </div>
+                <div class="pain-card">
+                    <div class="icon">💰</div>
+                    <div class="pain-content">
+                        <h3>成本高昂</h3>
+                        <div class="stat">2万元+</div>
+                    </div>
+                </div>
+                <div class="pain-card">
+                    <div class="icon">📉</div>
+                    <div class="pain-content">
+                        <h3>知识流失</h3>
+                        <div class="stat">70%</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 中间主体：架构图+工作流程图 -->
+            <div class="main-content">
+                <!-- 上半部分：系统架构图 -->
+                <div class="system-architecture">
+                    <h2 class="arch-title">
+                        系统架构：<span class="highlight">7大专家智能体 + 4大知识库</span>
+                    </h2>
+
+                    <div class="arch-layout">
+                        <!-- 左侧：输入 -->
+                        <div class="input-column">
+                            <div class="flow-box input">
+                                <div class="box-icon">💬</div>
+                                <h4>自然语言</h4>
+                                <p>业务需求</p>
+                            </div>
+                            <div class="flow-box input">
+                                <div class="box-icon">🤝</div>
+                                <h4>人机协作</h4>
+                                <p>P0-P4交互</p>
+                            </div>
+                        </div>
+
+                        <!-- 中间：核心系统 -->
+                        <div class="core-system">
+                            <!-- 总指挥 -->
+                            <div class="orchestrator-box">
+                                🎯 总指挥 | Phase 0-4编排 | 专家协调
+                            </div>
+
+                            <!-- 6大专家 - 缩小 -->
+                            <div class="agents-compact">
+                                <div class="agent-mini">
+                                    <strong>🏭 领域</strong>
+                                    <span class="token">-56%</span>
+                                </div>
+                                <div class="agent-mini">
+                                    <strong>🔒 约束</strong>
+                                    <span class="token">-60%</span>
+                                </div>
+                                <div class="agent-mini">
+                                    <strong>🎯 目标</strong>
+                                    <span class="token">-67%</span>
+                                </div>
+                                <div class="agent-mini">
+                                    <strong>⚡ 算法</strong>
+                                    <span class="token">-87%</span>
+                                </div>
+                                <div class="agent-mini">
+                                    <strong>💻 编码</strong>
+                                    <span class="token">-65%</span>
+                                </div>
+                                <div class="agent-mini">
+                                    <strong>✅ 质量</strong>
+                                    <span class="token">6层</span>
+                                </div>
+                            </div>
+
+                            <!-- 知识库 - 放大并详细展示 -->
+                            <div class="knowledge-libraries">
+                                <div class="kb-title">📚 四大知识库体系 - Agent as Doc核心</div>
+                                <div class="kb-grid">
+                                    <div class="kb-card">
+                                        <div class="kb-icon">🏭</div>
+                                        <h4>领域知识库</h4>
+                                        <div class="kb-count">10+ 模板</div>
+                                        <div class="kb-items">
+                                            <div>物流配送</div>
+                                            <div>生产调度</div>
+                                            <div>人员排班</div>
+                                            <div>项目管理</div>
+                                        </div>
+                                    </div>
+                                    <div class="kb-card">
+                                        <div class="kb-icon">🔒</div>
+                                        <h4>约束知识库</h4>
+                                        <div class="kb-count">20+ 模板</div>
+                                        <div class="kb-items">
+                                            <div>时间窗约束</div>
+                                            <div>容量约束</div>
+                                            <div>空间约束</div>
+                                            <div>逻辑约束</div>
+                                        </div>
+                                    </div>
+                                    <div class="kb-card">
+                                        <div class="kb-icon">🎯</div>
+                                        <h4>目标知识库</h4>
+                                        <div class="kb-count">15+ 模板</div>
+                                        <div class="kb-items">
+                                            <div>成本最小化</div>
+                                            <div>时间最优</div>
+                                            <div>多目标优化</div>
+                                            <div>帕累托分析</div>
+                                        </div>
+                                    </div>
+                                    <div class="kb-card">
+                                        <div class="kb-icon">⚡</div>
+                                        <h4>算法知识库</h4>
+                                        <div class="kb-count">13+ 模板</div>
+                                        <div class="kb-items">
+                                            <div>遗传算法</div>
+                                            <div>禁忌搜索</div>
+                                            <div>整数规划</div>
+                                            <div>启发式算法</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 右侧：输出 -->
+                        <div class="output-column">
+                            <div class="flow-box output">
+                                <div class="box-icon">💻</div>
+                                <h4>可执行代码</h4>
+                                <p>92%可用率</p>
+                            </div>
+                            <div class="flow-box output">
+                                <div class="box-icon">📊</div>
+                                <h4>完整文档</h4>
+                                <p>100%可追溯</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 下半部分：工作流程图 - 白色背景 -->
+                <div class="workflow-process">
+                    <h2 class="workflow-title">工作流程：70-130分钟端到端完成</h2>
+
+                    <div class="phases-flow">
+                        <!-- Phase 0 -->
+                        <div class="phase-card p0">
+                            <div class="interaction-badge">P0</div>
+                            <div class="phase-header">
+                                <div class="phase-number">0</div>
+                                <div class="phase-name">任务规划</div>
+                                <div class="phase-time">5-8min</div>
+                            </div>
+                            <div class="phase-agents">🎯 总指挥</div>
+                            <div class="phase-tasks">
+                                <div>生成TodoList</div>
+                                <div>用户确认</div>
+                                <div>形成合同</div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 1 -->
+                        <div class="phase-card p1">
+                            <div class="interaction-badge p1">P1</div>
+                            <div class="phase-header">
+                                <div class="phase-number">1</div>
+                                <div class="phase-name">需求分析</div>
+                                <div class="phase-time">10-15min</div>
+                            </div>
+                            <div class="phase-agents">🎯 总指挥</div>
+                            <div class="phase-tasks">
+                                <div>深度理解</div>
+                                <div>偏离检测</div>
+                                <div>需求澄清</div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 1.5 -->
+                        <div class="phase-card p1-5">
+                            <div class="interaction-badge">P0</div>
+                            <div class="phase-header">
+                                <div class="phase-number">1.5</div>
+                                <div class="phase-name">十要素建模</div>
+                                <div class="phase-time">5-15min</div>
+                            </div>
+                            <div class="phase-agents">🎯 总指挥</div>
+                            <div class="phase-tasks">
+                                <div>TenElementModel</div>
+                                <div>统一真相源</div>
+                                <div>模式选择</div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 2 -->
+                        <div class="phase-card p2">
+                            <div class="phase-header">
+                                <div class="phase-number">2</div>
+                                <div class="phase-name">专家协调</div>
+                                <div class="phase-time">10-48min</div>
+                            </div>
+                            <div class="phase-agents">🏭🔒🎯⚡ 4专家</div>
+                            <div class="phase-tasks">
+                                <div>并行分析</div>
+                                <div>一致性校验</div>
+                                <div>冲突解决</div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 3 -->
+                        <div class="phase-card p3">
+                            <div class="interaction-badge">P0</div>
+                            <div class="phase-header">
+                                <div class="phase-number">3</div>
+                                <div class="phase-name">方案集成</div>
+                                <div class="phase-time">15-20min</div>
+                            </div>
+                            <div class="phase-agents">🎯总指挥 💻编码</div>
+                            <div class="phase-tasks">
+                                <div>方案融合</div>
+                                <div>代码生成</div>
+                                <div>用户确认</div>
+                            </div>
+                        </div>
+
+                        <!-- Phase 4 -->
+                        <div class="phase-card p4">
+                            <div class="phase-header">
+                                <div class="phase-number">4</div>
+                                <div class="phase-name">质量保证</div>
+                                <div class="phase-time">9-12min</div>
+                            </div>
+                            <div class="phase-agents">✅ 质量专家</div>
+                            <div class="phase-tasks">
+                                <div>6层门禁</div>
+                                <div>Guardrails</div>
+                                <div>基准测试</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 核心能力 - 精简版 -->
+            <div class="core-capabilities">
+                <div class="capability-mini">
+                    <div class="cap-icon">📚</div>
+                    <h4>Agent as Doc</h4>
+                    <div class="cap-value">↑75-87%</div>
+                    <p>智能体=角色+动态加载 | Token效率提升</p>
+                </div>
+                <div class="capability-mini">
+                    <div class="cap-icon">🔄</div>
+                    <h4>Theory-to-Code</h4>
+                    <div class="cap-value">92%</div>
+                    <p>需求→建模→代码 | 全自动生成</p>
+                </div>
+                <div class="capability-mini">
+                    <div class="cap-icon">🤝</div>
+                    <h4>Human-in-Loop</h4>
+                    <div class="cap-value">P0-P4</div>
+                    <p>关键决策人机协作 | 任务偏离↓67%</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>APS调度智能体系统 v4.3 | 汇报日期: 2025年 | 保密文档</p>
+    </div>
+</body>
+</html>

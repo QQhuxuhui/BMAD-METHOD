@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APS调度智能体系统 - 产品价值</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page {
+            max-width: 1600px;
+            height: 900px;
+            background: white;
+            border-radius: 15px;
+            padding: 30px 40px;
+            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .page-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .page-subtitle {
+            font-size: 0.95em;
+            color: #666;
+        }
+
+        .value-section {
+            flex: 1;
+            display: grid;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 15px;
+        }
+
+        .value-proposition {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .value-proposition h2 {
+            font-size: 1.4em;
+            margin-bottom: 6px;
+        }
+
+        .value-proposition p {
+            font-size: 0.95em;
+            opacity: 0.95;
+        }
+
+        .value-matrix {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .value-quadrant {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .quadrant-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .quadrant-icon {
+            font-size: 2.2em;
+        }
+
+        .quadrant-title h3 {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin-bottom: 2px;
+        }
+
+        .quadrant-title .subtitle {
+            font-size: 0.75em;
+            color: #7f8c8d;
+        }
+
+        .metrics-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .metric-box {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            border-left: 3px solid #667eea;
+        }
+
+        .metric-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 3px;
+        }
+
+        .metric-label {
+            font-size: 0.85em;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .metric-detail {
+            font-size: 0.7em;
+            color: #7f8c8d;
+            margin-top: 3px;
+        }
+
+        .roi-calculator {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .roi-title {
+            text-align: center;
+            font-size: 1.3em;
+            color: #d35400;
+            margin-bottom: 12px;
+            font-weight: bold;
+        }
+
+        .roi-comparison {
+            display: grid;
+            grid-template-columns: 2fr auto 2fr;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .roi-box {
+            background: white;
+            padding: 14px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .roi-box h4 {
+            font-size: 1.1em;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .cost-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid #ecf0f1;
+            font-size: 0.85em;
+        }
+
+        .cost-item:last-child {
+            border-bottom: none;
+            border-top: 2px solid #667eea;
+            margin-top: 6px;
+            padding-top: 10px;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .cost-label {
+            color: #555;
+        }
+
+        .cost-value {
+            color: #2c3e50;
+            font-weight: 500;
+        }
+
+        .cost-value.highlight {
+            color: #e74c3c;
+            font-size: 1.15em;
+        }
+
+        .cost-value.success {
+            color: #27ae60;
+            font-size: 1.15em;
+        }
+
+        .arrow-divider {
+            font-size: 2.2em;
+            color: #667eea;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .competitive-edge {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .edge-card {
+            background: white;
+            padding: 12px;
+            border-radius: 6px;
+            border-top: 3px solid #667eea;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+        }
+
+        .edge-card h4 {
+            font-size: 0.95em;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .edge-card ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .edge-card li {
+            font-size: 0.75em;
+            color: #555;
+            padding: 3px 0;
+            line-height: 1.2;
+        }
+
+        .edge-card li::before {
+            content: "▸";
+            color: #27ae60;
+            font-weight: bold;
+            margin-right: 4px;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 12px;
+            font-size: 0.8em;
+            margin-top: 20px;
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            .page { box-shadow: none; margin-bottom: 0; }
+            .footer { color: #666; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="page-header">
+            <h1 class="page-title">产品价值</h1>
+            <p class="page-subtitle">让调度优化能力民主化，让每个企业都能拥有专业级解决方案</p>
+        </div>
+
+        <div class="value-section">
+            <div class="value-proposition">
+                <h2>🎯 核心价值主张</h2>
+                <p>85%效率提升 × 94.5%成本降低 × 92%质量保证 = 调度优化的范式革命</p>
+            </div>
+
+            <div class="value-matrix">
+                <div class="value-quadrant">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">⚡</div>
+                        <div class="quadrant-title">
+                            <h3>效率革命</h3>
+                            <div class="subtitle">从周到小时的跨越</div>
+                        </div>
+                    </div>
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-number">↑85%</div>
+                            <div class="metric-label">开发效率</div>
+                            <div class="metric-detail">3-4周 → 2小时</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-number">↑95%</div>
+                            <div class="metric-label">专家时间节省</div>
+                            <div class="metric-detail">80h → 2h</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="value-quadrant">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">💰</div>
+                        <div class="quadrant-title">
+                            <h3>成本优势</h3>
+                            <div class="subtitle">人力成本断崖式下降</div>
+                        </div>
+                    </div>
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-number">↓94.5%</div>
+                            <div class="metric-label">人力成本</div>
+                            <div class="metric-detail">2万 → 1100元</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-number">↓90%</div>
+                            <div class="metric-label">试错成本</div>
+                            <div class="metric-detail">快速迭代</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="value-quadrant">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">✅</div>
+                        <div class="quadrant-title">
+                            <h3>质量保证</h3>
+                            <div class="subtitle">6层门禁严控质量</div>
+                        </div>
+                    </div>
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-number">92%</div>
+                            <div class="metric-label">代码可用率</div>
+                            <div class="metric-detail">业界领先</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-number">100%</div>
+                            <div class="metric-label">可追溯性</div>
+                            <div class="metric-detail">引用完整</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="value-quadrant">
+                    <div class="quadrant-header">
+                        <div class="quadrant-icon">📚</div>
+                        <div class="quadrant-title">
+                            <h3>知识资产</h3>
+                            <div class="subtitle">持续积累组织能力</div>
+                        </div>
+                    </div>
+                    <div class="metrics-row">
+                        <div class="metric-box">
+                            <div class="metric-number">92.5%</div>
+                            <div class="metric-label">知识复用率</div>
+                            <div class="metric-detail">模板化</div>
+                        </div>
+                        <div class="metric-box">
+                            <div class="metric-number">↓87%</div>
+                            <div class="metric-label">学习曲线</div>
+                            <div class="metric-detail">3月 → 2周</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="roi-calculator">
+                <h3 class="roi-title">💎 单项目ROI对比（算一笔账）</h3>
+                <div class="roi-comparison">
+                    <div class="roi-box">
+                        <h4>传统方式</h4>
+                        <div class="cost-item">
+                            <span class="cost-label">算法专家(10天×2000元)</span>
+                            <span class="cost-value">20,000元</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">开发周期</span>
+                            <span class="cost-value">3-4周</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">试错风险(+2-3周)</span>
+                            <span class="cost-value">+10,000元</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">总成本</span>
+                            <span class="cost-value highlight">≈ 20,000+元</span>
+                        </div>
+                    </div>
+
+                    <div class="arrow-divider">→</div>
+
+                    <div class="roi-box">
+                        <h4>APS系统</h4>
+                        <div class="cost-item">
+                            <span class="cost-label">LLM调用成本</span>
+                            <span class="cost-value">100元</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">专家审核(0.5天×2000元)</span>
+                            <span class="cost-value">1,000元</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">开发周期</span>
+                            <span class="cost-value">2小时</span>
+                        </div>
+                        <div class="cost-item">
+                            <span class="cost-label">总成本</span>
+                            <span class="cost-value success">≈ 1,100元</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="competitive-edge">
+                <div class="edge-card">
+                    <h4><span style="color: #667eea;">💡</span> 技术创新</h4>
+                    <ul>
+                        <li>Agent as Doc业界首创</li>
+                        <li>Sidecar动态加载机制</li>
+                        <li>Theory-to-Code引擎</li>
+                        <li>状态持久化+断点续传</li>
+                    </ul>
+                </div>
+
+                <div class="edge-card">
+                    <h4><span style="color: #667eea;">🎓</span> 专业深度</h4>
+                    <ul>
+                        <li>7大专家智能体体系</li>
+                        <li>100+验证知识模板</li>
+                        <li>TenElementModel统一真相源</li>
+                        <li>15年行业经验沉淀</li>
+                    </ul>
+                </div>
+
+                <div class="edge-card">
+                    <h4><span style="color: #667eea;">🚀</span> 应用场景</h4>
+                    <ul>
+                        <li>物流: 成本↓15% 准时率↑13%</li>
+                        <li>制造: 周期↓20% 利用率↑15%</li>
+                        <li>排班: 成本↓12% 满意度↑30%</li>
+                        <li>覆盖20+行业领域</li>
+                    </ul>
+                </div>
+
+                <div class="edge-card">
+                    <h4><span style="color: #667eea;">🎯</span> 战略目标</h4>
+                    <ul>
+                        <li>6月: 100+试用用户</li>
+                        <li>12月: 200+付费客户</li>
+                        <li>24月: 1000+企业客户</li>
+                        <li>成为AI调度行业标准</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>APS调度智能体系统 v4.3 | 汇报日期: 2025年 | 保密文档</p>
+    </div>
+</body>
+</html>
