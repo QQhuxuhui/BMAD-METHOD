@@ -12,9 +12,9 @@
         }
 
         body {
-            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            padding: 20px;
+            font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #E8EAF0 0%, #F5F6FA 100%);
+            padding: 30px;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -24,10 +24,10 @@
         .page {
             max-width: 1600px;
             height: 900px;
-            background: white;
-            border-radius: 15px;
-            padding: 30px 40px;
-            box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
+            background: #FEFEFE;
+            border-radius: 20px;
+            padding: 35px 50px;
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.08);
             display: flex;
             flex-direction: column;
         }
@@ -39,84 +39,90 @@
 
         .page-title {
             font-size: 2.5em;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-weight: 600;
+            background: linear-gradient(135deg, #9DACBD 0%, #B4A4C4 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
         }
 
         .page-subtitle {
             font-size: 0.95em;
-            color: #666;
+            color: #7D8A99;
+            font-weight: 400;
         }
 
         .solution-layout {
             flex: 1;
             display: grid;
             grid-template-rows: auto 1fr auto;
-            gap: 12px;
+            gap: 18px;
         }
 
         /* 痛点 - 精简版 */
         .pain-points {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 15px;
         }
 
         .pain-card {
-            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #D98080 0%, #E8C4C4 100%);
+            color: #5A4A4A;
+            padding: 14px;
+            border-radius: 12px;
             text-align: center;
-            box-shadow: 0 3px 10px rgba(255, 107, 107, 0.3);
+            box-shadow: 0 2px 12px rgba(217, 128, 128, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
+            border: 1px solid rgba(217, 128, 128, 0.2);
         }
 
         .pain-card .icon {
             font-size: 2em;
+            opacity: 0.85;
         }
 
         .pain-content h3 {
             font-size: 0.95em;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
+            font-weight: 500;
         }
 
         .pain-content .stat {
             font-size: 1.3em;
-            font-weight: bold;
-            color: #ffd700;
+            font-weight: 600;
+            color: #8B6565;
         }
 
         /* 中间主体：架构图+工作流程图 */
         .main-content {
             display: grid;
             grid-template-rows: 1fr 1fr;
-            gap: 10px;
+            gap: 15px;
         }
 
         /* 系统架构图 */
         .system-architecture {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
-            padding: 12px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #F8F9FB 0%, #EDEEF2 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
         }
 
         .arch-title {
             text-align: center;
             font-size: 1.1em;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-weight: bold;
+            color: #4A5568;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
 
         .arch-title .highlight {
-            color: #667eea;
+            color: #9DACBD;
         }
 
         /* 架构布局 - 无连接线 */
@@ -135,19 +141,19 @@
 
         .flow-box {
             background: white;
-            padding: 10px;
-            border-radius: 6px;
+            padding: 12px;
+            border-radius: 8px;
             text-align: center;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-            border: 2px solid #667eea;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
+            border: 1.5px solid #B4A4C4;
         }
 
         .flow-box.input {
-            border-color: #f093fb;
+            border-color: #D4BFCF;
         }
 
         .flow-box.output {
-            border-color: #27ae60;
+            border-color: #A9B7A3;
         }
 
         .flow-box .box-icon {
@@ -176,29 +182,31 @@
         }
 
         .orchestrator-box {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-            padding: 8px;
-            border-radius: 6px;
+            background: linear-gradient(135deg, #D4BFCF 0%, #E8C4C4 100%);
+            color: #5A4A4A;
+            padding: 10px;
+            border-radius: 8px;
             text-align: center;
             font-size: 0.85em;
-            font-weight: bold;
+            font-weight: 600;
+            border: 1px solid rgba(212, 191, 207, 0.3);
         }
 
         /* 智能体网格 - 缩小 */
         .agents-compact {
             display: grid;
             grid-template-columns: repeat(6, 1fr);
-            gap: 5px;
+            gap: 6px;
         }
 
         .agent-mini {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 6px 4px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #9DACBD 0%, #B4A4C4 100%);
+            color: #4A5568;
+            padding: 8px 5px;
+            border-radius: 6px;
             text-align: center;
             font-size: 0.65em;
+            border: 1px solid rgba(157, 172, 189, 0.2);
         }
 
         .agent-mini strong {
@@ -208,27 +216,29 @@
         }
 
         .agent-mini .token {
-            background: rgba(231, 76, 60, 0.9);
-            padding: 1px 4px;
-            border-radius: 5px;
+            background: rgba(217, 128, 128, 0.75);
+            color: white;
+            padding: 2px 5px;
+            border-radius: 4px;
             font-size: 0.85em;
             display: inline-block;
         }
 
         /* 知识库 - 放大并详细展示 */
         .knowledge-libraries {
-            background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%);
-            padding: 12px;
-            border-radius: 8px;
-            box-shadow: 0 3px 10px rgba(132, 250, 176, 0.3);
+            background: linear-gradient(135deg, #CEDBCE 0%, #D4E4D4 100%);
+            padding: 14px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(169, 183, 163, 0.15);
+            border: 1px solid rgba(169, 183, 163, 0.25);
         }
 
         .kb-title {
             text-align: center;
             font-size: 1em;
-            color: #1a5f3f;
-            font-weight: bold;
-            margin-bottom: 10px;
+            color: #4A6150;
+            font-weight: 600;
+            margin-bottom: 12px;
         }
 
         .kb-grid {
@@ -238,65 +248,67 @@
         }
 
         .kb-card {
-            background: white;
-            padding: 10px;
-            border-radius: 6px;
-            border-left: 4px solid #27ae60;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            background: #FAFBFA;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid #A9B7A3;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            border: 1px solid #E5EBE3;
         }
 
         .kb-card .kb-icon {
             font-size: 1.5em;
             text-align: center;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            opacity: 0.85;
         }
 
         .kb-card h4 {
             font-size: 0.85em;
-            color: #1a5f3f;
-            margin-bottom: 3px;
-            font-weight: bold;
+            color: #4A6150;
+            margin-bottom: 4px;
+            font-weight: 600;
             text-align: center;
         }
 
         .kb-card .kb-count {
             text-align: center;
             font-size: 1.2em;
-            font-weight: bold;
-            color: #27ae60;
-            margin-bottom: 4px;
+            font-weight: 600;
+            color: #6B8068;
+            margin-bottom: 5px;
         }
 
         .kb-card .kb-items {
             font-size: 0.65em;
-            color: #555;
-            line-height: 1.3;
+            color: #6B7970;
+            line-height: 1.4;
         }
 
         .kb-card .kb-items div {
-            margin: 2px 0;
+            margin: 3px 0;
         }
 
         .kb-card .kb-items div::before {
             content: "▸";
-            color: #27ae60;
-            margin-right: 3px;
+            color: #A9B7A3;
+            margin-right: 4px;
         }
 
         /* 工作流程图 - 白色背景 */
         .workflow-process {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
-            padding: 12px;
-            border-radius: 8px;
-            border: 2px solid #e9ecef;
+            background: linear-gradient(135deg, #FEFEFE 0%, #F8F9FB 100%);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
         }
 
         .workflow-title {
             text-align: center;
             font-size: 1.1em;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-weight: bold;
+            color: #4A5568;
+            margin-bottom: 12px;
+            font-weight: 600;
         }
 
         .phases-flow {
@@ -312,27 +324,28 @@
             top: 40px;
             left: 8%;
             right: 8%;
-            height: 3px;
-            background: linear-gradient(90deg, #9c27b0, #2196F3, #ff9800, #4caf50, #f44336, #00bcd4);
+            height: 2px;
+            background: linear-gradient(90deg, #B4A4C4, #9DACBD, #D4BFCF, #A9B7A3, #D98080, #9DACBD);
             z-index: 0;
+            opacity: 0.5;
         }
 
         .phase-card {
             background: white;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            padding: 10px 8px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 10px;
+            padding: 12px 10px;
             position: relative;
             z-index: 1;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.06);
         }
 
-        .phase-card.p0 { border-color: #9c27b0; }
-        .phase-card.p1 { border-color: #2196F3; }
-        .phase-card.p1-5 { border-color: #ff9800; }
-        .phase-card.p2 { border-color: #4caf50; }
-        .phase-card.p3 { border-color: #f44336; }
-        .phase-card.p4 { border-color: #00bcd4; }
+        .phase-card.p0 { border-color: #B4A4C4; }
+        .phase-card.p1 { border-color: #9DACBD; }
+        .phase-card.p1-5 { border-color: #D4BFCF; }
+        .phase-card.p2 { border-color: #A9B7A3; }
+        .phase-card.p3 { border-color: #D98080; }
+        .phase-card.p4 { border-color: #9DACBD; }
 
         .phase-header {
             text-align: center;
@@ -344,52 +357,53 @@
             width: 28px;
             height: 28px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #9DACBD 0%, #B4A4C4 100%);
             color: white;
             line-height: 28px;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 0.85em;
             margin-bottom: 4px;
         }
 
         .phase-name {
-            color: #2c3e50;
+            color: #4A5568;
             font-size: 0.75em;
-            font-weight: bold;
-            margin-bottom: 3px;
+            font-weight: 600;
+            margin-bottom: 4px;
         }
 
         .phase-time {
-            color: #e74c3c;
+            color: #8B6565;
             font-size: 0.65em;
             margin-bottom: 6px;
         }
 
         /* 参与智能体标记 */
         .phase-agents {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 4px;
-            border-radius: 5px;
+            background: linear-gradient(135deg, #B4A4C4 0%, #D4BFCF 100%);
+            color: #5A4A4A;
+            padding: 5px;
+            border-radius: 6px;
             margin-bottom: 6px;
             font-size: 0.6em;
             text-align: center;
-            font-weight: bold;
+            font-weight: 600;
+            border: 1px solid rgba(180, 164, 196, 0.2);
         }
 
         .phase-tasks {
             font-size: 0.6em;
-            color: #555;
-            line-height: 1.3;
+            color: #6B7970;
+            line-height: 1.4;
         }
 
         .phase-tasks div {
-            margin: 2px 0;
+            margin: 3px 0;
         }
 
         .phase-tasks div::before {
             content: "▸";
-            color: #667eea;
+            color: #9DACBD;
             margin-right: 3px;
         }
 
@@ -397,59 +411,64 @@
             position: absolute;
             top: -8px;
             right: 8px;
-            background: #e74c3c;
+            background: #D98080;
             color: white;
-            padding: 2px 6px;
+            padding: 3px 7px;
             border-radius: 8px;
             font-size: 0.6em;
-            font-weight: bold;
+            font-weight: 600;
         }
 
         .interaction-badge.p1 {
-            background: #ff9800;
+            background: #D4BFCF;
+            color: #5A4A4A;
         }
 
         /* 核心能力 - 精简版 */
         .core-capabilities {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 15px;
         }
 
         .capability-mini {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 10px;
-            border-radius: 8px;
+            background: linear-gradient(135deg, #9DACBD 0%, #B4A4C4 100%);
+            color: #4A5568;
+            padding: 14px;
+            border-radius: 12px;
             text-align: center;
+            border: 1px solid rgba(157, 172, 189, 0.2);
         }
 
         .capability-mini .cap-icon {
             font-size: 1.8em;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            opacity: 0.85;
         }
 
         .capability-mini h4 {
             font-size: 0.95em;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            font-weight: 600;
         }
 
         .capability-mini .cap-value {
             font-size: 1.3em;
-            font-weight: bold;
-            color: #ffd700;
-            margin: 3px 0;
+            font-weight: 600;
+            color: #5A4A4A;
+            margin: 4px 0;
         }
 
         .capability-mini p {
             font-size: 0.7em;
-            opacity: 0.95;
-            line-height: 1.2;
+            opacity: 0.9;
+            line-height: 1.3;
+            color: #5A4A4A;
         }
 
         .footer {
             text-align: center;
-            color: white;
+            color: #9DACBD;
             padding: 12px;
             font-size: 0.8em;
             margin-top: 20px;
@@ -458,7 +477,7 @@
         @media print {
             body { background: white; padding: 0; }
             .page { box-shadow: none; margin-bottom: 0; }
-            .footer { color: #666; }
+            .footer { color: #7D8A99; }
         }
     </style>
 </head>
