@@ -22,34 +22,34 @@
         }
 
         .page {
-            width: 1600px;
-            height: 900px;
+            width: 100%;
+            max-width: 1600px;
+            min-height: 900px;
             background: white;
             border-radius: 15px;
-            padding: 50px 60px;
+            padding: 35px 40px;
             box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         /* 顶部：核心价值主张 */
         .hero {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 25px;
         }
 
         .hero-title {
-            font-size: 3.2em;
+            font-size: 2.5em;
             font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .hero-subtitle {
-            font-size: 1.3em;
+            font-size: 1.1em;
             color: #555;
             font-weight: 500;
         }
@@ -58,14 +58,14 @@
         .key-metrics {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 30px;
-            margin-bottom: 40px;
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
         .metric-card {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 35px 25px;
-            border-radius: 15px;
+            padding: 25px 20px;
+            border-radius: 12px;
             text-align: center;
             box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
             transition: transform 0.3s ease;
@@ -76,66 +76,66 @@
         }
 
         .metric-icon {
-            font-size: 4em;
-            margin-bottom: 15px;
+            font-size: 3em;
+            margin-bottom: 10px;
         }
 
         .metric-value {
-            font-size: 4.5em;
+            font-size: 3.5em;
             font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1;
-            margin-bottom: 10px;
-        }
-
-        .metric-label {
-            font-size: 1.3em;
-            color: #2c3e50;
-            font-weight: 600;
             margin-bottom: 8px;
         }
 
+        .metric-label {
+            font-size: 1.15em;
+            color: #2c3e50;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
         .metric-detail {
-            font-size: 1em;
+            font-size: 0.9em;
             color: #7f8c8d;
         }
 
         /* ROI对比 */
         .roi-section {
             background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 30px 40px;
-            border-radius: 15px;
-            margin-bottom: 35px;
+            padding: 20px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
         }
 
         .roi-title {
             text-align: center;
-            font-size: 1.8em;
+            font-size: 1.5em;
             color: #d35400;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             font-weight: bold;
         }
 
         .roi-comparison {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
-            gap: 30px;
+            gap: 20px;
             align-items: center;
         }
 
         .roi-box {
             background: white;
-            padding: 25px 30px;
-            border-radius: 12px;
+            padding: 18px 22px;
+            border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .roi-box h4 {
-            font-size: 1.4em;
+            font-size: 1.2em;
             color: #2c3e50;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             text-align: center;
             font-weight: bold;
         }
@@ -143,18 +143,18 @@
         .roi-item {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
-            font-size: 1.05em;
+            padding: 8px 0;
+            font-size: 0.95em;
             border-bottom: 1px solid #ecf0f1;
         }
 
         .roi-item:last-child {
             border-bottom: none;
-            border-top: 3px solid #667eea;
-            margin-top: 10px;
-            padding-top: 15px;
+            border-top: 2px solid #667eea;
+            margin-top: 8px;
+            padding-top: 12px;
             font-weight: bold;
-            font-size: 1.2em;
+            font-size: 1.1em;
         }
 
         .roi-label {
@@ -177,7 +177,7 @@
         }
 
         .arrow {
-            font-size: 4em;
+            font-size: 3em;
             color: #667eea;
             font-weight: bold;
         }
@@ -186,31 +186,31 @@
         .advantages {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
+            gap: 15px;
         }
 
         .advantage-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 20px;
-            border-radius: 12px;
+            padding: 18px 15px;
+            border-radius: 10px;
             text-align: center;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
         }
 
         .advantage-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 8px;
         }
 
         .advantage-title {
-            font-size: 1.2em;
+            font-size: 1.05em;
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
 
         .advantage-value {
-            font-size: 0.95em;
+            font-size: 0.85em;
             opacity: 0.95;
         }
 
