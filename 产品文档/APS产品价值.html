@@ -27,191 +27,226 @@
             min-height: 900px;
             background: white;
             border-radius: 15px;
-            padding: 35px 40px;
+            padding: 30px 40px;
             box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
-            display: flex;
-            flex-direction: column;
         }
 
-        /* 顶部：核心价值主张 */
+        /* 核心价值主张 */
         .hero {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
 
         .hero-title {
-            font-size: 2.5em;
+            font-size: 2.8em;
             font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
         }
 
         .hero-subtitle {
             font-size: 1.1em;
-            color: #555;
-            font-weight: 500;
+            color: #666;
         }
 
-        /* 核心指标：3个大数字 */
-        .key-metrics {
+        /* 价值1：效率×成本 */
+        .value-1 {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            color: white;
+        }
+
+        .value-1-title {
+            text-align: center;
+            font-size: 1.6em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .metric-box {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .metric-icon {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .metric-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .metric-detail {
+            font-size: 0.85em;
+            opacity: 0.9;
+        }
+
+        /* 价值2-4：3大核心技术 */
+        .value-234 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 20px;
             margin-bottom: 25px;
         }
 
-        .metric-card {
+        .tech-card {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             padding: 25px 20px;
             border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-        }
-
-        .metric-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .metric-icon {
-            font-size: 3em;
-            margin-bottom: 10px;
-        }
-
-        .metric-value {
-            font-size: 3.5em;
-            font-weight: bold;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .metric-label {
-            font-size: 1.15em;
-            color: #2c3e50;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .metric-detail {
-            font-size: 0.9em;
-            color: #7f8c8d;
-        }
-
-        /* ROI对比 */
-        .roi-section {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 20px 30px;
-            border-radius: 12px;
-            margin-bottom: 25px;
-        }
-
-        .roi-title {
-            text-align: center;
-            font-size: 1.5em;
-            color: #d35400;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-
-        .roi-comparison {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 20px;
-            align-items: center;
-        }
-
-        .roi-box {
-            background: white;
-            padding: 18px 22px;
-            border-radius: 10px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            position: relative;
         }
 
-        .roi-box h4 {
-            font-size: 1.2em;
-            color: #2c3e50;
-            margin-bottom: 12px;
-            text-align: center;
-            font-weight: bold;
-        }
-
-        .roi-item {
+        .tech-number {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 50%;
             display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            font-size: 0.95em;
-            border-bottom: 1px solid #ecf0f1;
-        }
-
-        .roi-item:last-child {
-            border-bottom: none;
-            border-top: 2px solid #667eea;
-            margin-top: 8px;
-            padding-top: 12px;
+            align-items: center;
+            justify-content: center;
             font-weight: bold;
             font-size: 1.1em;
         }
 
-        .roi-label {
-            color: #555;
+        .tech-icon {
+            font-size: 3.5em;
+            text-align: center;
+            margin-bottom: 15px;
         }
 
-        .roi-value {
+        .tech-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .tech-desc {
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .tech-highlights {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .highlight-item {
+            font-size: 0.85em;
+            color: #2c3e50;
+            padding: 4px 0;
+            display: flex;
+            align-items: start;
+            gap: 6px;
+        }
+
+        .highlight-item::before {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .tech-data {
+            text-align: center;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        .tech-data-number {
+            font-size: 2em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tech-data-label {
+            font-size: 0.85em;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* 价值闭环 */
+        .value-loop {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px 30px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .loop-icon {
+            font-size: 4em;
+            flex-shrink: 0;
+        }
+
+        .loop-content {
+            flex: 1;
+        }
+
+        .loop-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #d35400;
+            margin-bottom: 10px;
+        }
+
+        .loop-flow {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .loop-step {
+            background: white;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.9em;
             color: #2c3e50;
             font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .roi-value.bad {
-            color: #e74c3c;
-            font-size: 1.3em;
-        }
-
-        .roi-value.good {
-            color: #27ae60;
-            font-size: 1.3em;
-        }
-
-        .arrow {
-            font-size: 3em;
-            color: #667eea;
+        .loop-arrow {
+            font-size: 1.5em;
+            color: #d35400;
             font-weight: bold;
-        }
-
-        /* 底部：竞争优势 */
-        .advantages {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-        }
-
-        .advantage-card {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 18px 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-        }
-
-        .advantage-icon {
-            font-size: 2.5em;
-            margin-bottom: 8px;
-        }
-
-        .advantage-title {
-            font-size: 1.05em;
-            font-weight: bold;
-            margin-bottom: 4px;
-        }
-
-        .advantage-value {
-            font-size: 0.85em;
-            opacity: 0.95;
         }
 
         @media print {
@@ -222,8 +257,6 @@
             .page {
                 box-shadow: none;
                 margin: 0;
-                width: 100%;
-                height: 100vh;
             }
         }
     </style>
@@ -233,105 +266,108 @@
         <!-- 核心价值主张 -->
         <div class="hero">
             <h1 class="hero-title">让调度优化能力民主化</h1>
-            <p class="hero-subtitle">每个企业都能拥有专业级调度解决方案</p>
+            <p class="hero-subtitle">从专家垄断到人人可用的范式革命</p>
         </div>
 
-        <!-- 3大核心指标 -->
-        <div class="key-metrics">
-            <div class="metric-card">
-                <div class="metric-icon">⚡</div>
-                <div class="metric-value">85%</div>
-                <div class="metric-label">效率提升</div>
-                <div class="metric-detail">3-4周 → 3-5天</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-icon">💰</div>
-                <div class="metric-value">94.5%</div>
-                <div class="metric-label">成本降低</div>
-                <div class="metric-detail">2万元 → 1100元</div>
-            </div>
-
-            <div class="metric-card">
-                <div class="metric-icon">✅</div>
-                <div class="metric-value">92%</div>
-                <div class="metric-label">代码可用率</div>
-                <div class="metric-detail">业界领先水平</div>
-            </div>
-        </div>
-
-        <!-- ROI对比 -->
-        <div class="roi-section">
-            <h3 class="roi-title">💎 单项目投资回报对比</h3>
-            <div class="roi-comparison">
-                <div class="roi-box">
-                    <h4>传统方式</h4>
-                    <div class="roi-item">
-                        <span class="roi-label">算法专家</span>
-                        <span class="roi-value">20,000元</span>
-                    </div>
-                    <div class="roi-item">
-                        <span class="roi-label">开发周期</span>
-                        <span class="roi-value">3-4周</span>
-                    </div>
-                    <div class="roi-item">
-                        <span class="roi-label">试错风险</span>
-                        <span class="roi-value">+10,000元</span>
-                    </div>
-                    <div class="roi-item">
-                        <span class="roi-label">总成本</span>
-                        <span class="roi-value bad">≈ 20,000+元</span>
-                    </div>
+        <!-- 价值1：效率提升 × 成本下降 -->
+        <div class="value-1">
+            <div class="value-1-title">💰 核心价值：效率提升带来成本断崖式下降</div>
+            <div class="metrics-grid">
+                <div class="metric-box">
+                    <div class="metric-icon">⚡</div>
+                    <div class="metric-number">85%</div>
+                    <div class="metric-label">开发效率提升</div>
+                    <div class="metric-detail">3-4周 → 3-5天</div>
                 </div>
-
-                <div class="arrow">→</div>
-
-                <div class="roi-box">
-                    <h4>APS系统</h4>
-                    <div class="roi-item">
-                        <span class="roi-label">LLM成本</span>
-                        <span class="roi-value">100元</span>
-                    </div>
-                    <div class="roi-item">
-                        <span class="roi-label">专家审核</span>
-                        <span class="roi-value">1,000元</span>
-                    </div>
-                    <div class="roi-item">
-                        <span class="roi-label">开发周期</span>
-                        <span class="roi-value">2小时</span>
-                    </div>
-                    <div class="roi-item">
-                        <span class="roi-label">总成本</span>
-                        <span class="roi-value good">≈ 1,100元</span>
-                    </div>
+                <div class="metric-box">
+                    <div class="metric-icon">👨‍💼</div>
+                    <div class="metric-number">95%</div>
+                    <div class="metric-label">专家时间节省</div>
+                    <div class="metric-detail">80小时 → 2小时</div>
+                </div>
+                <div class="metric-box">
+                    <div class="metric-icon">💵</div>
+                    <div class="metric-number">94.5%</div>
+                    <div class="metric-label">人力成本降低</div>
+                    <div class="metric-detail">2万元 → 1100元</div>
                 </div>
             </div>
         </div>
 
-        <!-- 核心竞争优势 -->
-        <div class="advantages">
-            <div class="advantage-card">
-                <div class="advantage-icon">💡</div>
-                <div class="advantage-title">Agent as Doc</div>
-                <div class="advantage-value">Token效率提升 75-87%</div>
+        <!-- 价值2-4：3大核心技术保障 -->
+        <div class="value-234">
+            <!-- 价值2：知识库设计 -->
+            <div class="tech-card">
+                <div class="tech-number">2</div>
+                <div class="tech-icon">📚</div>
+                <div class="tech-title">专家知识库设计</div>
+                <div class="tech-desc">知识可沉淀、可复用，智能体持续成长</div>
+                <div class="tech-highlights">
+                    <div class="highlight-item">7大专家知识库模块化组织</div>
+                    <div class="highlight-item">100+验证模板按需加载</div>
+                    <div class="highlight-item">知识更新只需编辑Markdown</div>
+                    <div class="highlight-item">Token效率提升75-87%</div>
+                </div>
+                <div class="tech-data">
+                    <div class="tech-data-number">92.5%</div>
+                    <div class="tech-data-label">知识复用率</div>
+                </div>
             </div>
 
-            <div class="advantage-card">
-                <div class="advantage-icon">🎓</div>
-                <div class="advantage-title">专业知识库</div>
-                <div class="advantage-value">100+验证模板</div>
+            <!-- 价值3：工作流程设计 -->
+            <div class="tech-card">
+                <div class="tech-number">3</div>
+                <div class="tech-icon">🔄</div>
+                <div class="tech-title">智能体工作流程</div>
+                <div class="tech-desc">Todo机制+偏离检测，长任务链不偏移</div>
+                <div class="tech-highlights">
+                    <div class="highlight-item">Phase 0生成Todo执行合同</div>
+                    <div class="highlight-item">实时偏离检测(<0.60触发)</div>
+                    <div class="highlight-item">Phase 4完成度验证</div>
+                    <div class="highlight-item">状态持久化+智能续传</div>
+                </div>
+                <div class="tech-data">
+                    <div class="tech-data-number">67%</div>
+                    <div class="tech-data-label">任务偏离率下降</div>
+                </div>
             </div>
 
-            <div class="advantage-card">
-                <div class="advantage-icon">🚀</div>
-                <div class="advantage-title">应用场景</div>
-                <div class="advantage-value">物流/制造/排班等</div>
+            <!-- 价值4：Doc as Agent -->
+            <div class="tech-card">
+                <div class="tech-number">4</div>
+                <div class="tech-icon">📝</div>
+                <div class="tech-title">Doc as Agent理念</div>
+                <div class="tech-desc">专家只需专注写文档，知识自动转化为能力</div>
+                <div class="tech-highlights">
+                    <div class="highlight-item">Agent = 角色 + 知识文档库</div>
+                    <div class="highlight-item">Sidecar模式按需加载</div>
+                    <div class="highlight-item">Markdown即知识，无需Prompt工程</div>
+                    <div class="highlight-item">专家经验可标准化传承</div>
+                </div>
+                <div class="tech-data">
+                    <div class="tech-data-number">10倍</div>
+                    <div class="tech-data-label">知识维护效率</div>
+                </div>
             </div>
+        </div>
 
-            <div class="advantage-card">
-                <div class="advantage-icon">🎯</div>
-                <div class="advantage-title">市场目标</div>
-                <div class="advantage-value">2027年 1000+企业</div>
+        <!-- 价值闭环 -->
+        <div class="value-loop">
+            <div class="loop-icon">🔁</div>
+            <div class="loop-content">
+                <div class="loop-title">价值闭环：持续成长的智能体系统</div>
+                <div class="loop-flow">
+                    <div class="loop-step">专家写文档</div>
+                    <div class="loop-arrow">→</div>
+                    <div class="loop-step">知识库沉淀</div>
+                    <div class="loop-arrow">→</div>
+                    <div class="loop-step">智能体能力提升</div>
+                    <div class="loop-arrow">→</div>
+                    <div class="loop-step">解决更多问题</div>
+                    <div class="loop-arrow">→</div>
+                    <div class="loop-step">新知识反馈</div>
+                    <div class="loop-arrow">↻</div>
+                </div>
             </div>
         </div>
     </div>
