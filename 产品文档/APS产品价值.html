@@ -27,7 +27,7 @@
             min-height: 900px;
             background: white;
             border-radius: 15px;
-            padding: 35px 40px;
+            padding: 30px 40px;
             box-shadow: 0 20px 80px rgba(0, 0, 0, 0.3);
             display: flex;
             flex-direction: column;
@@ -36,7 +36,7 @@
         /* 核心价值主张 */
         .hero {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .hero-title {
@@ -44,6 +44,7 @@
             font-weight: bold;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
             margin-bottom: 8px;
         }
@@ -56,20 +57,20 @@
         .value-layout {
             flex: 1;
             display: grid;
-            grid-template-rows: auto 1fr auto;
-            gap: 25px;
+            grid-template-rows: auto auto auto 1fr auto;
+            gap: 20px;
         }
 
         /* 业务价值 - 3个大数据卡片 */
         .business-values {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 18px;
         }
 
         .value-card {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 25px 20px;
+            padding: 22px 18px;
             border-radius: 12px;
             color: white;
             text-align: center;
@@ -77,76 +78,254 @@
         }
 
         .value-icon {
-            font-size: 3em;
-            margin-bottom: 12px;
+            font-size: 2.8em;
+            margin-bottom: 10px;
         }
 
         .value-number {
-            font-size: 3.5em;
+            font-size: 3.2em;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
         .value-label {
-            font-size: 1.2em;
-            margin-bottom: 8px;
+            font-size: 1.15em;
+            margin-bottom: 6px;
             font-weight: 600;
         }
 
         .value-detail {
-            font-size: 0.9em;
+            font-size: 0.85em;
             opacity: 0.95;
             background: rgba(255, 255, 255, 0.15);
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 8px;
-            margin-top: 10px;
+            margin-top: 8px;
+        }
+
+        /* 实战验证 */
+        .battle-tested {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 20px 25px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(252, 182, 159, 0.3);
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 1.35em;
+            font-weight: bold;
+            color: #d35400;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid rgba(211, 84, 0, 0.3);
+        }
+
+        .verification-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr 1fr;
+            gap: 20px;
+        }
+
+        .test-method, .verified-scenarios {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .test-method h3, .verified-scenarios h3 {
+            font-size: 1em;
+            color: #d35400;
+            margin-bottom: 12px;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .method-item, .scenario-item {
+            display: flex;
+            align-items: start;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.85em;
+            color: #555;
+        }
+
+        .method-item .icon, .scenario-item .icon {
+            font-size: 1.5em;
+            flex-shrink: 0;
+        }
+
+        .scenario-item strong {
+            display: block;
+            color: #d35400;
+            margin-bottom: 2px;
+            font-size: 0.95em;
+        }
+
+        .scenario-item p {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .test-result {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .big-number {
+            font-size: 4em;
+            font-weight: bold;
+            background: linear-gradient(135deg, #d35400 0%, #ff8c42 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .result-label {
+            font-size: 1.1em;
+            color: #d35400;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .result-detail {
+            font-size: 0.8em;
+            color: #666;
+            line-height: 1.5;
+        }
+
+        /* 成功案例 - 精简版 */
+        .success-cases {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 18px;
+        }
+
+        .case-card {
+            background: linear-gradient(135deg, #c3e6ff 0%, #a1d4ff 100%);
+            padding: 18px 16px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(161, 212, 255, 0.3);
+        }
+
+        .case-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(67, 139, 202, 0.3);
+        }
+
+        .case-icon {
+            font-size: 2.2em;
+        }
+
+        .case-title {
+            flex: 1;
+        }
+
+        .case-title h4 {
+            font-size: 1em;
+            color: #2874a6;
+            margin-bottom: 3px;
+        }
+
+        .case-title p {
+            font-size: 0.75em;
+            color: #5499c7;
+        }
+
+        .case-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+        }
+
+        .metric {
+            background: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .metric-value {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #2874a6;
+            margin-bottom: 2px;
+        }
+
+        .metric-label {
+            font-size: 0.7em;
+            color: #666;
+        }
+
+        .case-highlight {
+            margin-top: 8px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            color: #2874a6;
+            text-align: center;
+            font-weight: 600;
         }
 
         /* 竞争优势 - 2列对比 */
         .competitive-advantages {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 18px;
         }
 
         .advantage-column {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            padding: 25px 20px;
+            padding: 20px 18px;
             border-radius: 12px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
         .advantage-title {
             text-align: center;
-            font-size: 1.4em;
+            font-size: 1.25em;
             font-weight: bold;
             color: #2c3e50;
-            margin-bottom: 18px;
-            padding-bottom: 12px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
             border-bottom: 3px solid #667eea;
         }
 
         .advantage-items {
             display: grid;
-            gap: 12px;
+            gap: 10px;
         }
 
         .advantage-item {
             background: white;
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-radius: 10px;
             border-left: 4px solid #667eea;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
         .advantage-item h4 {
-            font-size: 1em;
+            font-size: 0.95em;
             color: #2c3e50;
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .advantage-item h4 .check-icon {
@@ -157,9 +336,9 @@
         .advantage-compare {
             display: grid;
             grid-template-columns: 1fr auto 1fr;
-            gap: 10px;
-            font-size: 0.85em;
-            margin-top: 6px;
+            gap: 8px;
+            font-size: 0.8em;
+            margin-top: 5px;
         }
 
         .compare-ours {
@@ -177,83 +356,55 @@
             text-align: right;
         }
 
-        /* 成功案例 - 3个精简卡片 */
-        .success-cases {
+        /* 下一步规划 */
+        .next-steps {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 25px;
+            border-radius: 12px;
+            color: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .next-steps h3 {
+            text-align: center;
+            font-size: 1.35em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .planning-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: 1.5fr 1fr;
             gap: 20px;
         }
 
-        .case-card {
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            padding: 20px 18px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(252, 182, 159, 0.3);
+        .goals, .resources {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
         }
 
-        .case-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        .goals h4, .resources h4 {
+            font-size: 1.05em;
             margin-bottom: 12px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid rgba(211, 84, 0, 0.3);
-        }
-
-        .case-icon {
-            font-size: 2.5em;
-        }
-
-        .case-title {
-            flex: 1;
-        }
-
-        .case-title h4 {
-            font-size: 1.1em;
-            color: #d35400;
-            margin-bottom: 3px;
-        }
-
-        .case-title p {
-            font-size: 0.8em;
-            color: #8b5a00;
-        }
-
-        .case-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-        }
-
-        .metric {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        }
-
-        .metric-value {
-            font-size: 1.4em;
-            font-weight: bold;
-            color: #d35400;
-            margin-bottom: 3px;
-        }
-
-        .metric-label {
-            font-size: 0.75em;
-            color: #666;
-        }
-
-        .case-highlight {
-            margin-top: 10px;
-            background: rgba(255, 255, 255, 0.6);
-            padding: 8px 10px;
-            border-radius: 6px;
-            font-size: 0.8em;
-            color: #8b5a00;
-            text-align: center;
             font-weight: 600;
+            padding-bottom: 8px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .goal-item, .resource-item {
+            font-size: 0.85em;
+            margin-bottom: 8px;
+            padding-left: 15px;
+            position: relative;
+            line-height: 1.4;
+        }
+
+        .goal-item::before, .resource-item::before {
+            content: "▸";
+            position: absolute;
+            left: 0;
+            color: #FCD34D;
         }
 
         @media print {
@@ -277,7 +428,7 @@
         </div>
 
         <div class="value-layout">
-            <!-- 业务价值 - 3个大数据卡片 -->
+            <!-- 1. 业务价值 - 3个大数据卡片 -->
             <div class="business-values">
                 <div class="value-card">
                     <div class="value-icon">⚡</div>
@@ -299,88 +450,68 @@
                 </div>
             </div>
 
-            <!-- 竞争优势 - 2列对比 -->
-            <div class="competitive-advantages">
-                <!-- vs 传统优化软件 -->
-                <div class="advantage-column">
-                    <div class="advantage-title">🆚 vs 传统优化软件</div>
-                    <div class="advantage-items">
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 易用性</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">自然语言输入</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">需要建模专家</div>
-                            </div>
+            <!-- 2. 实战验证 - 新增板块 -->
+            <div class="battle-tested">
+                <h2 class="section-title">🏆 实战验证：数竞杯调度优化赛题</h2>
+
+                <div class="verification-layout">
+                    <!-- 左侧：测试方式 -->
+                    <div class="test-method">
+                        <h3>测试方式</h3>
+                        <div class="method-item">
+                            <span class="icon">📝</span>
+                            <p>真实比赛题目<br/>无人工干预</p>
                         </div>
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 开发效率</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">70-130分钟</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">2-4周</div>
-                            </div>
+                        <div class="method-item">
+                            <span class="icon">🤖</span>
+                            <p>AI智能体全自动<br/>端到端求解</p>
                         </div>
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 交付物</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">代码+文档+可追溯</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">仅代码</div>
-                            </div>
-                        </div>
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 知识积累</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">持续沉淀复用</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">依赖个人经验</div>
-                            </div>
+                        <div class="method-item">
+                            <span class="icon">⚡</span>
+                            <p>Theory-to-Code<br/>生成可执行代码</p>
                         </div>
                     </div>
-                </div>
 
-                <!-- vs 其他AI Agent -->
-                <div class="advantage-column">
-                    <div class="advantage-title">🆚 vs 其他AI Agent</div>
-                    <div class="advantage-items">
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 专业深度</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">调度优化深度专精</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">通用能力</div>
+                    <!-- 中间：客观成绩 -->
+                    <div class="test-result">
+                        <div class="big-number">50%</div>
+                        <div class="result-label">击败参赛选手</div>
+                        <div class="result-detail">
+                            在数百支队伍中脱颖而出<br/>
+                            验证AI驱动方案的实战能力<br/>
+                            证明Theory-to-Code的可靠性
+                        </div>
+                    </div>
+
+                    <!-- 右侧：已验证场景 -->
+                    <div class="verified-scenarios">
+                        <h3>已验证场景库</h3>
+                        <div class="scenario-item">
+                            <span class="icon">🔋</span>
+                            <div>
+                                <strong>新能源补能调度</strong>
+                                <p>已融合场景库，可直接复用</p>
                             </div>
                         </div>
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 代码质量</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">92%可用率</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">50-70%</div>
+                        <div class="scenario-item">
+                            <span class="icon">🚚</span>
+                            <div>
+                                <strong>车辆路径优化</strong>
+                                <p>物流配送场景验证</p>
                             </div>
                         </div>
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 可追溯性</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">完整引用链</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">黑盒决策</div>
-                            </div>
-                        </div>
-                        <div class="advantage-item">
-                            <h4><span class="check-icon">✓</span> 知识库</h4>
-                            <div class="advantage-compare">
-                                <div class="compare-ours">100+验证模板</div>
-                                <div class="compare-vs">vs</div>
-                                <div class="compare-theirs">无专业库</div>
+                        <div class="scenario-item">
+                            <span class="icon">🏭</span>
+                            <div>
+                                <strong>生产作业调度</strong>
+                                <p>制造场景验证</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <!-- 成功案例 - 3个精简卡片 -->
+            <!-- 3. 成功案例 - 3个精简卡片 -->
             <div class="success-cases">
                 <!-- 案例1: 生鲜电商 -->
                 <div class="case-card">
@@ -475,6 +606,110 @@
                     </div>
                     <div class="case-highlight">
                         利润率从60%提升至92%
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. 竞争优势 - 2列对比 -->
+            <div class="competitive-advantages">
+                <!-- vs 传统优化软件 -->
+                <div class="advantage-column">
+                    <div class="advantage-title">🆚 vs 传统优化软件</div>
+                    <div class="advantage-items">
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 易用性</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">自然语言输入</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">需要建模专家</div>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 开发效率</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">70-130分钟</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">2-4周</div>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 交付物</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">代码+文档+可追溯</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">仅代码</div>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 知识积累</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">持续沉淀复用</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">依赖个人经验</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- vs 其他AI Agent -->
+                <div class="advantage-column">
+                    <div class="advantage-title">🆚 vs 其他AI Agent</div>
+                    <div class="advantage-items">
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 专业深度</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">调度优化深度专精</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">通用能力</div>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 代码质量</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">92%可用率</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">50-70%</div>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 可追溯性</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">完整引用链</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">黑盒决策</div>
+                            </div>
+                        </div>
+                        <div class="advantage-item">
+                            <h4><span class="check-icon">✓</span> 知识库</h4>
+                            <div class="advantage-compare">
+                                <div class="compare-ours">100+验证模板</div>
+                                <div class="compare-vs">vs</div>
+                                <div class="compare-theirs">无专业库</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. 下一步规划 - 新增板块 -->
+            <div class="next-steps">
+                <h3>📋 下一步计划与资源需求</h3>
+
+                <div class="planning-grid">
+                    <div class="goals">
+                        <h4>Q1-Q2 目标</h4>
+                        <div class="goal-item">知识库填充至100+模板，覆盖10+行业场景</div>
+                        <div class="goal-item">商业化试点：对接3-5家付费客户，验证商业模式</div>
+                        <div class="goal-item">产品化迭代：开发Web界面，提升用户体验</div>
+                        <div class="goal-item">技术壁垒：申请核心技术专利，建立竞争护城河</div>
+                    </div>
+
+                    <div class="resources">
+                        <h4>资源需求</h4>
+                        <div class="resource-item"><strong>研发团队</strong>：3人（1算法+2工程）</div>
+                        <div class="resource-item"><strong>预算</strong>：50万元（研发+市场）</div>
+                        <div class="resource-item"><strong>预期回报</strong>：Q4实现收支平衡</div>
+                        <div class="resource-item"><strong>市场目标</strong>：签约10+付费客户</div>
                     </div>
                 </div>
             </div>
