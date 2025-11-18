@@ -57,7 +57,7 @@
         .value-layout {
             flex: 1;
             display: grid;
-            grid-template-rows: auto auto auto 1fr auto;
+            grid-template-rows: auto auto 1fr auto;
             gap: 20px;
         }
 
@@ -201,85 +201,6 @@
             font-size: 0.8em;
             color: #666;
             line-height: 1.5;
-        }
-
-        /* 成功案例 - 精简版 */
-        .success-cases {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 18px;
-        }
-
-        .case-card {
-            background: linear-gradient(135deg, #c3e6ff 0%, #a1d4ff 100%);
-            padding: 18px 16px;
-            border-radius: 12px;
-            box-shadow: 0 5px 15px rgba(161, 212, 255, 0.3);
-        }
-
-        .case-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid rgba(67, 139, 202, 0.3);
-        }
-
-        .case-icon {
-            font-size: 2.2em;
-        }
-
-        .case-title {
-            flex: 1;
-        }
-
-        .case-title h4 {
-            font-size: 1em;
-            color: #2874a6;
-            margin-bottom: 3px;
-        }
-
-        .case-title p {
-            font-size: 0.75em;
-            color: #5499c7;
-        }
-
-        .case-metrics {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-        }
-
-        .metric {
-            background: white;
-            padding: 8px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-        }
-
-        .metric-value {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #2874a6;
-            margin-bottom: 2px;
-        }
-
-        .metric-label {
-            font-size: 0.7em;
-            color: #666;
-        }
-
-        .case-highlight {
-            margin-top: 8px;
-            background: rgba(255, 255, 255, 0.7);
-            padding: 6px 8px;
-            border-radius: 6px;
-            font-size: 0.75em;
-            color: #2874a6;
-            text-align: center;
-            font-weight: 600;
         }
 
         /* 竞争优势 - 2列对比 */
@@ -533,106 +454,7 @@
                 </div>
             </div>
 
-            <!-- 3. 成功案例 - 3个精简卡片 -->
-            <div class="success-cases">
-                <!-- 案例1: 生鲜电商 -->
-                <div class="case-card">
-                    <div class="case-header">
-                        <div class="case-icon">🚚</div>
-                        <div class="case-title">
-                            <h4>生鲜电商配送</h4>
-                            <p>头部电商 | 日均5000+订单</p>
-                        </div>
-                    </div>
-                    <div class="case-metrics">
-                        <div class="metric">
-                            <div class="metric-value">↓20%</div>
-                            <div class="metric-label">配送成本</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">↑17%</div>
-                            <div class="metric-label">准时率</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">↓82%</div>
-                            <div class="metric-label">客户投诉</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">3天</div>
-                            <div class="metric-label">上线周期</div>
-                        </div>
-                    </div>
-                    <div class="case-highlight">
-                        准时率从83%提升至97%
-                    </div>
-                </div>
-
-                <!-- 案例2: 制造企业 -->
-                <div class="case-card">
-                    <div class="case-header">
-                        <div class="case-icon">🏭</div>
-                        <div class="case-title">
-                            <h4>车间调度优化</h4>
-                            <p>汽车零部件 | 50台设备</p>
-                        </div>
-                    </div>
-                    <div class="case-metrics">
-                        <div class="metric">
-                            <div class="metric-value">↓23%</div>
-                            <div class="metric-label">生产周期</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">↑24%</div>
-                            <div class="metric-label">设备利用率</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">90%</div>
-                            <div class="metric-label">效率提升</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">92%</div>
-                            <div class="metric-label">成本降低</div>
-                        </div>
-                    </div>
-                    <div class="case-highlight">
-                        开发从6周缩短至4天
-                    </div>
-                </div>
-
-                <!-- 案例3: 咨询公司 -->
-                <div class="case-card">
-                    <div class="case-header">
-                        <div class="case-icon">💼</div>
-                        <div class="case-title">
-                            <h4>咨询公司升级</h4>
-                            <p>管理咨询 | 50人团队</p>
-                        </div>
-                    </div>
-                    <div class="case-metrics">
-                        <div class="metric">
-                            <div class="metric-value">+175%</div>
-                            <div class="metric-label">项目数量</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">↓72%</div>
-                            <div class="metric-label">项目周期</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">+27%</div>
-                            <div class="metric-label">成功率</div>
-                        </div>
-                        <div class="metric">
-                            <div class="metric-value">+175%</div>
-                            <div class="metric-label">复购率</div>
-                        </div>
-                    </div>
-                    <div class="case-highlight">
-                        利润率从60%提升至92%
-                    </div>
-                </div>
-            </div>
-
-            <!-- 4. 竞争优势 - 2列对比 -->
+            <!-- 3. 竞争优势 - 2列对比 -->
             <div class="competitive-advantages">
                 <!-- vs 传统优化软件 -->
                 <div class="advantage-column">
