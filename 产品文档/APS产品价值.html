@@ -356,7 +356,7 @@
             text-align: right;
         }
 
-        /* 下一步规划 */
+        /* 下一步行动计划 */
         .next-steps {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             padding: 20px 25px;
@@ -372,19 +372,19 @@
             font-weight: 600;
         }
 
-        .planning-grid {
+        .action-plan {
             display: grid;
-            grid-template-columns: 1.5fr 1fr;
+            grid-template-columns: 1.2fr 1fr;
             gap: 20px;
         }
 
-        .goals, .resources {
+        .action-section {
             background: rgba(255, 255, 255, 0.15);
             padding: 15px;
             border-radius: 10px;
         }
 
-        .goals h4, .resources h4 {
+        .action-section h4 {
             font-size: 1.05em;
             margin-bottom: 12px;
             font-weight: 600;
@@ -392,7 +392,7 @@
             border-bottom: 2px solid rgba(255, 255, 255, 0.3);
         }
 
-        .goal-item, .resource-item {
+        .action-item {
             font-size: 0.85em;
             margin-bottom: 8px;
             padding-left: 15px;
@@ -400,11 +400,33 @@
             line-height: 1.4;
         }
 
-        .goal-item::before, .resource-item::before {
+        .action-item::before {
             content: "▸";
             position: absolute;
             left: 0;
             color: #FCD34D;
+        }
+
+        .growth-path {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .growth-item {
+            font-size: 0.85em;
+            line-height: 1.4;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 10px;
+            border-radius: 6px;
+            border-left: 3px solid #FCD34D;
+        }
+
+        .growth-item strong {
+            color: #FCD34D;
+            display: block;
+            margin-bottom: 3px;
+            font-size: 0.95em;
         }
 
         @media print {
@@ -691,25 +713,35 @@
                 </div>
             </div>
 
-            <!-- 5. 下一步规划 - 新增板块 -->
+            <!-- 5. 下一步行动计划 -->
             <div class="next-steps">
-                <h3>📋 下一步计划与资源需求</h3>
+                <h3>📋 下一步行动计划：场景化融合，持续成长</h3>
 
-                <div class="planning-grid">
-                    <div class="goals">
-                        <h4>Q1-Q2 目标</h4>
-                        <div class="goal-item">知识库填充至100+模板，覆盖10+行业场景</div>
-                        <div class="goal-item">商业化试点：对接3-5家付费客户，验证商业模式</div>
-                        <div class="goal-item">产品化迭代：开发Web界面，提升用户体验</div>
-                        <div class="goal-item">技术壁垒：申请核心技术专利，建立竞争护城河</div>
+                <div class="action-plan">
+                    <div class="action-section">
+                        <h4>🎯 核心行动</h4>
+                        <div class="action-item">场景库持续扩充：基于新能源补能调度等已验证场景，融合更多行业模板</div>
+                        <div class="action-item">知识持续沉淀：每个项目交付都成为可复用的知识资产，不断积累</div>
+                        <div class="action-item">项目交付支撑：支撑更多实际业务落地，验证Theory-to-Code的规模化能力</div>
+                        <div class="action-item">技术壁垒建设：申请核心技术专利，建立竞争护城河</div>
                     </div>
 
-                    <div class="resources">
-                        <h4>资源需求</h4>
-                        <div class="resource-item"><strong>研发团队</strong>：3人（1算法+2工程）</div>
-                        <div class="resource-item"><strong>预算</strong>：50万元（研发+市场）</div>
-                        <div class="resource-item"><strong>预期回报</strong>：Q4实现收支平衡</div>
-                        <div class="resource-item"><strong>市场目标</strong>：签约10+付费客户</div>
+                    <div class="action-section">
+                        <h4>📈 能力成长路径</h4>
+                        <div class="growth-path">
+                            <div class="growth-item">
+                                <strong>场景覆盖</strong>
+                                从10+验证场景 → 100+场景库 → 覆盖10+行业垂直领域
+                            </div>
+                            <div class="growth-item">
+                                <strong>交付能力</strong>
+                                从验证阶段 → 规模化交付 → 成熟的产品化服务
+                            </div>
+                            <div class="growth-item">
+                                <strong>技术演进</strong>
+                                从单点突破 → 体系化能力 → 行业标准平台
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
