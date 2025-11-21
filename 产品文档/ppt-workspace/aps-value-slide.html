@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<style>
+html { background: #ffffff; }
+body {
+  width: 720pt; height: 405pt; margin: 0; padding: 0;
+  background: #ffffff; font-family: Arial, sans-serif;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #0066FF;
+  padding: 10pt 30pt 8pt 30pt;
+  position: relative;
+}
+
+.triangle-decoration {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 40pt 40pt 0;
+  border-color: transparent #FFB800 transparent transparent;
+}
+
+.content-area {
+  flex: 1;
+  padding: 10pt 30pt 12pt 30pt;
+  display: flex;
+  flex-direction: column;
+  gap: 8pt;
+}
+
+.business-values {
+  display: flex;
+  gap: 8pt;
+}
+
+.value-card {
+  flex: 1;
+  background: #0066FF;
+  padding: 8pt 6pt;
+  border-radius: 4pt;
+  text-align: center;
+}
+
+.middle-section {
+  display: flex;
+  gap: 8pt;
+  flex: 1;
+}
+
+.battle-tested {
+  flex: 1;
+  background: #FFF9E6;
+  padding: 6pt 8pt;
+  border-radius: 4pt;
+  border-left: 3pt solid #FFB800;
+  display: flex;
+  flex-direction: column;
+}
+
+.battle-content {
+  display: flex;
+  gap: 6pt;
+  flex: 1;
+}
+
+.battle-left {
+  flex: 1;
+  background: #FFFFFF;
+  padding: 5pt;
+  border-radius: 3pt;
+}
+
+.battle-right {
+  flex: 1;
+  background: #FFFFFF;
+  padding: 5pt;
+  border-radius: 3pt;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.competitive-advantages {
+  flex: 1;
+  background: #F5F5F5;
+  padding: 6pt 8pt;
+  border-radius: 4pt;
+  display: flex;
+  flex-direction: column;
+}
+
+.adv-header {
+  text-align: center;
+  margin-bottom: 4pt;
+  padding-bottom: 3pt;
+  border-bottom: 2pt solid #0066FF;
+}
+
+.advantage-items {
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+  flex: 1;
+}
+
+.advantage-item {
+  background: #FFFFFF;
+  padding: 3pt 5pt;
+  border-radius: 3pt;
+  border-left: 3pt solid #0066FF;
+}
+
+.next-steps {
+  background: #0066FF;
+  padding: 5pt 10pt;
+  border-radius: 4pt;
+  color: #FFFFFF;
+  display: flex;
+  gap: 10pt;
+}
+
+.next-left {
+  flex: 1.2;
+}
+
+.next-header {
+  font-size: 8pt;
+  font-weight: bold;
+  margin: 0 0 3pt 0;
+  padding-bottom: 2pt;
+  border-bottom: 2pt solid #FFB800;
+}
+
+.next-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2pt;
+}
+
+.timeline-item {
+  background: rgba(255, 255, 255, 0.15);
+  padding: 2pt 5pt;
+  border-radius: 3pt;
+  border-left: 3pt solid #FFB800;
+}
+</style>
+</head>
+<body>
+<div class="header">
+  <div class="triangle-decoration"></div>
+  <h1 style="font-size: 20pt; font-weight: bold; color: #FFFFFF; margin: 0 0 2pt 0;">APS调度智能体系统：让调度优化能力民主化</h1>
+  <p style="font-size: 10pt; color: #CCE5FF; margin: 0;">从专家垄断到人人可用的范式革命</p>
+</div>
+
+<div class="content-area">
+  <div class="business-values">
+    <div class="value-card">
+      <p style="font-size: 18pt; margin: 0 0 1pt 0;">⚡</p>
+      <p style="font-size: 24pt; font-weight: bold; color: #FFFFFF; margin: 0 0 1pt 0;">85%</p>
+      <p style="font-size: 9pt; font-weight: bold; color: #FFFFFF; margin: 0 0 2pt 0;">开发效率提升</p>
+      <div style="background: rgba(255, 255, 255, 0.15); padding: 2pt 4pt; border-radius: 3pt;">
+        <p style="font-size: 7pt; color: #CCE5FF; margin: 0;">3-4周 → 3-5天</p>
+      </div>
+    </div>
+    <div class="value-card">
+      <p style="font-size: 18pt; margin: 0 0 1pt 0;">💰</p>
+      <p style="font-size: 24pt; font-weight: bold; color: #FFFFFF; margin: 0 0 1pt 0;">94.5%</p>
+      <p style="font-size: 9pt; font-weight: bold; color: #FFFFFF; margin: 0 0 2pt 0;">人力成本降低</p>
+      <div style="background: rgba(255, 255, 255, 0.15); padding: 2pt 4pt; border-radius: 3pt;">
+        <p style="font-size: 7pt; color: #CCE5FF; margin: 0;">2万元 → 1100元</p>
+      </div>
+    </div>
+    <div class="value-card">
+      <p style="font-size: 18pt; margin: 0 0 1pt 0;">✅</p>
+      <p style="font-size: 24pt; font-weight: bold; color: #FFFFFF; margin: 0 0 1pt 0;">92%</p>
+      <p style="font-size: 9pt; font-weight: bold; color: #FFFFFF; margin: 0 0 2pt 0;">代码可用率</p>
+      <div style="background: rgba(255, 255, 255, 0.15); padding: 2pt 4pt; border-radius: 3pt;">
+        <p style="font-size: 7pt; color: #CCE5FF; margin: 0;">6层质量门禁</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="middle-section">
+    <div class="battle-tested">
+      <p style="font-size: 9pt; font-weight: bold; color: #666666; margin: 0 0 4pt 0; text-align: center;">🏆 实战验证：数竞杯竞���级通过</p>
+      <div class="battle-content">
+        <div class="battle-left">
+          <p style="font-size: 8pt; font-weight: bold; color: #0066FF; margin: 0 0 3pt 0; text-align: center;">测试方式</p>
+          <p style="font-size: 7pt; color: #666666; margin: 0 0 2pt 0;">📝 真实比赛题目</p>
+          <p style="font-size: 7pt; color: #666666; margin: 0 0 2pt 0;">🤖 AI全自动求解</p>
+          <p style="font-size: 7pt; color: #666666; margin: 0;">⚡ Theory-to-Code</p>
+        </div>
+        <div class="battle-right">
+          <p style="font-size: 20pt; font-weight: bold; color: #FFB800; margin: 0 0 1pt 0;">首战</p>
+          <p style="font-size: 8pt; font-weight: bold; color: #666666; margin: 0 0 2pt 0;">竞赛级验证通过</p>
+          <p style="font-size: 6pt; color: #999999; margin: 0;">全自动无人工干预</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="competitive-advantages">
+      <div class="adv-header">
+        <p style="font-size: 9pt; font-weight: bold; color: #0066FF; margin: 0;">🆚 核心竞争优势</p>
+      </div>
+      <div class="advantage-items">
+        <div class="advantage-item">
+          <p style="font-size: 7pt; font-weight: bold; color: #333333; margin: 0;">✓ 易用性：自然语言 vs 需要专家</p>
+        </div>
+        <div class="advantage-item">
+          <p style="font-size: 7pt; font-weight: bold; color: #333333; margin: 0;">✓ 开发效率：70-130分钟 vs 2-4周</p>
+        </div>
+        <div class="advantage-item">
+          <p style="font-size: 7pt; font-weight: bold; color: #333333; margin: 0;">✓ 领域专业性：专家级 vs 通用能力</p>
+        </div>
+        <div class="advantage-item">
+          <p style="font-size: 7pt; font-weight: bold; color: #333333; margin: 0;">✓ 知识可追溯：完整引用链 vs 黑盒</p>
+        </div>
+        <div class="advantage-item">
+          <p style="font-size: 7pt; font-weight: bold; color: #333333; margin: 0;">✓ 专业知识库：58+模板持续积累</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-steps">
+    <div class="next-left">
+      <div class="next-header">
+        <p style="font-size: 8pt; font-weight: bold; margin: 0;">📋 下一步行动计划</p>
+      </div>
+      <ul style="margin: 0; padding-left: 12pt; font-size: 6pt; line-height: 1.4;">
+        <li>场景库持续扩充：基于已验证场景，融合更多行业模板</li>
+        <li>知识持续沉淀：每个项目都成为可复用知识资产</li>
+        <li>项目交付支撑：支撑更多实际业务落地</li>
+        <li>技术壁垒建设：申请核心技术专利</li>
+      </ul>
+    </div>
+    <div class="next-right">
+      <div class="next-header">
+        <p style="font-size: 8pt; font-weight: bold; margin: 0;">📈 能力成长路径</p>
+      </div>
+      <div class="timeline-item">
+        <p style="font-size: 6pt; margin: 0;"><b style="color: #FFB800;">近期(3个月)</b> 场景库扩充至30+</p>
+      </div>
+      <div class="timeline-item">
+        <p style="font-size: 6pt; margin: 0;"><b style="color: #FFB800;">中期(6个月)</b> 覆盖5个行业领域</p>
+      </div>
+      <div class="timeline-item">
+        <p style="font-size: 6pt; margin: 0;"><b style="color: #FFB800;">远期(12个月)</b> 100+场景库</p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
