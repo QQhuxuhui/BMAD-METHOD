@@ -68,7 +68,10 @@
     "inquirer": "^8.2.6",
     "js-yaml": "^4.1.0",
     "ora": "^5.4.1",
+    "playwright": "^1.56.1",
+    "pptxgenjs": "^4.0.1",
     "semver": "^7.6.3",
+    "sharp": "^0.34.5",
     "wrap-ansi": "^7.0.0",
     "xml2js": "^0.6.2"
   },
