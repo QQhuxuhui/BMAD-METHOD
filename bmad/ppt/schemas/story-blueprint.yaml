@@ -1,0 +1,197 @@
+# Story Blueprint Schema
+# Stage 1 (Story Design) 输出
+
+type: object
+required:
+  - narrative_structure
+  - sections
+  - total_pages
+
+properties:
+  narrative_structure:
+    type: object
+    required:
+      - type
+      - template_ref
+    properties:
+      type:
+        type: string
+        enum:
+          - problem-solution
+          - timeline
+          - feature-showcase
+          - comparison
+          - process
+        description: 叙事结构类型
+
+      template_ref:
+        type: string
+        description: 专家库模板引用
+        examples:
+          - expert-library/story-design/narrative-structures/problem-solution.yaml
+
+      rationale:
+        type: string
+        description: 选择此结构的原因
+
+  sections:
+    type: array
+    minItems: 3
+    maxItems: 5
+    items:
+      type: object
+      required:
+        - section_number
+        - section_name
+        - key_messages
+        - allocated_pages
+      properties:
+        section_number:
+          type: integer
+          minimum: 1
+
+        section_name:
+          type: string
+          description: 章节名称
+          examples:
+            - Introduction
+            - Problem
+            - Solution
+            - Market
+            - Ask
+
+        key_messages:
+          type: array
+          minItems: 1
+          maxItems: 3
+          items:
+            type: string
+          description: 1-3个关键信息
+
+        allocated_pages:
+          type: integer
+          minimum: 1
+          description: 分配的页数
+
+        content_hints:
+          type: array
+          items:
+            type: string
+          description: 内容提示
+
+  total_pages:
+    type: integer
+    minimum: 10
+    maximum: 20
+    description: 总页数
+
+  page_allocation:
+    type: object
+    description: 页面分配明细
+    properties:
+      cover:
+        type: integer
+        default: 1
+      agenda:
+        type: integer
+        default: 1
+      content_pages:
+        type: integer
+      summary:
+        type: integer
+        default: 1
+
+  story_flow:
+    type: string
+    description: 故事流程描述
+
+  audience_adaptation:
+    type: object
+    description: 受众适配说明
+    properties:
+      knowledge_level_adjustment:
+        type: string
+      pain_points_addressed:
+        type: array
+        items:
+          type: string
+
+# 示例
+example:
+  narrative_structure:
+    type: problem-solution
+    template_ref: expert-library/story-design/narrative-structures/problem-solution.yaml
+    rationale: 适合商业推介,清晰展示问题和解决方案
+
+  sections:
+    - section_number: 1
+      section_name: Introduction
+      key_messages:
+        - 公司简介
+        - 愿景使命
+      allocated_pages: 2
+      content_hints:
+        - cover_slide
+        - company_intro
+
+    - section_number: 2
+      section_name: Problem
+      key_messages:
+        - 市场痛点
+        - 当前解决方案的不足
+      allocated_pages: 3
+      content_hints:
+        - market_pain_points
+        - current_solutions_limitations
+
+    - section_number: 3
+      section_name: Solution
+      key_messages:
+        - 我们的解决方案
+        - 核心价值主张
+        - 关键功能
+      allocated_pages: 5
+      content_hints:
+        - solution_overview
+        - value_proposition
+        - key_features
+
+    - section_number: 4
+      section_name: Market
+      key_messages:
+        - 市场规模
+        - 竞争优势
+      allocated_pages: 3
+      content_hints:
+        - market_size_data
+        - competitive_landscape
+
+    - section_number: 5
+      section_name: Ask
+      key_messages:
+        - 融资需求
+        - 资金用途
+      allocated_pages: 2
+      content_hints:
+        - funding_ask
+        - use_of_funds
+        - summary
+
+  total_pages: 15
+
+  page_allocation:
+    cover: 1
+    agenda: 1
+    content_pages: 12
+    summary: 1
+
+  story_flow: |
+    开场吸引注意 → 建立问题紧迫性 → 展示解决方案 →
+    证明市场机会 → 明确行动呼吁
+
+  audience_adaptation:
+    knowledge_level_adjustment: 商业专业术语,避免技术细节
+    pain_points_addressed:
+      - ROI证明
+      - 市场规模验证
+      - 团队能力展示

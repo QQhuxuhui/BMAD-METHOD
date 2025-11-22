@@ -1,0 +1,377 @@
+# Visual Design Spec Schema
+# Stage 3 (Visual Design) 输出
+
+type: object
+required:
+  - theme
+  - layout_assignments
+  - typography
+  - color_palette
+  - design_standards
+
+properties:
+  theme:
+    type: object
+    required:
+      - name
+      - style
+      - template_ref
+    properties:
+      name:
+        type: string
+        description: 主题名称
+        examples:
+          - Professional Dark
+          - Modern Light
+          - Corporate Blue
+
+      style:
+        type: string
+        enum:
+          - professional
+          - creative
+          - minimal
+          - corporate
+          - tech
+          - academic
+
+      template_ref:
+        type: string
+        description: 专家库模板引用
+        examples:
+          - expert-library/visual-design/themes/professional-dark.yaml
+
+      user_selected:
+        type: boolean
+        default: false
+        description: 是否为用户选择(HITL)
+
+      alternative_themes:
+        type: array
+        description: 备选主题(A/B/C选项)
+        items:
+          type: object
+          properties:
+            name:
+              type: string
+            preview_image:
+              type: string
+
+  layout_assignments:
+    type: object
+    description: 每页的布局分配
+    patternProperties:
+      "^page_[0-9]+$":
+        type: object
+        required:
+          - template_id
+          - layout_type
+        properties:
+          template_id:
+            type: string
+            description: 布局模板ID
+            examples:
+              - layout_cover_standard
+              - layout_chart_dominant
+
+          layout_type:
+            type: string
+            description: 布局类型
+
+          template_ref:
+            type: string
+            description: 专家库模板引用
+
+  typography:
+    type: object
+    required:
+      - font_family
+      - heading_sizes
+      - body_sizes
+    properties:
+      font_family:
+        type: object
+        properties:
+          heading:
+            type: string
+            description: 标题字体
+            examples:
+              - Montserrat Bold
+              - 思源黑体 Bold
+
+          body:
+            type: string
+            description: 正文字体
+            examples:
+              - Open Sans Regular
+              - 思源黑体 Regular
+
+          code:
+            type: string
+            description: 代码字体(如需要)
+            examples:
+              - Consolas
+              - Source Code Pro
+
+      heading_sizes:
+        type: object
+        properties:
+          H1:
+            type: integer
+            minimum: 36
+            maximum: 60
+            description: 一级标题字号(pt)
+
+          H2:
+            type: integer
+            minimum: 28
+            maximum: 44
+            description: 二级标题字号(pt)
+
+          H3:
+            type: integer
+            minimum: 20
+            maximum: 32
+            description: 三级标题字号(pt)
+
+      body_sizes:
+        type: object
+        properties:
+          body:
+            type: integer
+            minimum: 14
+            maximum: 24
+            description: 正文字号(pt)
+
+          caption:
+            type: integer
+            minimum: 10
+            maximum: 16
+            description: 说明文字字号(pt)
+
+      line_height:
+        type: object
+        properties:
+          heading:
+            type: number
+            minimum: 1.0
+            maximum: 1.5
+          body:
+            type: number
+            minimum: 1.2
+            maximum: 1.8
+
+  color_palette:
+    type: object
+    required:
+      - primary
+      - background
+      - text
+      - accent
+    properties:
+      primary:
+        type: string
+        pattern: "^#[0-9A-Fa-f]{6}$"
+        description: 主色
+
+      secondary:
+        type: string
+        pattern: "^#[0-9A-Fa-f]{6}$"
+        description: 辅助色
+
+      background:
+        type: object
+        properties:
+          light:
+            type: string
+            pattern: "^#[0-9A-Fa-f]{6}$"
+          dark:
+            type: string
+            pattern: "^#[0-9A-Fa-f]{6}$"
+
+      text:
+        type: object
+        properties:
+          primary:
+            type: string
+            pattern: "^#[0-9A-Fa-f]{6}$"
+          secondary:
+            type: string
+            pattern: "^#[0-9A-Fa-f]{6}$"
+
+      accent:
+        type: array
+        minItems: 3
+        maxItems: 6
+        items:
+          type: string
+          pattern: "^#[0-9A-Fa-f]{6}$"
+        description: 强调色(用于图表、按钮等)
+
+      contrast_ratios:
+        type: object
+        description: 对比度(WCAG AA标准)
+        properties:
+          text_on_background:
+            type: number
+            minimum: 4.5
+          heading_on_background:
+            type: number
+            minimum: 3.0
+
+  design_standards:
+    type: object
+    description: 设计标准(CRAP原则应用)
+    properties:
+      spacing:
+        type: object
+        properties:
+          margin:
+            type: object
+            description: 页边距(px)
+            properties:
+              top:
+                type: integer
+              right:
+                type: integer
+              bottom:
+                type: integer
+              left:
+                type: integer
+
+          padding:
+            type: object
+            description: 内边距(px)
+            properties:
+              title:
+                type: integer
+              content:
+                type: integer
+
+      alignment:
+        type: object
+        properties:
+          title:
+            type: string
+            enum: [left, center, right]
+          body:
+            type: string
+            enum: [left, center, right, justify]
+
+      visual_hierarchy:
+        type: array
+        items:
+          type: object
+          properties:
+            element:
+              type: string
+            priority:
+              type: integer
+              minimum: 1
+              maximum: 5
+
+      crap_compliance:
+        type: object
+        description: CRAP原则遵守情况
+        properties:
+          contrast:
+            type: boolean
+          repetition:
+            type: boolean
+          alignment:
+            type: boolean
+          proximity:
+            type: boolean
+
+  brand_integration:
+    type: object
+    description: 品牌整合(如提供了brand_guidelines)
+    properties:
+      logo_placement:
+        type: string
+        enum: [header, footer, cover_only]
+      brand_colors_applied:
+        type: boolean
+      brand_fonts_applied:
+        type: boolean
+
+# 示例
+example:
+  theme:
+    name: Professional Dark
+    style: professional
+    template_ref: expert-library/visual-design/themes/professional-dark.yaml
+    user_selected: true
+    alternative_themes:
+      - name: Modern Light
+        preview_image: themes/modern-light-preview.png
+      - name: Corporate Blue
+        preview_image: themes/corporate-blue-preview.png
+
+  layout_assignments:
+    page_1:
+      template_id: layout_cover_standard
+      layout_type: cover
+      template_ref: expert-library/visual-design/layouts/cover-standard.yaml
+    page_7:
+      template_id: layout_chart_dominant
+      layout_type: data-chart
+      template_ref: expert-library/visual-design/layouts/chart-dominant.yaml
+
+  typography:
+    font_family:
+      heading: Montserrat Bold
+      body: Open Sans Regular
+    heading_sizes:
+      H1: 44
+      H2: 32
+      H3: 24
+    body_sizes:
+      body: 18
+      caption: 12
+    line_height:
+      heading: 1.2
+      body: 1.5
+
+  color_palette:
+    primary: "#1A1A2E"
+    secondary: "#16213E"
+    background:
+      light: "#FFFFFF"
+      dark: "#0F0F0F"
+    text:
+      primary: "#FFFFFF"
+      secondary: "#CCCCCC"
+    accent:
+      - "#0F3460"
+      - "#16213E"
+      - "#1A1A2E"
+    contrast_ratios:
+      text_on_background: 7.2
+      heading_on_background: 5.1
+
+  design_standards:
+    spacing:
+      margin:
+        top: 60
+        right: 80
+        bottom: 60
+        left: 80
+      padding:
+        title: 40
+        content: 20
+    alignment:
+      title: left
+      body: left
+    visual_hierarchy:
+      - element: title
+        priority: 1
+      - element: key_visual
+        priority: 2
+      - element: body_text
+        priority: 3
+    crap_compliance:
+      contrast: true
+      repetition: true
+      alignment: true
+      proximity: true

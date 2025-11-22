@@ -1,0 +1,42 @@
+# Technical Report 示例输入
+# 场景: 技术报告(技术团队)
+
+purpose: technical_report
+
+audience:
+  primary: technical_team
+  knowledge_level: technical_expert
+  pain_points:
+    - 性能指标
+    - 可扩展性
+    - 可维护性
+    - 技术债务
+
+message:
+  core_points:
+    - 架构设计
+    - 性能指标
+    - 实现细节
+  key_data:
+    - metric: latency_p99
+      value: 50
+      context: ms
+    - metric: throughput
+      value: 10000
+      context: req/s
+    - metric: availability
+      value: 99.9
+      context: "%"
+
+narrative: process
+
+constraints:
+  target_pages: 12
+  duration_minutes: 15
+  brand_guidelines: null
+
+visual_preference: tech
+
+tone_of_voice: technical
+
+language: en-US

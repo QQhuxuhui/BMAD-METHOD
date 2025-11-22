@@ -1,0 +1,46 @@
+# Feature-Showcase Narrative Structure
+# 功能展示叙事结构
+
+name: Feature-Showcase
+type: feature-showcase
+description: "围绕产品核心功能展开,逐一展示功能亮点和价值。适合产品发布、功能演示等场景。"
+
+suitable_for:
+  purposes: [product_launch, feature_announcement, demo]
+  audiences: [customers, users, media]
+
+standard_sections:
+  - section_name: Introduction
+    typical_pages: 2
+    key_elements: [Product overview, Value proposition]
+
+  - section_name: Feature_1
+    typical_pages: 3-4
+    key_elements: [Feature description, Benefits, Demo/Screenshot]
+
+  - section_name: Feature_2
+    typical_pages: 3-4
+    key_elements: [Feature description, Benefits, Demo/Screenshot]
+
+  - section_name: Feature_3
+    typical_pages: 3-4
+    key_elements: [Feature description, Benefits, Demo/Screenshot]
+
+  - section_name: Pricing_and_CTA
+    typical_pages: 2
+    key_elements: [Pricing tiers, Call to action, Summary]
+
+page_allocation_strategy:
+  "15":
+    cover: 1
+    agenda: 1
+    Introduction: 2
+    Feature_1: 4
+    Feature_2: 3
+    Feature_3: 3
+    Pricing_and_CTA: 2
+
+design_principles:
+  - "每个功能独立成章节,结构清晰"
+  - "用视觉演示(截图/视频)增强理解"
+  - "突出用户价值,而非技术细节"
