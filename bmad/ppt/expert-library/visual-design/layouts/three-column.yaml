@@ -1,0 +1,9 @@
+name: Three-Column
+layout_id: three-column
+category: content
+compatible_page_types: [text-heavy, process-flow]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: col1, position: { x: left-80px, width: 28% } }
+  - { zone_id: col2, position: { x: center, width: 28% } }
+  - { zone_id: col3, position: { x: right-100px, width: 28% } }

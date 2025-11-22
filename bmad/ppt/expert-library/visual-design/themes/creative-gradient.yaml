@@ -1,0 +1,30 @@
+# Creative Gradient Theme
+name: Creative Gradient
+style: creative
+description: "创意渐变主题,活力四射,适合创意展示和年轻品牌"
+
+suitable_for:
+  purposes: [creative_pitch, brand_showcase, marketing_campaign]
+  audiences: [creative_teams, young_audience, marketing]
+
+color_palette:
+  primary: "#667EEA" # 紫蓝渐变起点
+  secondary: "#764BA2" # 紫色渐变终点
+  background:
+    light: "#FFFFFF"
+    gradient: "linear-gradient(135deg, #667EEA 0%, #764BA2 100%)"
+  text:
+    primary: "#FFFFFF"
+    secondary: "#E0E0E0"
+  accent:
+    - "#F093FB" # 粉紫
+    - "#4FACFE" # 天蓝
+    - "#43E97B" # 绿色
+
+typography:
+  font_family:
+    heading_en: "Poppins Bold"
+    body_en: "Poppins Regular"
+    heading_cn: "站酷快乐体"
+    body_cn: "思源黑体 Regular"
+  heading_sizes: { H1: 52, H2: 38, H3: 26 }

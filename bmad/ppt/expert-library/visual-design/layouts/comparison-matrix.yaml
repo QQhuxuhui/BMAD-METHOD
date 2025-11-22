@@ -1,0 +1,7 @@
+name: Comparison-Matrix
+layout_id: comparison-matrix
+category: data
+compatible_page_types: [comparison]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: matrix, element: comparison_table, position: { x: center, y: center, width: 80% }, style: grid }

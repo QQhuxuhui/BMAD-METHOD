@@ -1,0 +1,8 @@
+name: Text-Dominant
+layout_id: text-dominant
+category: content
+compatible_page_types: [text-heavy, agenda]
+layout_zones:
+  - { zone_id: header, element: title, position: { x: left-80px, y: top-60px, width: 80% } }
+  - { zone_id: main, element: body_text_or_bullets, position: { x: left-80px, y: 150px, width: 75% } }
+  - { zone_id: footer, element: footnote, position: { x: left-80px, y: bottom-40px } }

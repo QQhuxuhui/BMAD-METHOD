@@ -1,0 +1,38 @@
+# Academic Minimal Theme
+name: Academic Minimal
+style: minimal
+description: "学术极简主题,简洁专注,适合学术报告和研究展示"
+
+suitable_for:
+  purposes: [research_presentation, academic_report, thesis_defense]
+  audiences: [academics, researchers, students]
+
+color_palette:
+  primary: "#000000"
+  secondary: "#4A4A4A"
+  background:
+    light: "#FFFFFF"
+    dark: "#FAFAFA"
+  text:
+    primary: "#000000"
+    secondary: "#5A5A5A"
+  accent:
+    - "#2E86AB" # 学术蓝
+    - "#A23B72" # 深紫红
+    - "#C73E1D" # 暖红
+
+typography:
+  font_family:
+    heading_en: "Georgia Bold" # 衬线字体
+    body_en: "Georgia Regular"
+    heading_cn: "宋体 Bold"
+    body_cn: "宋体"
+  heading_sizes: { H1: 38, H2: 28, H3: 20 }
+  body_sizes: { body: 16, caption: 12 }
+
+design_standards:
+  spacing:
+    margin: { top: 80, right: 100, bottom: 80, left: 100 } # 大留白
+  alignment:
+    title: left
+    body: justify

@@ -1,0 +1,31 @@
+# Creative Bold Theme
+name: Creative Bold
+style: creative
+description: "创意大胆主题,强烈视觉冲击,适合设计展示和艺术项目"
+
+suitable_for:
+  purposes: [design_showcase, art_exhibition, creative_portfolio]
+  audiences: [designers, artists, creative_professionals]
+
+color_palette:
+  primary: "#FF0000" # 大胆红
+  secondary: "#000000"
+  background:
+    light: "#FFFFFF"
+    dark: "#000000"
+  text:
+    primary: "#000000"
+    on_dark: "#FFFFFF"
+  accent:
+    - "#FF0000" # 红
+    - "#FFFF00" # 黄
+    - "#0000FF" # 蓝
+    - "#00FF00" # 绿
+
+typography:
+  font_family:
+    heading_en: "Impact"
+    body_en: "Helvetica Bold"
+    heading_cn: "黑体 Bold"
+    body_cn: "黑体"
+  heading_sizes: { H1: 60, H2: 42, H3: 28 } # 大字号

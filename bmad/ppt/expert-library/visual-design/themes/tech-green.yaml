@@ -1,0 +1,30 @@
+# Tech Green Theme
+name: Tech Green
+style: tech
+description: "科技绿主题,现代科技感,适合技术产品和环保主题"
+
+suitable_for:
+  purposes: [tech_product_launch, sustainability_report, innovation_showcase]
+  audiences: [tech_enthusiasts, developers, eco_conscious]
+
+color_palette:
+  primary: "#00D9A3" # 科技绿
+  secondary: "#00B386"
+  background:
+    light: "#FFFFFF"
+    dark: "#0A0E27" # 深蓝黑
+  text:
+    primary: "#FFFFFF"
+    secondary: "#B0B0B0"
+  accent:
+    - "#00D9A3" # 绿色
+    - "#00A8CC" # 青色
+    - "#FFD93D" # 黄色
+
+typography:
+  font_family:
+    heading_en: "Roboto Bold"
+    body_en: "Roboto Regular"
+    heading_cn: "思源黑体 Bold"
+    body_cn: "思源黑体 Regular"
+  heading_sizes: { H1: 46, H2: 34, H3: 24 }

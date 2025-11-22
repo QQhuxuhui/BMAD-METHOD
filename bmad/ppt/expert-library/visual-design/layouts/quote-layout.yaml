@@ -1,0 +1,8 @@
+name: Quote-Layout
+layout_id: quote-layout
+category: content
+compatible_page_types: [quote]
+layout_zones:
+  - { zone_id: quote_mark, element: decorative_quote, position: { x: left-80px, y: 30% }, size: 60px, opacity: 0.2 }
+  - { zone_id: quote_text, element: quote, position: { x: center, y: center, width: 70% }, alignment: center, font_size: 32 }
+  - { zone_id: attribution, element: author_info, position: { x: center, y: 65% }, alignment: center }

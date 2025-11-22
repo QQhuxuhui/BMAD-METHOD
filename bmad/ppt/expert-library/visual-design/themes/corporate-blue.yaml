@@ -1,0 +1,38 @@
+# Corporate Blue Theme
+name: Corporate Blue
+style: corporate
+description: "企业蓝主题,正式稳重,适合企业报告和正式汇报"
+
+suitable_for:
+  purposes: [technical_report, annual_report, board_presentation]
+  audiences: [management, shareholders, board_members]
+
+color_palette:
+  primary: "#003366" # 企业深蓝
+  secondary: "#005A9C"
+  background:
+    light: "#FFFFFF"
+    dark: "#F5F5F5"
+  text:
+    primary: "#333333"
+    secondary: "#666666"
+  accent:
+    - "#0066CC" # 企业蓝
+    - "#4D94D1" # 天蓝
+    - "#FF6B35" # 橙色(强调)
+
+typography:
+  font_family:
+    heading_en: "Arial Bold"
+    body_en: "Arial Regular"
+    heading_cn: "微软雅黑 Bold"
+    body_cn: "微软雅黑"
+  heading_sizes: { H1: 40, H2: 30, H3: 22 }
+  body_sizes: { body: 16, caption: 12 }
+
+design_standards:
+  spacing:
+    margin: { top: 60, right: 80, bottom: 60, left: 80 }
+  alignment:
+    title: left
+    body: justify # 两端对齐(正式文档)

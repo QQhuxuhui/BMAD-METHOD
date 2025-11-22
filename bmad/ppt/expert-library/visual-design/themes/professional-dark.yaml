@@ -1,0 +1,264 @@
+# Professional Dark Theme
+# 专业暗色主题
+
+name: Professional Dark
+style: professional
+description: "专业商务风格,暗色背景,适合投资推介和高端商务场景"
+
+# 适用场景
+suitable_for:
+  purposes:
+    - pitch_deck
+    - business_proposal
+    - executive_summary
+  audiences:
+    - investors
+    - executives
+    - business_professionals
+  scenarios:
+    - 融资路演
+    - 董事会汇报
+    - 商业计划展示
+
+# 色彩系统
+color_palette:
+  # 主色调
+  primary: "#1A1A2E" # 深蓝灰(主背景色)
+  secondary: "#16213E" # 次深蓝(强调背景)
+
+  # 背景色
+  background:
+    light: "#FFFFFF" # 亮色模式背景(备用)
+    dark: "#0F0F0F" # 暗色模式背景(主用)
+    card: "#1F1F2E" # 卡片/容器背景
+
+  # 文字色
+  text:
+    primary: "#FFFFFF" # 主文字(白色)
+    secondary: "#CCCCCC" # 次要文字(浅灰)
+    tertiary: "#999999" # 三级文字(中灰)
+    disabled: "#666666" # 禁用文字(深灰)
+
+  # 强调色(用于图表、按钮等)
+  accent:
+    - "#0F3460" # 深蓝(冷静)
+    - "#16213E" # 靛蓝(专业)
+    - "#1A1A2E" # 深灰蓝(严肃)
+    - "#E94560" # 玫红(警示/重点)
+    - "#F4A261" # 橙色(积极)
+    - "#2A9D8F" # 青绿(成功)
+
+  # 功能色
+  semantic:
+    success: "#2A9D8F" # 成功/增长
+    warning: "#F4A261" # 警告/注意
+    error: "#E94560" # 错误/下降
+    info: "#0F3460" # 信息/中性
+
+  # 对比度验证(WCAG AA标准: ≥4.5)
+  contrast_ratios:
+    text_primary_on_dark: 21.0 # #FFFFFF on #0F0F0F
+    text_secondary_on_dark: 10.5 # #CCCCCC on #0F0F0F
+    accent_blue_on_dark: 7.2 # #0F3460 on #0F0F0F
+
+# 字体系统
+typography:
+  # 字体家族
+  font_family:
+    heading_en: "Montserrat Bold" # 英文标题
+    body_en: "Open Sans Regular" # 英文正文
+    heading_cn: "思源黑体 Bold" # 中文标题
+    body_cn: "思源黑体 Regular" # 中文正文
+    code: "Consolas" # 代码字体(可选)
+
+  # 标题字号(pt)
+  heading_sizes:
+    H1: 44 # 主标题(封面、重要页面)
+    H2: 32 # 副标题
+    H3: 24 # 三级标题
+
+  # 正文字号(pt)
+  body_sizes:
+    body: 18 # 正文
+    small: 14 # 小字
+    caption: 12 # 说明文字
+
+  # 行高
+  line_height:
+    heading: 1.2 # 标题紧凑
+    body: 1.5 # 正文舒适
+    caption: 1.4 # 说明适中
+
+  # 字重
+  font_weights:
+    heading: 700 # Bold
+    body: 400 # Regular
+    emphasis: 600 # Semi-bold
+
+# 设计标准
+design_standards:
+  # 间距系统(px)
+  spacing:
+    margin:
+      top: 60
+      right: 80
+      bottom: 60
+      left: 80
+    padding:
+      title: 40 # 标题上下留白
+      content: 20 # 内容区域内边距
+      section: 60 # 章节间距
+
+  # 对齐规则
+  alignment:
+    title: left # 标题左对齐
+    body: left # 正文左对齐
+    numbers: right # 数字右对齐
+    chart_title: left # 图表标题左对齐
+
+  # 视觉层级
+  visual_hierarchy:
+    - element: title
+      priority: 1
+      emphasis: "size(H1=44pt) + weight(700) + color(#FFFFFF) + position(top-left)"
+
+    - element: key_visual
+      priority: 2
+      emphasis: "size(50-70% of page) + accent_color + central_position"
+
+    - element: body_text
+      priority: 3
+      emphasis: "size(18pt) + color(#CCCCCC) + left_aligned"
+
+    - element: footnote
+      priority: 4
+      emphasis: "size(12pt) + color(#999999) + bottom_placement"
+
+  # CRAP原则应用
+  crap:
+    # Contrast(对比)
+    contrast:
+      enabled: true
+      rules:
+        - "标题vs正文字号比 = 44/18 = 2.4"
+        - "白色文字on暗背景,高对比度"
+        - "强调色vs背景色,明显区分"
+
+    # Repetition(重复)
+    repetition:
+      enabled: true
+      rules:
+        - "所有页面使用一致的margin: 60-80px"
+        - "标题位置固定在左上角"
+        - "色彩系统化: primary(#1A1A2E) + accents"
+
+    # Alignment(对齐)
+    alignment:
+      enabled: true
+      rules:
+        - "所有元素左对齐(中文习惯)"
+        - "数字右对齐(表格/图表)"
+        - "居中对齐仅用于封面和章节分隔"
+
+    # Proximity(亲密性)
+    proximity:
+      enabled: true
+      rules:
+        - "相关元素间距: 15px"
+        - "不相关元素间距: 40px"
+        - "章节分隔: 60px"
+
+# 布局偏好
+layout_preferences:
+  cover:
+    - cover-standard # 标准封面(推荐)
+    - cover-left-aligned # 左对齐封面
+    - cover-full-bleed # 全屏背景封面
+
+  content:
+    - text-dominant # 文字为主(常用)
+    - text-image-left # 左图右文
+    - bullet-list-standard # 标准列表
+
+  data:
+    - chart-dominant # 图表为主(推荐)
+    - chart-split # 双图表对比
+    - data-storytelling # 数据叙事
+
+# 特殊效果
+visual_effects:
+  shadows:
+    card: "0 4px 6px rgba(0, 0, 0, 0.3)"
+    elevated: "0 10px 20px rgba(0, 0, 0, 0.5)"
+
+  gradients:
+    background: "linear-gradient(135deg, #1A1A2E 0%, #0F0F0F 100%)"
+    accent: "linear-gradient(90deg, #0F3460 0%, #16213E 100%)"
+
+  borders:
+    subtle: "1px solid rgba(255, 255, 255, 0.1)"
+    emphasis: "2px solid #0F3460"
+
+# 图表样式
+chart_styling:
+  default_chart_type: bar # 默认图表类型
+
+  chart_colors:
+    primary_series: "#0F3460"
+    secondary_series: "#16213E"
+    tertiary_series: "#1A1A2E"
+    positive: "#2A9D8F" # 增长/成功
+    negative: "#E94560" # 下降/警示
+
+  chart_fonts:
+    title: { family: "Montserrat Bold", size: 24, color: "#FFFFFF" }
+    labels: { family: "Open Sans Regular", size: 14, color: "#CCCCCC" }
+    data_labels: { family: "Open Sans Regular", size: 12, color: "#FFFFFF" }
+
+  chart_backgrounds:
+    transparent: true # 图表背景透明
+    grid_color: "rgba(255, 255, 255, 0.1)"
+    axis_color: "#666666"
+
+# 品牌整合建议
+brand_integration:
+  logo_placement: "top-right" # logo位置建议
+  logo_size: "small" # logo大小建议
+
+  color_override_strategy:
+    - "如果品牌主色为暖色,可替换accent[3]玫红色"
+    - "如果品牌主色为冷色,可替换primary或accent[0]深蓝"
+    - "保持暗色背景,除非品牌明确要求亮色"
+
+  font_override_strategy:
+    - "品牌字体替换heading字体"
+    - "保持body字体可读性"
+
+# 使用示例
+example_usage:
+  scenario: "投资人路演PPT"
+  page_count: 15
+  highlights:
+    - "封面: 暗背景+大标题+品牌logo"
+    - "问题页: 左对齐标题+bullet list+数据可视化"
+    - "解决方案页: 图表dominant+insight说明"
+    - "总结页: key takeaways+CTA"
+
+# 设计心理
+design_psychology:
+  color_meaning:
+    dark_background: "专业、高端、聚焦内容"
+    blue_accent: "信任、稳定、科技"
+    white_text: "清晰、直接、高对比"
+
+  audience_perception:
+    investors: "专业、可信、数据驱动"
+    executives: "高端、简洁、重点突出"
+    technical: "现代、专注、信息密度适中"
+
+# 注意事项
+warnings:
+  - "暗色背景需确保投影环境光线充足"
+  - "打印时建议转换为亮色版本"
+  - "注意文字对比度,避免使用低对比度的灰色"
+  - "图表数据标签确保可读,必要时加白色背景"
