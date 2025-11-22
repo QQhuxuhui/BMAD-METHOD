@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APS智能体工作流程</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', 'Arial', sans-serif;
+            background: #f5f7fa;
+            padding: 30px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1600px;
+            background: #ffffff;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(102, 126, 234, 0.2);
+            border: 2px solid rgba(102, 126, 234, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            font-size: 2em;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #718096;
+            font-size: 1em;
+            margin-bottom: 40px;
+        }
+
+        /* 流程主线 */
+        .workflow {
+            position: relative;
+            padding-top: 20px;
+        }
+
+        /* 连接线 */
+        .timeline {
+            position: absolute;
+            top: 90px;
+            left: 8%;
+            right: 8%;
+            height: 4px;
+            background: linear-gradient(90deg, #9c27b0, #2196F3, #ff9800, #4caf50, #f44336, #00bcd4);
+            z-index: 0;
+        }
+
+        /* Phase节点容器 */
+        .phases {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+
+        .phase {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        /* Phase圆形节点 */
+        .phase-node {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .phase-node:hover {
+            transform: scale(1.1);
+        }
+
+        .phase-node.p0 { background: linear-gradient(135deg, #9c27b0, #7b1fa2); }
+        .phase-node.p1 { background: linear-gradient(135deg, #2196F3, #1976d2); }
+        .phase-node.p1-5 { background: linear-gradient(135deg, #ff9800, #f57c00); }
+        .phase-node.p2 { background: linear-gradient(135deg, #4caf50, #388e3c); }
+        .phase-node.p3 { background: linear-gradient(135deg, #f44336, #d32f2f); }
+        .phase-node.p4 { background: linear-gradient(135deg, #00bcd4, #0097a7); }
+
+        .phase-number {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .phase-name {
+            font-size: 0.75em;
+            margin-top: 3px;
+        }
+
+        .phase-time {
+            position: absolute;
+            top: -30px;
+            background: rgba(45, 55, 72, 0.9);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            white-space: nowrap;
+        }
+
+        /* 交互标记 */
+        .interaction-badge {
+            position: absolute;
+            top: -50px;
+            background: #d32f2f;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.6em;
+            font-weight: bold;
+        }
+
+        .interaction-badge.p1-level { background: #ff9800; }
+
+        /* Phase详情卡片 */
+        .phase-details {
+            margin-top: 30px;
+            width: 100%;
+            background: #f7fafc;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .phase.p0 .phase-details { border-top: 3px solid #9c27b0; }
+        .phase.p1 .phase-details { border-top: 3px solid #2196F3; }
+        .phase.p1-5 .phase-details { border-top: 3px solid #ff9800; }
+        .phase.p2 .phase-details { border-top: 3px solid #4caf50; }
+        .phase.p3 .phase-details { border-top: 3px solid #f44336; }
+        .phase.p4 .phase-details { border-top: 3px solid #00bcd4; }
+
+        /* 参与者 */
+        .actors {
+            margin-bottom: 12px;
+        }
+
+        .actor {
+            display: inline-block;
+            background: #edf2f7;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            margin: 2px;
+            border: 2px solid #667eea;
+            color: #2d3748;
+        }
+
+        .actor.orchestrator { border-color: #f093fb; background: rgba(240, 147, 251, 0.2); }
+        .actor.user { border-color: #ff9800; background: rgba(255, 152, 0, 0.2); }
+        .actor.agent { border-color: #2196F3; background: rgba(33, 150, 243, 0.2); }
+
+        /* 执行内容 */
+        .tasks {
+            margin-bottom: 12px;
+        }
+
+        .task-item {
+            font-size: 0.7em;
+            color: #4a5568;
+            padding: 3px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+        }
+
+        .task-item::before {
+            content: "▸";
+            color: #667eea;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        /* 特殊标记 */
+        .highlight-box {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ffc107;
+            border-radius: 6px;
+            padding: 6px;
+            margin: 8px 0;
+            font-size: 0.65em;
+            color: #f57f17;
+            text-align: center;
+        }
+
+        /* 并行专家 */
+        .parallel-experts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            margin: 8px 0;
+        }
+
+        .expert {
+            background: rgba(33, 150, 243, 0.15);
+            padding: 6px;
+            border-radius: 6px;
+            font-size: 0.65em;
+            text-align: center;
+            border-left: 3px solid #2196F3;
+            color: #1565c0;
+            border: 1px solid rgba(33, 150, 243, 0.3);
+        }
+
+        /* 交付物 */
+        .deliverable {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.7em;
+        }
+
+        .deliverable strong {
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        .deliverable.critical {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 0 15px rgba(231, 76, 60, 0.3);
+        }
+
+        /* 底部指标 */
+        .metrics {
+            margin-top: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            text-align: center;
+        }
+
+        .metric-item {
+            border-right: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .metric-item:last-child {
+            border-right: none;
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+        }
+
+        /* 图例 */
+        .legend {
+            margin-top: 30px;
+            background: #f7fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.8em;
+            color: #4a5568;
+        }
+
+        .legend-box {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 1200px) {
+            .phases {
+                flex-wrap: wrap;
+            }
+
+            .phase {
+                min-width: 45%;
+                margin-bottom: 30px;
+            }
+
+            .timeline {
+                display: none;
+            }
+
+            .metrics {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>调度智能体团队工作流程</h1>
+        <div class="subtitle">Phase 0-4 端到端协作流程 | 双模式交互 | 状态持久化</div>
+
+        <div class="workflow">
+            <!-- 连接线 -->
+            <div class="timeline"></div>
+
+            <!-- Phase节点 -->
+            <div class="phases">
+                <!-- Phase 0 -->
+                <div class="phase p0">
+                    <div class="phase-node p0">
+                        <div class="interaction-badge">P0</div>
+                        <div class="phase-time">5-8min</div>
+                        <div class="phase-number">Phase 0</div>
+                        <div class="phase-name">任务规划</div>
+                    </div>
+                    <div class="phase-details">
+                        <div class="actors">
+                            <span class="actor orchestrator">🎯 总指挥</span>
+                            <span class="actor user">👤 用户</span>
+                        </div>
+                        <div class="tasks">
+                            <div class="task-item">接收需求，生成Todo List</div>
+                            <div class="task-item">估算时间成本</div>
+                            <div class="task-item">用户确认（执行合同）</div>
+                        </div>
+                        <div class="deliverable">
+                            <strong>📄 phase_0_state.yaml</strong>
+                            Todo List基线
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 1 -->
+                <div class="phase p1">
+                    <div class="phase-node p1">
+                        <div class="interaction-badge p1-level">P1</div>
+                        <div class="phase-time">10-15min</div>
+                        <div class="phase-number">Phase 1</div>
+                        <div class="phase-name">需求分析</div>
+                    </div>
+                    <div class="phase-details">
+                        <div class="actors">
+                            <span class="actor orchestrator">🎯 总指挥</span>
+                        </div>
+                        <div class="tasks">
+                            <div class="task-item">深度语义解析</div>
+                            <div class="task-item">识别关键信息</div>
+                            <div class="task-item">置信度评估（<0.7触发澄清）</div>
+                        </div>
+                        <div class="deliverable">
+                            <strong>📄 phase_1_state.yaml</strong>
+                            需求分析结果
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 1.5 -->
+                <div class="phase p1-5">
+                    <div class="phase-node p1-5">
+                        <div class="interaction-badge">P0</div>
+                        <div class="phase-time">5-15min</div>
+                        <div class="phase-number">Phase 1.5</div>
+                        <div class="phase-name">十要素建模</div>
+                    </div>
+                    <div class="phase-details">
+                        <div class="actors">
+                            <span class="actor orchestrator">🎯 总指挥</span>
+                            <span class="actor user">👤 用户</span>
+                        </div>
+                        <div class="tasks">
+                            <div class="task-item">构建TenElementModel</div>
+                            <div class="task-item">模式A:全部确认 | 模式B:框架确认</div>
+                        </div>
+                        <div class="highlight-box">
+                            🔒 <strong>统一真相源</strong><br>后续专家基于此模型工作
+                        </div>
+                        <div class="deliverable critical">
+                            <strong>📄 phase_1_5_state.yaml</strong>
+                            TenElementModel（关键依赖）
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="phase p2">
+                    <div class="phase-node p2">
+                        <div class="phase-time">10-48min</div>
+                        <div class="phase-number">Phase 2</div>
+                        <div class="phase-name">专家协调</div>
+                    </div>
+                    <div class="phase-details">
+                        <div class="actors">
+                            <span class="actor agent">🏭 领域专家</span>
+                            <span class="actor agent">🔒 约束专家</span>
+                            <span class="actor agent">🎯 目标专家</span>
+                            <span class="actor agent">⚡ 算法专家</span>
+                        </div>
+                        <div class="tasks">
+                            <div class="task-item">加载TenElementModel（前置验证）</div>
+                            <div class="task-item">🔌 MCP读取历史数据</div>
+                        </div>
+                        <div class="parallel-experts">
+                            <div class="expert">🏭 领域识别<br>Token↓56%</div>
+                            <div class="expert">🔒 约束建模<br>Token↓60%</div>
+                            <div class="expert">🎯 目标优化<br>Token↓67%</div>
+                            <div class="expert">⚡ 算法推荐<br>Token↓87%</div>
+                        </div>
+                        <div class="tasks">
+                            <div class="task-item">跨专家一致性校验</div>
+                            <div class="task-item">模式B: 逐个确认</div>
+                        </div>
+                        <div class="deliverable">
+                            <strong>📄 phase_2_state.yaml</strong>
+                            4份专家报告+一致性验证
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="phase p3">
+                    <div class="phase-node p3">
+                        <div class="interaction-badge">P0</div>
+                        <div class="phase-time">15-20min</div>
+                        <div class="phase-number">Phase 3</div>
+                        <div class="phase-name">方案集成</div>
+                    </div>
+                    <div class="phase-details">
+                        <div class="actors">
+                            <span class="actor orchestrator">🎯 总指挥</span>
+                            <span class="actor agent">💻 编码专家</span>
+                        </div>
+                        <div class="tasks">
+                            <div class="task-item">集成4份专家报告</div>
+                            <div class="task-item">Theory-to-Code生成Python代码</div>
+                            <div class="task-item">生成完整文档</div>
+                            <div class="task-item">用户确认最终方案</div>
+                        </div>
+                        <div class="highlight-box">
+                            💡 <strong>92%代码直接可用</strong>
+                        </div>
+                        <div class="deliverable">
+                            <strong>📄 phase_3_state.yaml</strong>
+                            代码+文档+方案
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Phase 4 -->
+                <div class="phase p4">
+                    <div class="phase-node p4">
+                        <div class="phase-time">9-12min</div>
+                        <div class="phase-number">Phase 4</div>
+                        <div class="phase-name">质量保证</div>
+                    </div>
+                    <div class="phase-details">
+                        <div class="actors">
+                            <span class="actor agent">✅ 质量专家</span>
+                        </div>
+                        <div class="tasks">
+                            <div class="task-item">语法检查 + 逻辑验证</div>
+                            <div class="task-item">一致性检查（TenElementModel对齐）</div>
+                            <div class="task-item">Guardrails验证（引用完整性）</div>
+                            <div class="task-item">基准测试 + 质量报告</div>
+                        </div>
+                        <div class="deliverable" style="background: linear-gradient(135deg, #4caf50, #388e3c);">
+                            <strong>✅ 最终交付物</strong>
+                            代码+文档+报告<br>可用率: 92%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 核心指标 -->
+        <div class="metrics">
+            <div class="metric-item">
+                <div class="metric-value">70-130min</div>
+                <div class="metric-label">端到端总时间</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">7个</div>
+                <div class="metric-label">智能体协作</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">4-6次</div>
+                <div class="metric-label">人机交互</div>
+            </div>
+            <div class="metric-item">
+                <div class="metric-value">100%</div>
+                <div class="metric-label">可追溯性</div>
+            </div>
+        </div>
+
+        <!-- 图例 -->
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-box" style="background: #d32f2f;"></div>
+                <span><strong>P0:</strong> 强制交互</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ff9800;"></div>
+                <span><strong>P1:</strong> 建议澄清</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: #ffc107;"></div>
+                <span><strong>🔌 MCP:</strong> 数据访问</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-box" style="background: linear-gradient(135deg, #e74c3c, #c0392b);"></div>
+                <span><strong>关键依赖:</strong> TenElementModel</span>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 25px; color: #718096; font-size: 0.85em;">
+            <p>调度智能体系统 v4.3 | 工作流程详解</p>
+        </div>
+    </div>
+</body>
+</html>
