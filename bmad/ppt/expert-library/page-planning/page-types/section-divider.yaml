@@ -1,0 +1,22 @@
+# Section-Divider Page Type
+name: Section-Divider
+type: section-divider
+description: "章节分隔页,标识新章节开始"
+
+default_content_slots:
+  section_title:
+    max_chars_en: 30
+    max_chars_cn: 10
+    hierarchy: H1
+    content_hint: "章节名称"
+  section_number:
+    hierarchy: H2
+    content_hint: "章节编号(可选)"
+
+info_architecture_patterns:
+  - "section_number + section_title"
+  - "section_title + background_pattern"
+
+compatible_layouts:
+  - cover-centered.yaml
+  - title-dominant.yaml

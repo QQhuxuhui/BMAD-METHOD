@@ -1,0 +1,99 @@
+# Summary Page Type
+# 总结页
+
+name: Summary
+type: summary
+description: "演示文稿总结页,回顾关键要点并提供行动呼吁"
+
+# 典型位置
+typical_position: -1 # 固定最后一页
+
+# 默认Content Slots
+default_content_slots:
+  title:
+    max_chars_en: 40
+    max_chars_cn: 12
+    hierarchy: H1
+    required: true
+    content_hint: "总结标题"
+    examples:
+      - "Summary & Next Steps"
+      - "Thank You"
+      - "Let's Transform Together"
+      - "核心要点回顾"
+
+  key_takeaways:
+    max_chars_en: 200
+    max_chars_cn: 65
+    hierarchy: body
+    required: true
+    bullet_points: 2-4
+    content_hint: "2-4个最重要的信息点"
+
+  call_to_action:
+    max_chars_en: 60
+    max_chars_cn: 20
+    hierarchy: body
+    required: false
+    content_hint: "明确的下一步行动"
+    examples:
+      - "Schedule a demo today"
+      - "Join our beta program"
+      - "Let's discuss your needs"
+      - "联系我们获取详细方案"
+
+  contact_info:
+    max_chars_en: 100
+    max_chars_cn: 30
+    hierarchy: caption
+    required: false
+    content_hint: "联系方式(邮箱、电话、网站)"
+
+# 特殊需求
+default_special_requirements:
+  has_image: false
+  has_chart: false
+  has_diagram: false
+
+# 信息架构模式
+info_architecture_patterns:
+  - "title + key_takeaways + cta"
+  - "title + key_takeaways + contact"
+  - "thank_you + key_numbers + contact"
+  - "title + cta + contact + logo"
+
+# 布局模板兼容性
+compatible_layouts:
+  - summary-centered.yaml
+  - summary-with-cta.yaml
+  - thank-you-simple.yaml
+
+# 设计原则
+design_principles:
+  - "Key takeaways应该是整个演示的核心结论"
+  - "CTA要具体明确,避免模糊表述"
+  - "联系方式清晰可读"
+  - "风格应呼应封面页,形成首尾呼应"
+
+# Key Takeaways最佳实践
+key_takeaways_guidelines:
+  count: 2-4
+  content:
+    - "每条takeaway应该是自包含的完整观点"
+    - "不是重复章节标题,而是提炼核心价值"
+    - "使用有力的动作语言"
+  examples:
+    - "85% automation = 70 hours saved per week"
+    - "ROI achieved in 6 months, industry-leading"
+    - "12 customers validated, 95% satisfaction"
+
+# 常见错误
+common_pitfalls:
+  - pitfall: "Key takeaways过多(>5个)"
+    fix: "只保留最重要的2-4个"
+
+  - pitfall: "CTA不明确('了解更多')"
+    fix: "具体化('预约演示','下载白皮书')"
+
+  - pitfall: "联系方式过小或不清晰"
+    fix: "使用足够大的字号,确保可读"

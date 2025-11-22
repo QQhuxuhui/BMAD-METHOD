@@ -1,0 +1,24 @@
+# Data-Table Page Type
+name: Data-Table
+type: data-table
+description: "数据表格页,展示详细的表格数据"
+
+default_content_slots:
+  title:
+    max_chars_en: 50
+    max_chars_cn: 15
+    hierarchy: H1
+  footnote:
+    max_chars_en: 80
+    max_chars_cn: 25
+    hierarchy: caption
+
+default_special_requirements:
+  has_chart: true
+  chart_hint: "table format"
+
+info_architecture_patterns:
+  - "title + data_table"
+
+compatible_layouts:
+  - table-layout.yaml

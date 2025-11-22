@@ -1,0 +1,6 @@
+name: Split-Data
+category: data-focused
+compatible_page_types: [data-chart, comparison]
+layout_zones:
+  - { zone: left, element: chart_1, position: left, size_percent: 45 }
+  - { zone: right, element: chart_2, position: right, size_percent: 45 }

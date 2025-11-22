@@ -1,0 +1,6 @@
+name: Blank-Canvas
+category: special
+compatible_page_types: [text-heavy, image-focus, data-chart]
+description: "最小约束布局,给设计师最大自由度"
+layout_zones:
+  - { zone: flexible, element: any, position: custom }

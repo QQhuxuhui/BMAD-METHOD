@@ -1,0 +1,95 @@
+# Data-Chart Page Type
+# 数据图表页
+
+name: Data-Chart
+type: data-chart
+description: "包含数据可视化的页面,用图表传达数据洞察"
+
+# 典型位置
+typical_position: null # 任意位置,通常在Solution/Market章节
+
+# 默认Content Slots
+default_content_slots:
+  title:
+    max_chars_en: 60
+    max_chars_cn: 18
+    hierarchy: H1
+    required: true
+    content_hint: "图表主题或关键指标"
+    examples:
+      - "85% Automation Achieved in 6 Months"
+      - "客户满意度提升40%"
+
+  insight:
+    max_chars_en: 120
+    max_chars_cn: 40
+    hierarchy: body
+    required: true
+    content_hint: "数据洞察或关键结论(So What?)"
+    examples:
+      - "Our AI system reduced manual work by 70 hours/week"
+      - "投资回报期缩短至6个月,行业领先"
+
+  footnote:
+    max_chars_en: 80
+    max_chars_cn: 25
+    hierarchy: caption
+    required: true
+    content_hint: "数据来源、时间范围或计算方法"
+    examples:
+      - "Source: Internal analytics, Jan-Jun 2025"
+      - "数据来源: 12家SME客户,2024年Q4-2025年Q2"
+
+# 特殊需求
+default_special_requirements:
+  has_chart: true
+  chart_hint: "需要指定图表类型和数据结构"
+  has_image: false
+  has_diagram: false
+
+# 图表类型提示
+chart_type_hints:
+  comparison: "bar chart (before/after, us vs competitors)"
+  trend: "line chart (growth over time)"
+  composition: "pie chart (market share, budget allocation)"
+  distribution: "histogram, scatter plot"
+  relationship: "scatter plot with trend line"
+
+# 信息架构模式
+info_architecture_patterns:
+  - "title + chart + insight"
+  - "title + chart + insight + footnote"
+  - "title + chart + key_numbers + insight"
+
+# 布局模板兼容性
+compatible_layouts:
+  - chart-dominant.yaml
+  - split-data.yaml
+  - text-chart-combo.yaml
+
+# 设计原则
+design_principles:
+  - "图表应占页面50-70%"
+  - "Insight要回答'So What?' - 数据的意义是什么"
+  - "标题应包含关键数字或结论"
+  - "Footnote必须注明数据来源和时间"
+  - "避免3D图表和过度装饰"
+
+# Chart设计最佳实践
+chart_best_practices:
+  - "选择最简单能表达数据的图表类型"
+  - "坐标轴标签清晰,单位明确"
+  - "使用品牌色或主题色"
+  - "数据标签(data labels)在条目<5时显示"
+  - "图例(legend)在数据系列>1时显示"
+
+# 常见错误
+common_pitfalls:
+  - pitfall: "图表类型选择不当(用饼图表示趋势)"
+    fix: "参考chart_type_hints选择合适类型"
+
+  - pitfall: "Insight只重复图表数据,没有洞察"
+    fix: "回答So What - 数据说明了什么,对受众意味着什么"
+
+  - pitfall: "缺少数据来源"
+    fix: "在footnote中必须注明来源和时间范围"

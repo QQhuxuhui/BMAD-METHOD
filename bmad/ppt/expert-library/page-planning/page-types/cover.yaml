@@ -1,0 +1,72 @@
+# Cover Page Type
+# 封面页
+
+name: Cover
+type: cover
+description: "演示文稿封面页,建立第一印象"
+
+# 典型位置
+typical_position: 1 # 固定第1页
+
+# 默认Content Slots
+default_content_slots:
+  title:
+    max_chars_en: 40
+    max_chars_cn: 12
+    hierarchy: H1
+    required: true
+    content_hint: "公司名称、产品名称或演示标题"
+    examples:
+      - "Company Name - Product Launch"
+      - "智能排程系统 - 商业计划书"
+
+  subtitle:
+    max_chars_en: 80
+    max_chars_cn: 25
+    hierarchy: H2
+    required: false
+    content_hint: "副标题、Tagline或日期"
+    examples:
+      - "Revolutionizing Manufacturing Scheduling"
+      - "让生产调度更智能 | 2025年融资路演"
+
+  author:
+    max_chars_en: 50
+    max_chars_cn: 15
+    hierarchy: caption
+    required: false
+    content_hint: "演讲人姓名和职位"
+
+# 特殊需求
+default_special_requirements:
+  has_image: true
+  image_hint: "公司logo或产品图标"
+  has_chart: false
+  has_diagram: false
+
+# 信息架构模式
+info_architecture_patterns:
+  - "title + subtitle + logo"
+  - "title + subtitle + background_image"
+  - "title + subtitle + author + date"
+
+# 布局模板兼容性
+compatible_layouts:
+  - cover-centered.yaml
+  - cover-left-aligned.yaml
+  - cover-full-bleed-image.yaml
+
+# 设计原则
+design_principles:
+  - "标题要简洁有力,一目了然"
+  - "避免在封面放置过多文字"
+  - "Logo位置通常在右上角或底部居中"
+  - "可使用品牌色或高质量背景图"
+
+# 常见错误
+common_pitfalls:
+  - pitfall: "标题过长,超过2行"
+    fix: "将详细描述移到副标题"
+
+  - pitfall: "封面元素过多,视觉混乱"
+    fix: "保持简洁,最多3-4个元素"

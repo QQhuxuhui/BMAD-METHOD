@@ -1,0 +1,5 @@
+name: Title-Dominant
+category: title-focused
+compatible_page_types: [section-divider, summary]
+layout_zones:
+  - { zone: center, element: large_title, position: center, size_percent: 60 }

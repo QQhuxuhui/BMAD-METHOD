@@ -1,0 +1,24 @@
+# Table-Layout Pattern
+name: Table-Layout
+category: data-focused
+description: "表格占据主要区域"
+
+compatible_page_types:
+  - data-table
+  - comparison
+
+layout_zones:
+  - zone: header
+    element: title
+    position: top
+    size_percent: 15
+
+  - zone: main
+    element: table
+    position: center
+    size_percent: 70
+
+  - zone: footer
+    element: footnote
+    position: bottom
+    size_percent: 10
