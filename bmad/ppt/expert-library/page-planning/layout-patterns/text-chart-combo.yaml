@@ -1,0 +1,23 @@
+# Text-Chart-Combo Layout Pattern
+name: Text-Chart-Combo
+category: hybrid
+description: "左侧文字(30%),右侧图表(60%)"
+
+compatible_page_types:
+  - data-chart
+  - text-heavy
+
+layout_zones:
+  - zone: header
+    element: title
+    position: top
+
+  - zone: left
+    element: text_or_bullets
+    position: left
+    size_percent: 30
+
+  - zone: right
+    element: chart
+    position: right
+    size_percent: 60

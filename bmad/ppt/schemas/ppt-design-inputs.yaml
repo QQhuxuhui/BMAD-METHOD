@@ -1,0 +1,224 @@
+# PPTDesignInputs Schema
+# 用户需求输入数据模型 - 8个核心要素
+
+type: object
+required:
+  - purpose
+  - audience
+  - message
+  - constraints
+
+properties:
+  purpose:
+    type: string
+    enum:
+      - pitch_deck # 商业推介
+      - product_launch # 产品发布
+      - technical_report # 技术报告
+      - training # 培训教育
+      - sales_proposal # 销售提案
+    description: 演示文稿目的
+
+  audience:
+    type: object
+    required:
+      - primary
+      - knowledge_level
+    properties:
+      primary:
+        type: string
+        description: 主要受众群体
+        examples:
+          - investors
+          - customers
+          - technical_team
+          - management
+          - students
+
+      knowledge_level:
+        type: string
+        enum:
+          - beginner # 初学者
+          - intermediate # 中级
+          - business_professional # 商业专业人士
+          - technical_expert # 技术专家
+        description: 受众知识水平
+
+      pain_points:
+        type: array
+        items:
+          type: string
+        description: 受众痛点和关注点
+        examples:
+          - [ROI, market_size, team_capability]
+          - [product_features, pricing, support]
+
+  message:
+    type: object
+    required:
+      - core_points
+    properties:
+      core_points:
+        type: array
+        minItems: 2
+        maxItems: 5
+        items:
+          type: string
+        description: 2-5个核心信息点
+        examples:
+          - [problem_severity, solution_innovation, market_potential]
+
+      key_data:
+        type: array
+        items:
+          type: object
+          properties:
+            metric:
+              type: string
+            value:
+              type: [number, string]
+            context:
+              type: string
+        description: 关键数据点(可选)
+        examples:
+          - [{ metric: "automation_rate", value: 85, context: "achieved" }]
+
+  narrative:
+    type: string
+    enum:
+      - problem-solution # 问题-解决方案
+      - timeline # 时间线
+      - feature-showcase # 功能展示
+      - comparison # 对比分析
+      - process # 流程说明
+    default: problem-solution
+    description: 叙事结构(由Story Designer推荐或用户选择)
+
+  constraints:
+    type: object
+    required:
+      - target_pages
+    properties:
+      target_pages:
+        type: integer
+        minimum: 10
+        maximum: 20
+        description: 目标页数
+
+      duration_minutes:
+        type: integer
+        minimum: 5
+        maximum: 60
+        description: 预计演讲时长(分钟)
+
+      brand_guidelines:
+        type: string
+        format: uri
+        description: 品牌指南文件路径(可选)
+
+      deadline:
+        type: string
+        format: date-time
+        description: 交付截止时间(可选)
+
+  visual_preference:
+    type: string
+    enum:
+      - professional # 专业商务
+      - creative # 创意风格
+      - minimal # 极简风格
+      - corporate # 企业正式
+      - tech # 科技感
+      - academic # 学术风格
+    default: professional
+    description: 视觉风格偏好
+
+  tone_of_voice:
+    type: string
+    enum:
+      - formal # 正式
+      - persuasive # 说服性
+      - casual # 轻松
+      - technical # 技术性
+    default: formal
+    description: 文案语气风格
+
+  language:
+    type: string
+    enum:
+      - zh-CN # 简体中文
+      - en-US # 美式英语
+    default: zh-CN
+    description: 内容语言
+
+# 验证规则
+validations:
+  - name: page_duration_ratio
+    rule: duration_minutes / target_pages >= 0.5 && <= 3
+    message: 每页演讲时长应在0.5-3分钟之间
+
+  - name: core_points_limit
+    rule: message.core_points.length >= 2 && <= 5
+    message: 核心信息点应在2-5个之间
+
+# 示例
+examples:
+  - name: business_pitch_example
+    description: 商业推介示例
+    data:
+      purpose: pitch_deck
+      audience:
+        primary: investors
+        knowledge_level: business_professional
+        pain_points: [ROI, market_size, team_capability]
+      message:
+        core_points: [problem_severity, solution_innovation, market_potential]
+        key_data:
+          - { metric: "market_size", value: "10B USD", context: "TAM" }
+          - { metric: "growth_rate", value: 85, context: "YoY%" }
+      narrative: problem-solution
+      constraints:
+        target_pages: 15
+        duration_minutes: 20
+      visual_preference: professional
+      tone_of_voice: persuasive
+      language: zh-CN
+
+  - name: product_launch_example
+    description: 产品发布示例
+    data:
+      purpose: product_launch
+      audience:
+        primary: customers
+        knowledge_level: intermediate
+        pain_points: [ease_of_use, pricing, support]
+      message:
+        core_points: [product_features, customer_benefits, competitive_advantage]
+      narrative: feature-showcase
+      constraints:
+        target_pages: 20
+        duration_minutes: 30
+      visual_preference: creative
+      tone_of_voice: persuasive
+      language: zh-CN
+
+  - name: technical_report_example
+    description: 技术报告示例
+    data:
+      purpose: technical_report
+      audience:
+        primary: technical_team
+        knowledge_level: technical_expert
+        pain_points: [performance, scalability, maintainability]
+      message:
+        core_points: [architecture_design, performance_metrics, implementation_details]
+        key_data:
+          - { metric: "latency", value: 50, context: "ms p99" }
+          - { metric: "throughput", value: 10000, context: "req/s" }
+      narrative: process
+      constraints:
+        target_pages: 12
+        duration_minutes: 15
+      visual_preference: tech
+      tone_of_voice: technical
+      language: en-US

@@ -1,0 +1,9 @@
+name: Data-Storytelling
+layout_id: data-storytelling
+category: data
+compatible_page_types: [data-chart]
+description: "数据叙事布局: 图表+文字解释"
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: chart, position: { x: right-100px, width: 55% } }
+  - { zone_id: narrative, element: story_text, position: { x: left-80px, width: 35% } }

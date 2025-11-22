@@ -1,0 +1,25 @@
+# Timeline Page Type
+name: Timeline
+type: timeline
+description: "时间线页,展示历程或路线图"
+
+default_content_slots:
+  title:
+    max_chars_en: 50
+    max_chars_cn: 15
+    hierarchy: H1
+  timeline_items:
+    hierarchy: body
+    content_hint: "3-5个时间节点及描述"
+
+default_special_requirements:
+  has_diagram: true
+  diagram_hint: "timeline visualization"
+
+info_architecture_patterns:
+  - "title + timeline_horizontal"
+  - "title + timeline_vertical"
+
+compatible_layouts:
+  - three-zone.yaml
+  - single-column-text.yaml

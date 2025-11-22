@@ -1,0 +1,26 @@
+# Agenda Page Type
+name: Agenda
+type: agenda
+description: "议程页,展示演示内容结构"
+
+typical_position: 2 # 通常第2页
+
+default_content_slots:
+  title:
+    max_chars_en: 30
+    max_chars_cn: 10
+    hierarchy: H1
+    content_hint: "Agenda / 议程"
+  body:
+    max_chars_en: 200
+    max_chars_cn: 65
+    hierarchy: body
+    bullet_points: 3-6
+    content_hint: "章节列表"
+
+info_architecture_patterns:
+  - "title + section_list"
+
+compatible_layouts:
+  - bullet-list.yaml
+  - two-column-text.yaml

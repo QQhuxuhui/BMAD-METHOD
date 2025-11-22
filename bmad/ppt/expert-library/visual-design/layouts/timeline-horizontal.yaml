@@ -1,0 +1,8 @@
+name: Timeline-Horizontal
+layout_id: timeline-horizontal
+category: special
+compatible_page_types: [timeline]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: timeline, element: horizontal_timeline, position: { x: center, y: center, width: 85% } }
+  - { zone_id: milestones, element: event_markers, count: 3-5 }

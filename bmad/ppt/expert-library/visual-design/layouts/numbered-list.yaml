@@ -1,0 +1,7 @@
+name: Numbered-List
+layout_id: numbered-list
+category: content
+compatible_page_types: [text-heavy, process-flow]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: list, element: numbered_items, position: { x: left-100px, y: 150px }, numbering: "1. 2. 3." }

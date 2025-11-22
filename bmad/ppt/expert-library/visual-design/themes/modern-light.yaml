@@ -1,0 +1,44 @@
+# Modern Light Theme
+name: Modern Light
+style: creative
+description: "现代亮色主题,清新明快,适合产品发布和创新展示"
+
+suitable_for:
+  purposes: [product_launch, feature_announcement, creative_presentation]
+  audiences: [customers, users, media, partners]
+
+color_palette:
+  primary: "#FFFFFF"
+  secondary: "#F8F9FA"
+  background:
+    light: "#FFFFFF"
+    dark: "#F8F9FA"
+  text:
+    primary: "#212529"
+    secondary: "#6C757D"
+  accent:
+    - "#0D6EFD" # 蓝色
+    - "#20C997" # 青色
+    - "#FFC107" # 黄色
+    - "#DC3545" # 红色
+  contrast_ratios:
+    text_primary_on_light: 16.2
+
+typography:
+  font_family:
+    heading_en: "Inter Bold"
+    body_en: "Inter Regular"
+    heading_cn: "苹方-简 Bold"
+    body_cn: "苹方-简 Regular"
+  heading_sizes: { H1: 48, H2: 36, H3: 24 }
+  body_sizes: { body: 18, caption: 14 }
+  line_height: { heading: 1.2, body: 1.6 }
+
+design_standards:
+  spacing:
+    margin: { top: 80, right: 100, bottom: 80, left: 100 }
+  crap:
+    contrast: { enabled: true }
+    repetition: { enabled: true }
+    alignment: { enabled: true, default: "left" }
+    proximity: { enabled: true }

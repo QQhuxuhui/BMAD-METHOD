@@ -1,0 +1,38 @@
+# Elegant Serif Theme
+name: Elegant Serif
+style: professional
+description: "优雅衬线主题,高端典雅,适合奢侈品牌和高端服务"
+
+suitable_for:
+  purposes: [luxury_brand_presentation, high_end_service, premium_product]
+  audiences: [high_net_worth_individuals, luxury_market, premium_segment]
+
+color_palette:
+  primary: "#2C2416" # 深棕色
+  secondary: "#8B7355" # 驼色
+  background:
+    light: "#FAF8F3" # 米白色
+    dark: "#2C2416"
+  text:
+    primary: "#2C2416"
+    secondary: "#6B5D52"
+  accent:
+    - "#C9A961" # 金色
+    - "#8B7355" # 驼色
+    - "#2C2416" # 深棕
+
+typography:
+  font_family:
+    heading_en: "Playfair Display Bold" # 优雅衬线
+    body_en: "Lora Regular"
+    heading_cn: "宋体 Bold"
+    body_cn: "宋体"
+  heading_sizes: { H1: 48, H2: 34, H3: 24 }
+  body_sizes: { body: 18, caption: 14 }
+
+design_standards:
+  spacing:
+    margin: { top: 100, right: 120, bottom: 100, left: 120 } # 宽松留白
+  alignment:
+    title: center # 居中对齐(优雅风格)
+    body: justify

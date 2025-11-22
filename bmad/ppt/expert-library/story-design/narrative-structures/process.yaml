@@ -1,0 +1,45 @@
+# Process Narrative Structure
+# 流程叙事结构
+
+name: Process
+type: process
+description: "按步骤展示工作流程、方法论或系统架构。适合技术报告、操作指南、架构设计。"
+
+suitable_for:
+  purposes: [technical_report, training, architecture_presentation]
+  audiences: [technical_team, engineers, analysts]
+
+standard_sections:
+  - section_name: Overview
+    typical_pages: 2
+    key_elements: [System/Process overview, Objectives]
+
+  - section_name: Step_1
+    typical_pages: 2-3
+    key_elements: [Step description, Inputs, Outputs]
+
+  - section_name: Step_2
+    typical_pages: 2-3
+    key_elements: [Step description, Inputs, Outputs]
+
+  - section_name: Step_3
+    typical_pages: 2-3
+    key_elements: [Step description, Inputs, Outputs]
+
+  - section_name: Results
+    typical_pages: 2
+    key_elements: [Final outputs, Performance metrics]
+
+page_allocation_strategy:
+  "12":
+    cover: 1
+    Overview: 2
+    Step_1: 3
+    Step_2: 3
+    Step_3: 3
+    Results: 1
+
+design_principles:
+  - "每个步骤有清晰的输入输出"
+  - "使用流程图可视化步骤关系"
+  - "技术细节适度,避免过度复杂"

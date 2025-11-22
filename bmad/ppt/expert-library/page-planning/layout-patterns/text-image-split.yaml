@@ -1,0 +1,7 @@
+name: Text-Image-Split
+category: hybrid
+compatible_page_types: [text-heavy, image-focus, process-flow, quote]
+layout_zones:
+  - { zone: top, element: title, position: top }
+  - { zone: left, element: text_or_bullets, position: left, size_percent: 50 }
+  - { zone: right, element: image_or_diagram, position: right, size_percent: 40 }

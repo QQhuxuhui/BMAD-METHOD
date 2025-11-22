@@ -1,0 +1,8 @@
+name: Text-Image-Left
+layout_id: text-image-left
+category: content
+compatible_page_types: [text-heavy, image-focus]
+layout_zones:
+  - { zone_id: title, position: { x: left-80px, y: top-60px, width: 100% } }
+  - { zone_id: left, element: text_or_bullets, position: { x: left-80px, y: 150px, width: 45% } }
+  - { zone_id: right, element: image, position: { x: right-100px, y: 150px, width: 45% } }

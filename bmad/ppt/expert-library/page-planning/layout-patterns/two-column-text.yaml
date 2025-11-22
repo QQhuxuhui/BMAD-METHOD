@@ -1,0 +1,24 @@
+# Two-Column-Text Layout Pattern
+name: Two-Column-Text
+category: text-focused
+description: "两栏文本布局"
+
+compatible_page_types:
+  - text-heavy
+  - comparison
+  - agenda
+
+layout_zones:
+  - zone: header
+    element: title
+    position: top_full_width
+
+  - zone: left_column
+    element: text_or_bullets
+    position: left
+    size_percent: 45
+
+  - zone: right_column
+    element: text_or_bullets
+    position: right
+    size_percent: 45

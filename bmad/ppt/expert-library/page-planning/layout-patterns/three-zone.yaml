@@ -1,0 +1,28 @@
+# Three-Zone Layout Pattern
+name: Three-Zone
+category: hybrid
+description: "三区域布局,适合流程或时间线"
+
+compatible_page_types:
+  - timeline
+  - process-flow
+
+layout_zones:
+  - zone: header
+    element: title
+    position: top
+
+  - zone: left
+    element: step_1
+    position: left
+    size_percent: 30
+
+  - zone: center
+    element: step_2
+    position: center
+    size_percent: 30
+
+  - zone: right
+    element: step_3
+    position: right
+    size_percent: 30

@@ -1,0 +1,8 @@
+name: Table-Standard
+layout_id: table-standard
+category: data
+compatible_page_types: [data-table, comparison]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: table, element: data_table, position: { x: center, y: center, width: 85% } }
+  - { zone_id: footnote, position: { y: bottom-40px } }

@@ -1,0 +1,6 @@
+name: Image-Right
+category: visual-focused
+compatible_page_types: [image-focus]
+layout_zones:
+  - { zone: left, element: text, position: left, size_percent: 45 }
+  - { zone: right, element: image, position: right, size_percent: 45 }

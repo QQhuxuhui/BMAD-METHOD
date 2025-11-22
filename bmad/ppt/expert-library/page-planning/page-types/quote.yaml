@@ -1,0 +1,28 @@
+# Quote Page Type
+name: Quote
+type: quote
+description: "引用/证言页,展示客户评价或名言"
+
+default_content_slots:
+  quote_text:
+    max_chars_en: 150
+    max_chars_cn: 50
+    hierarchy: H2
+    content_hint: "引用内容"
+  attribution:
+    max_chars_en: 60
+    max_chars_cn: 20
+    hierarchy: caption
+    content_hint: "引用来源(姓名、职位、公司)"
+
+default_special_requirements:
+  has_image: true
+  image_hint: "被引用人照片(可选)"
+
+info_architecture_patterns:
+  - "quote + attribution"
+  - "quote + attribution + photo"
+
+compatible_layouts:
+  - single-column-text.yaml
+  - text-image-split.yaml

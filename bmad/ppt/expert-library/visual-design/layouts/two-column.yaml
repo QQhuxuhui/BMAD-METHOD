@@ -1,0 +1,8 @@
+name: Two-Column
+layout_id: two-column
+category: content
+compatible_page_types: [text-heavy, comparison]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: left_column, element: content, position: { x: left-80px, width: 45% } }
+  - { zone_id: right_column, element: content, position: { x: right-100px, width: 45% } }

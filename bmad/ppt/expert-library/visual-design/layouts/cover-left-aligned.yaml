@@ -1,0 +1,8 @@
+name: Cover Left-Aligned
+layout_id: cover-left-aligned
+category: cover
+compatible_page_types: [cover]
+layout_zones:
+  - { zone_id: title, element: main_title, position: { x: left-100px, y: 35%, width: 60% }, alignment: left }
+  - { zone_id: subtitle, element: subtitle, position: { x: left-100px, y: 48%, width: 55% }, alignment: left }
+  - { zone_id: logo, element: logo, position: { x: right-80px, y: bottom-60px } }

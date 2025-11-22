@@ -1,0 +1,94 @@
+# PPT Agent System Configuration
+# 5-Stage Creative Workflow for Professional Presentations
+
+module:
+  name: PPT Creator
+  version: 1.0.0
+  description: 5-stage intelligent system for automated professional PowerPoint creation
+
+workflow:
+  stages:
+    - name: story_design
+      agent: story_designer
+      duration_minutes: 10-15
+      hitl: true
+      hitl_description: User confirms story structure
+
+    - name: page_planning
+      agent: page_planner
+      duration_minutes: 10-15
+      hitl: false
+
+    - name: visual_design
+      agent: visual_stylist
+      duration_minutes: 15-20
+      hitl: true
+      hitl_description: User selects theme (A/B/C)
+
+    - name: content_production
+      agent: content_producer
+      duration_minutes: 20-30
+      hitl: false
+      helpers:
+        - copywriter
+        - chart_specialist
+
+    - name: file_generation
+      agent: file_generator
+      duration_minutes: 5-10
+      hitl: false
+      fallback: design_export
+
+# Total estimated time: 60-90 minutes (Quick mode)
+
+expert_library:
+  story_design:
+    narrative_structures: 5
+    audience_templates: 8
+    content_organization: 6
+
+  page_planning:
+    page_types: 12
+    layout_patterns: 15
+
+  visual_design:
+    themes: 8
+    layouts: 20
+
+supported_features:
+  scenarios:
+    - business_pitch
+    - product_launch
+    - technical_report
+
+  languages:
+    - zh-CN
+    - en-US
+
+  tones:
+    - formal
+    - persuasive
+    - casual
+    - technical
+
+  chart_types:
+    - bar
+    - line
+    - pie
+    - table
+
+  page_range:
+    min: 10
+    max: 20
+
+quality_metrics:
+  design_consistency: 85 # minimum score
+  content_clarity: 90 # minimum score
+  generation_success_rate: 80 # percentage
+  user_satisfaction: 80 # percentage
+
+dependencies:
+  external:
+    - document-skills:pptx
+  internal:
+    - bmad-core v6

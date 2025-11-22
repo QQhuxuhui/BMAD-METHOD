@@ -1,0 +1,13 @@
+name: Bullet-List-Standard
+layout_id: bullet-list-standard
+category: content
+compatible_page_types: [text-heavy, agenda]
+layout_zones:
+  - { zone_id: title, position: { x: left-80px, y: top-60px } }
+  - {
+      zone_id: bullets,
+      element: bullet_points,
+      position: { x: left-100px, y: 150px, width: 75% },
+      bullet_style: filled_circle,
+      indent: 40px,
+    }

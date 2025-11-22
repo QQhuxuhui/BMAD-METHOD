@@ -1,0 +1,46 @@
+# Comparison Narrative Structure
+# 对比分析叙事结构
+
+name: Comparison
+type: comparison
+description: "通过多维度对比展示优势。适合竞品对比、方案选择、对比营销。"
+
+suitable_for:
+  purposes: [competitive_analysis, solution_comparison, benchmark_report]
+  audiences: [decision_makers, buyers, analysts]
+
+standard_sections:
+  - section_name: Introduction
+    typical_pages: 2
+    key_elements: [Comparison scope, Evaluation criteria]
+
+  - section_name: Option_A
+    typical_pages: 3
+    key_elements: [Features, Pros, Cons]
+
+  - section_name: Option_B
+    typical_pages: 3
+    key_elements: [Features, Pros, Cons]
+
+  - section_name: Comparison_Matrix
+    typical_pages: 4
+    key_elements: [Side-by-side comparison, Key differentiators]
+
+  - section_name: Recommendation
+    typical_pages: 2
+    key_elements: [Recommendation, Rationale, Next steps]
+
+page_allocation_strategy:
+  "15":
+    cover: 1
+    agenda: 1
+    Introduction: 2
+    Option_A: 3
+    Option_B: 3
+    Comparison_Matrix: 4
+    Recommendation: 2
+
+design_principles:
+  - "对比维度要客观公正"
+  - "使用表格/矩阵清晰展示差异"
+  - "突出关键差异点,避免信息过载"

@@ -1,0 +1,89 @@
+# PPT Workflow State Template
+# 用于跟踪工作流执行状态
+
+workflow_id: "{{workflow_id}}"
+session_id: "{{session_id}}"
+created_at: "{{timestamp}}"
+updated_at: "{{timestamp}}"
+
+# Overall Status
+status: pending # pending | in_progress | completed | failed
+current_stage: null
+progress_percentage: 0
+
+# Stage Status
+stages:
+  stage_1_story_design:
+    status: pending # pending | in_progress | completed | failed | skipped
+    started_at: null
+    completed_at: null
+    duration_seconds: null
+    output_file: null
+    validation_results: null
+    hitl_response: null
+
+  stage_2_page_planning:
+    status: pending
+    started_at: null
+    completed_at: null
+    duration_seconds: null
+    output_file: null
+    validation_results: null
+
+  stage_3_visual_design:
+    status: pending
+    started_at: null
+    completed_at: null
+    duration_seconds: null
+    output_file: null
+    validation_results: null
+    hitl_response: null
+
+  stage_4_content_production:
+    status: pending
+    started_at: null
+    completed_at: null
+    duration_seconds: null
+    output_file: null
+    validation_results: null
+
+  stage_5_file_generation:
+    status: pending
+    started_at: null
+    completed_at: null
+    duration_seconds: null
+    output_file: null
+    validation_results: null
+    fallback_triggered: false
+
+# Input
+user_inputs:
+  ppt_design_inputs: null
+  brand_guidelines: null
+
+# HITL Interactions
+hitl_interactions:
+  - stage: null
+    timestamp: null
+    prompt: null
+    response: null
+    timeout_occurred: false
+
+# Errors and Warnings
+errors: []
+warnings: []
+
+# Metrics
+metrics:
+  total_duration_seconds: null
+  llm_calls_count: 0
+  tokens_consumed: 0
+  quality_scores:
+    design_consistency: null
+    content_clarity: null
+
+# Checkpoints (for recovery)
+checkpoints:
+  - stage_id: null
+    timestamp: null
+    state_snapshot: null

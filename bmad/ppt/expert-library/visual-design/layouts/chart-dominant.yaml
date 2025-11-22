@@ -1,0 +1,9 @@
+name: Chart-Dominant
+layout_id: chart-dominant
+category: data
+compatible_page_types: [data-chart]
+layout_zones:
+  - { zone_id: title, position: { x: left-80px, y: top-60px } }
+  - { zone_id: chart, element: main_chart, position: { x: center, y: center, width: 75%, height: 60% } }
+  - { zone_id: insight, element: key_takeaway, position: { x: left-80px, y: bottom-120px } }
+  - { zone_id: footnote, position: { y: bottom-40px } }

@@ -1,0 +1,6 @@
+name: Single-Column-Text
+category: text-focused
+compatible_page_types: [text-heavy, quote]
+layout_zones:
+  - { zone: header, element: title, position: top }
+  - { zone: main, element: text, position: center, size_percent: 70 }
