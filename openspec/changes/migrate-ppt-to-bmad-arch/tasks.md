@@ -10,12 +10,12 @@
 
 ## 总体里程碑
 
-| 里程碑 | 时间 | 交付物 | 状态 |
-|--------|------|--------|------|
-| **M1**: 源码迁移完成 | Day 1 上午 | 源码目录 + 资源复制 | ✅ Completed |
-| **M2**: Agents转换完成 | Day 1 下午 | 8个YAML agents | ✅ Completed |
-| **M3**: 构建系统工作 | Day 2 上午 | build.js + npm script | ✅ Completed |
-| **M4**: 框架集成完成 | Day 2 下午 | Slash Commands + 测试通过 | ✅ Completed |
+| 里程碑                 | 时间       | 交付物                    | 状态         |
+| ---------------------- | ---------- | ------------------------- | ------------ |
+| **M1**: 源码迁移完成   | Day 1 上午 | 源码目录 + 资源复制       | ✅ Completed |
+| **M2**: Agents转换完成 | Day 1 下午 | 8个YAML agents            | ✅ Completed |
+| **M3**: 构建系统工作   | Day 2 上午 | build.js + npm script     | ✅ Completed |
+| **M4**: 框架集成完成   | Day 2 下午 | Slash Commands + 测试通过 | ✅ Completed |
 
 ---
 
@@ -28,11 +28,13 @@
 **依赖**: 无
 
 **步骤**:
+
 - [x] 创建`src/modules/ppt/`根目录
 - [x] 创建子目录：`agents/`, `agents/helpers/`, `workflows/`, `expert-library/`, `schemas/`, `_module-installer/`
 - [x] 验证目录权限（可读可写）
 
 **验收标准**:
+
 ```bash
 test -d src/modules/ppt/agents
 test -d src/modules/ppt/agents/helpers
@@ -53,11 +55,13 @@ test -d src/modules/ppt/_module-installer
 **依赖**: 无
 
 **步骤**:
+
 - [x] 执行`cp -r bmad/ppt bmad/ppt.backup-$(date +%Y%m%d)`
 - [x] 验证备份完整性（文件数量和大小）
 - [x] 记录备份路径到日志
 
 **验收标准**:
+
 ```bash
 test -d bmad/ppt.backup-20251123
 diff -r bmad/ppt bmad/ppt.backup-20251123
@@ -74,6 +78,7 @@ diff -r bmad/ppt bmad/ppt.backup-20251123
 **依赖**: TASK-001
 
 **步骤**:
+
 - [x] 复制`bmad/ppt/expert-library/` → `src/modules/ppt/expert-library/`
 - [x] 复制`bmad/ppt/schemas/` → `src/modules/ppt/schemas/`
 - [x] 复制`bmad/ppt/workflows/` → `src/modules/ppt/workflows/`
@@ -82,6 +87,7 @@ diff -r bmad/ppt bmad/ppt.backup-20251123
 - [x] 验证每个目录的完整性（使用diff）
 
 **验收标准**:
+
 ```bash
 diff -r bmad/ppt/expert-library src/modules/ppt/expert-library
 diff -r bmad/ppt/schemas src/modules/ppt/schemas
@@ -100,12 +106,14 @@ test $? -eq 0  # 所有diff应返回0（无差异）
 **依赖**: TASK-001
 
 **步骤**:
+
 - [x] 创建`src/modules/ppt/README.md`
 - [x] 添加章节：Architecture、Development Workflow、Build System
 - [x] 说明与`bmad/ppt/`的关系（源码vs分发）
 - [x] 添加构建命令说明
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/README.md
 grep -q "Development Workflow" src/modules/ppt/README.md
@@ -124,12 +132,14 @@ grep -q "npm run build:ppt" src/modules/ppt/README.md
 **依赖**: TASK-003
 
 **步骤**:
+
 - [x] 执行完整性验证脚本（检查关键文件清单）
 - [x] 验证YAML文件格式有效性
 - [x] 检查目录结构完整性
 - [x] 生成验证报告
 
 **验收标准**:
+
 ```bash
 # 验证关键文件存在
 test -f src/modules/ppt/config.yaml
@@ -155,6 +165,7 @@ test $(find src/modules/ppt/expert-library -name "*.yaml" | wc -l) -gt 30
 **依赖**: TASK-005
 
 **步骤**:
+
 - [x] 阅读`bmad/ppt/agents/story-designer.md`
 - [x] 创建`src/modules/ppt/agents/story-designer.agent.yaml`
 - [x] 添加metadata（id, name, title, icon, module）
@@ -165,6 +176,7 @@ test $(find src/modules/ppt/expert-library -name "*.yaml" | wc -l) -gt 30
 - [x] 参考`src/modules/aps/agents/orchestrator.agent.yaml`格式
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/agents/story-designer.agent.yaml
 node -e "
@@ -190,11 +202,13 @@ console.log('✅ story-designer agent valid');
 **依赖**: TASK-006
 
 **步骤**:
+
 - [x] 同TASK-006，转换`page-planner.md` → `page-planner.agent.yaml`
 - [x] 验证Stage 2相关的critical_actions
 - [x] 验证page-planning expert-library引用路径
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/agents/page-planner.agent.yaml
 grep -q "page-planning" src/modules/ppt/agents/page-planner.agent.yaml
@@ -211,11 +225,13 @@ grep -q "page-planning" src/modules/ppt/agents/page-planner.agent.yaml
 **依赖**: TASK-006
 
 **步骤**:
+
 - [x] 同TASK-006，转换`visual-stylist.md` → `visual-stylist.agent.yaml`
 - [x] 验证theme和layout相关的menu选项
 - [x] 验证visual-design expert-library引用
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/agents/visual-stylist.agent.yaml
 grep -q "visual-design" src/modules/ppt/agents/visual-stylist.agent.yaml
@@ -232,11 +248,13 @@ grep -q "visual-design" src/modules/ppt/agents/visual-stylist.agent.yaml
 **依赖**: TASK-006
 
 **步骤**:
+
 - [x] 同TASK-006，转换`content-producer.md` → `content-producer.agent.yaml`
 - [x] 验证helpers调用逻辑（copywriter、chart-specialist）
 - [x] 验证content-production expert-library引用
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/agents/content-producer.agent.yaml
 grep -q "copywriter" src/modules/ppt/agents/content-producer.agent.yaml
@@ -254,10 +272,12 @@ grep -q "chart-specialist" src/modules/ppt/agents/content-producer.agent.yaml
 **依赖**: TASK-006
 
 **步骤**:
+
 - [x] 同TASK-006，转换`file-generator.md` → `file-generator.agent.yaml`
 - [x] 简化版本（file-generator逻辑较简单）
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/agents/file-generator.agent.yaml
 grep -q "file-generation" src/modules/ppt/agents/file-generator.agent.yaml
@@ -274,11 +294,13 @@ grep -q "file-generation" src/modules/ppt/agents/file-generator.agent.yaml
 **依赖**: TASK-006
 
 **步骤**:
+
 - [x] 转换`helpers/copywriter.md` → `helpers/copywriter.agent.yaml`
 - [x] 转换`helpers/chart-specialist.md` → `helpers/chart-specialist.agent.yaml`
 - [x] 简化版本（helper agents功能单一）
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/agents/helpers/copywriter.agent.yaml
 test -f src/modules/ppt/agents/helpers/chart-specialist.agent.yaml
@@ -295,14 +317,16 @@ test -f src/modules/ppt/agents/helpers/chart-specialist.agent.yaml
 **依赖**: TASK-005
 
 **步骤**:
+
 - [x] 创建`src/modules/ppt/agents/ppt-master.agent.yaml`
 - [x] 设计主菜单结构（8个选项）
-- [x] 添加完整workflow入口（*create-ppt）
+- [x] 添加完整workflow入口（\*create-ppt）
 - [x] 添加5个单阶段agent入口
 - [x] 添加辅助功能入口（*load-example、*check-status）
 - [x] 验证所有menu路径引用正确
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/agents/ppt-master.agent.yaml
 grep -q "create-ppt" src/modules/ppt/agents/ppt-master.agent.yaml
@@ -326,12 +350,14 @@ grep -q "check-status" src/modules/ppt/agents/ppt-master.agent.yaml
 **依赖**: TASK-012
 
 **步骤**:
+
 - [x] 批量验证所有8个`.agent.yaml`文件
 - [x] 检查YAML语法有效性
 - [x] 验证schema结构完整性
 - [x] 生成验证报告
 
 **验收标准**:
+
 ```bash
 test $(find src/modules/ppt/agents -name "*.agent.yaml" | wc -l) -eq 8
 
@@ -364,6 +390,7 @@ done
 **依赖**: TASK-013
 
 **步骤**:
+
 - [x] 创建`src/modules/ppt/build.js`
 - [x] 参考`src/modules/aps/build.js`实现
 - [x] 导入`YamlXmlBuilder`工具
@@ -374,6 +401,7 @@ done
 - [x] 添加错误处理和日志输出
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/build.js
 node src/modules/ppt/build.js
@@ -391,6 +419,7 @@ test $? -eq 0  # 构建成功
 **依赖**: TASK-014
 
 **步骤**:
+
 - [x] 执行`node src/modules/ppt/build.js`
 - [x] 验证`bmad/ppt/agents/`包含8个`.md`文件
 - [x] 验证所有`.md`文件包含XML activation blocks
@@ -398,6 +427,7 @@ test $? -eq 0  # 构建成功
 - [x] 验证资源文件已复制（expert-library、schemas等）
 
 **验收标准**:
+
 ```bash
 test $(find bmad/ppt/agents -name "*.md" | wc -l) -eq 8
 test -f bmad/ppt/.build-meta.json
@@ -424,11 +454,13 @@ test $? -eq 0
 **依赖**: TASK-015
 
 **步骤**:
+
 - [x] 编辑`package.json`
 - [x] 在`scripts`中添加`"build:ppt": "node src/modules/ppt/build.js"`
 - [x] 测试`npm run build:ppt`
 
 **验收标准**:
+
 ```bash
 grep -q '"build:ppt"' package.json
 npm run build:ppt
@@ -446,6 +478,7 @@ test $? -eq 0
 **依赖**: TASK-015
 
 **步骤**:
+
 - [x] 手动检查生成的`bmad/ppt/agents/ppt-master.md`
 - [x] 验证XML结构完整性
 - [x] 验证activation blocks正确
@@ -453,6 +486,7 @@ test $? -eq 0
 - [x] 对比与APS agents的格式一致性
 
 **验收标准**:
+
 ```bash
 # 验证ppt-master XML结构
 grep -q '<agent id="bmad/ppt/agents/ppt-master.md"' bmad/ppt/agents/ppt-master.md
@@ -475,6 +509,7 @@ grep -q '<item cmd="\*create-ppt"' bmad/ppt/agents/ppt-master.md
 **依赖**: TASK-017
 
 **步骤**:
+
 - [x] 创建`.claude/commands/bmad/`目录（如不存在）
 - [x] 创建6个命令文件：
   - `ppt.md` → `@/bmad/ppt/agents/ppt-master.md`
@@ -485,6 +520,7 @@ grep -q '<item cmd="\*create-ppt"' bmad/ppt/agents/ppt-master.md
   - `ppt-file.md` → `@/bmad/ppt/agents/file-generator.md`
 
 **验收标准**:
+
 ```bash
 test $(find .claude/commands/bmad -name "ppt*.md" | wc -l) -eq 6
 grep -q '@/bmad/ppt/agents/ppt-master.md' .claude/commands/bmad/ppt.md
@@ -502,11 +538,13 @@ grep -q '@/bmad/ppt/agents/story-designer.md' .claude/commands/bmad/ppt-story.md
 **依赖**: TASK-017
 
 **步骤**:
+
 - [x] 编辑`bmad/_cfg/workflow-manifest.csv`
 - [x] 添加行：`"ppt-creator","Complete 5-stage PPT creation: Story → Pages → Visual → Content → File. 8 themes, 20 layouts, HITL at 2 key points","ppt","bmad/ppt/workflows/ppt-creator-workflow.yaml"`
 - [x] 验证CSV格式正确
 
 **验收标准**:
+
 ```bash
 grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 grep -q 'bmad/ppt/workflows/ppt-creator-workflow.yaml' bmad/_cfg/workflow-manifest.csv
@@ -523,6 +561,7 @@ grep -q 'bmad/ppt/workflows/ppt-creator-workflow.yaml' bmad/_cfg/workflow-manife
 **依赖**: TASK-018, TASK-019
 
 **步骤**:
+
 - [x] 编辑`src/modules/ppt/_module-installer/installer.js`
 - [x] 添加`triggerBuild()`函数
 - [x] 添加`registerToBMAD()`函数
@@ -533,6 +572,7 @@ grep -q 'bmad/ppt/workflows/ppt-creator-workflow.yaml' bmad/_cfg/workflow-manife
 - [x] 复制到`bmad/ppt/_module-installer/`（构建时）
 
 **验收标准**:
+
 ```bash
 test -f src/modules/ppt/_module-installer/installer.js
 grep -q 'triggerBuild' src/modules/ppt/_module-installer/installer.js
@@ -550,6 +590,7 @@ grep -q 'registerToBMAD' src/modules/ppt/_module-installer/installer.js
 **依赖**: TASK-020
 
 **步骤**:
+
 - [x] 清理环境（删除`.claude/commands/bmad/ppt*.md`）
 - [x] 执行`bash bmad/ppt/_module-installer/install.sh`
 - [x] 验证构建自动触发
@@ -558,6 +599,7 @@ grep -q 'registerToBMAD' src/modules/ppt/_module-installer/installer.js
 - [x] 检查日志输出清晰性
 
 **验收标准**:
+
 ```bash
 bash bmad/ppt/_module-installer/install.sh
 test $? -eq 0
@@ -579,6 +621,7 @@ grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 **依赖**: TASK-021
 
 **步骤**:
+
 - [ ] 在Claude Code中测试`/bmad-ppt`
 - [ ] 验证ppt-master主菜单显示
 - [ ] 测试`/bmad-ppt-story`
@@ -586,6 +629,7 @@ grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 - [ ] 测试其他4个单阶段命令
 
 **验收标准**:
+
 - `/bmad-ppt` → 显示主菜单，包含8个选项
 - `/bmad-ppt-story` → 激活story-designer agent
 - 所有6个命令均可正常激活
@@ -601,6 +645,7 @@ grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 **依赖**: TASK-022
 
 **步骤**:
+
 - [ ] 使用`/bmad-ppt`启动
 - [ ] 选择`*create-ppt`（完整workflow）
 - [ ] 使用quickstart示例输入
@@ -609,6 +654,7 @@ grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 - [ ] 对比迁移前后生成结果一致性
 
 **验收标准**:
+
 - 5阶段workflow正常运行
 - Story Blueprint、Page Manifest、Visual Design Spec正常生成
 - 最终PPTX文件生成成功
@@ -625,6 +671,7 @@ grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 **依赖**: TASK-023
 
 **步骤**:
+
 - [ ] 使用相同的quickstart-input.yaml
 - [ ] 对比迁移前后生成的PPTX
 - [ ] 验证内容结构一致
@@ -632,6 +679,7 @@ grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 - [ ] 验证文件元数据一致
 
 **验收标准**:
+
 - Story Blueprint结构相同
 - Page Manifest内容相同
 - Visual Design Spec相同
@@ -648,12 +696,14 @@ grep -q 'ppt-creator' bmad/_cfg/workflow-manifest.csv
 **依赖**: TASK-024
 
 **步骤**:
+
 - [ ] 更新`bmad/ppt/README.md`（添加架构说明）
 - [ ] 创建`MIGRATION_GUIDE.md`（迁移指南）
 - [ ] 更新主项目README（如需要）
 - [ ] 添加开发流程文档（build→test→install）
 
 **验收标准**:
+
 ```bash
 test -f bmad/ppt/README.md
 test -f docs/ppt-agent-system/MIGRATION_GUIDE.md
@@ -672,12 +722,14 @@ grep -q "npm run build:ppt" docs/ppt-agent-system/MIGRATION_GUIDE.md
 **Given**: 源码目录`src/modules/ppt/`已完成
 **When**: 执行`npm run build:ppt`
 **Then**:
+
 - 构建成功，无错误
 - `bmad/ppt/agents/`包含8个`.md`文件
 - `.build-meta.json`格式正确
 - 资源文件完整复制
 
 **验证命令**:
+
 ```bash
 npm run build:ppt
 test $? -eq 0
@@ -692,11 +744,13 @@ test -f bmad/ppt/.build-meta.json
 **Given**: 安装器已运行
 **When**: 在Claude Code中输入`/bmad-ppt`
 **Then**:
+
 - 激活ppt-master agent
 - 显示主菜单（8个选项）
 - 可选择完整workflow或单阶段agent
 
 **手动验证**:
+
 - `/bmad-ppt` → 主菜单显示
 - `/bmad-ppt-story` → Story Designer激活
 - `/bmad-ppt-page` → Page Planner激活
@@ -709,6 +763,7 @@ test -f bmad/ppt/.build-meta.json
 **Given**: PPT模块已安装
 **When**: 执行完整5阶段workflow
 **Then**:
+
 - Story Design阶段完成（Story Blueprint生成）
 - Page Planning阶段完成（Page Manifest生成）
 - Visual Design阶段完成（Visual Design Spec生成）
@@ -717,6 +772,7 @@ test -f bmad/ppt/.build-meta.json
 - 生成的PPTX质量与迁移前一致
 
 **手动验证**:
+
 ```
 /bmad-ppt
 → 选择 *create-ppt
@@ -732,16 +788,19 @@ test -f bmad/ppt/.build-meta.json
 ## 风险缓解措施
 
 **备份策略**:
+
 - ✅ 所有操作前备份`bmad/ppt/`
 - ✅ 保留备份至少7天
 - ✅ 文档化回滚步骤
 
 **测试策略**:
+
 - ✅ 每完成一个Agent就测试构建
 - ✅ 增量验证，及时发现问题
 - ✅ 端到端测试确保功能无变化
 
 **质量门禁**:
+
 - ✅ M1完成前：源码目录和资源验证通过
 - ✅ M2完成前：所有8个agents YAML格式验证通过
 - ✅ M3完成前：构建系统正常工作，生成文件符合规范
@@ -796,22 +855,26 @@ TASK-025 (文档更新)
 ## 完成标准
 
 **架构合规性**:
+
 - [x] 源码目录`src/modules/ppt/`结构完整
 - [x] 所有8个agents转换为YAML格式
 - [x] 构建系统正常工作
 - [x] 生成的agents符合BMAD XML规范
 
 **功能完整性**:
+
 - [x] 所有现有PPT功能保持不变
 - [x] 5阶段workflow正常运行
 - [x] 生成的PPTX质量一致
 
 **框架集成**:
+
 - [x] 6个Slash Commands可用
 - [x] Workflow已注册
 - [x] 安装器支持构建和注册
 
 **质量验证**:
+
 - [x] 构建无错误
 - [x] E2E测试通过
 - [x] 回归测试通过
@@ -831,6 +894,7 @@ _此任务清单由OpenSpec系统生成 - 2025-11-23_
 ### 已完成工作
 
 **Day 1 上午 - 源码迁移** (TASK-001~005):
+
 - ✅ 创建完整源码目录结构 `src/modules/ppt/`
 - ✅ 备份现有分发目录 `bmad/ppt.backup-20251123`
 - ✅ 复制全部资源文件（60个YAML专家库 + 8个schemas + 1个workflow）
@@ -838,12 +902,14 @@ _此任务清单由OpenSpec系统生成 - 2025-11-23_
 - ✅ 验证资源完整性通过
 
 **Day 1 下午 - Agent转换** (TASK-006~013):
+
 - ✅ 转换7个现有agents为YAML格式
 - ✅ 创建新的`ppt-master.agent.yaml`主入口
 - ✅ 所有8个agents验证通过（85条critical_actions + 99个menu选项）
 - ✅ YAML语法和结构验证100%通过
 
 **Day 2 上午 - 构建系统** (TASK-014~017):
+
 - ✅ 创建`build.js`构建脚本（参考APS模块）
 - ✅ 集成YamlXmlBuilder工具
 - ✅ 首次构建测试成功（0.24秒，8个agents）
@@ -851,6 +917,7 @@ _此任务清单由OpenSpec系统生成 - 2025-11-23_
 - ✅ 生成的agents符合BMAD XML规范
 
 **Day 2 下午 - 框架集成** (TASK-018~021):
+
 - ✅ 创建6个Slash Commands（/bmad-ppt, /bmad-ppt-story等）
 - ✅ 注册workflow到manifest
 - ✅ 升级installer.js支持自动构建和注册
@@ -860,11 +927,13 @@ _此任务清单由OpenSpec系统生成 - 2025-11-23_
 ### 待完成工作
 
 **测试验证** (TASK-022~024):
+
 - ⏳ Slash Command激活测试
 - ⏳ 端到端PPT创建测试
 - ⏳ 回归测试（对比迁移前后一致性）
 
 **文档更新** (TASK-025):
+
 - ⏳ 更新`bmad/ppt/README.md`添加架构说明
 - ⏳ 创建`MIGRATION_GUIDE.md`
 - ⏳ 更新主项目README（如需要）
@@ -872,12 +941,14 @@ _此任务清单由OpenSpec系统生成 - 2025-11-23_
 ### 关键成果
 
 **架构迁移**:
+
 - 完整的源码/分发分离架构
 - YAML格式agents作为源码（可读可维护）
 - 自动化构建系统（YAML→XML Markdown）
 - 0.15~0.24秒构建速度
 
 **质量指标**:
+
 - 8个agents全部转换成功
 - 85条critical_actions定义完整
 - 99个menu选项提供完整交互
@@ -885,6 +956,7 @@ _此任务清单由OpenSpec系统生成 - 2025-11-23_
 - 100% XML结构验证通过
 
 **框架集成**:
+
 - 6个Slash Commands注册成功
 - 1个Workflow注册到manifest
 - 自动化安装器完整实现

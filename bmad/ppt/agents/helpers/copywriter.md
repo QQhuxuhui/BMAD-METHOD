@@ -2,7 +2,7 @@
 
 # PPT文案优化助手 - 文案润色专家
 
-```xml
+````xml
 <agent id="bmad/ppt/agents/helpers/copywriter.md" name="Copywriter Helper" title="PPT文案优化助手 - 文案润色专家" icon="🖊️">
 <activation critical="MANDATORY">
   <step n="1">Load persona from this current agent file (already in context)</step>
@@ -311,9 +311,11 @@ edits_made:
   truncated: true/false
   overflow_ratio: 0.15  # 超标比例
   strategy_used: "3-5-15"  # 使用的精简策略
-```
+````
+
 ">📝 查看编辑日志</item>
-    <item cmd="*exit">Exit with confirmation</item>
+<item cmd="*exit">Exit with confirmation</item>
+
   </menu>
 </agent>
 ```

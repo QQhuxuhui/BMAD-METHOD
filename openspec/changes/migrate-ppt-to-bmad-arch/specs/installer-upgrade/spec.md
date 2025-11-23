@@ -16,6 +16,7 @@ The installer file location MUST be updated to follow the source-distribution se
 **Priority**: P0 (Critical)
 
 **Acceptance Criteria**:
+
 - 两个位置的安装器保持同步
 - 用户仍从`bmad/ppt/_module-installer/`执行安装
 
@@ -24,10 +25,12 @@ The installer file location MUST be updated to follow the source-distribution se
 **Given**: 构建系统已配置
 **When**: 执行`npm run build:ppt`
 **Then**:
+
 - `src/modules/ppt/_module-installer/`内容被复制到`bmad/ppt/_module-installer/`
 - 两个目录的installer.js内容完全一致
 
 **Validation**:
+
 ```bash
 diff src/modules/ppt/_module-installer/installer.js bmad/ppt/_module-installer/installer.js
 test $? -eq 0
@@ -38,10 +41,12 @@ test $? -eq 0
 ## Cross-References
 
 **依赖于**:
+
 - `build-system` - 需要调用构建脚本
 - `slash-command-integration` - 需要创建命令文件
 
 **被依赖于**:
+
 - 无（这是最后一步）
 
 ---
@@ -83,7 +88,7 @@ async function registerToBMAD() {
     'ppt-page.md': '@/bmad/ppt/agents/page-planner.md',
     'ppt-visual.md': '@/bmad/ppt/agents/visual-stylist.md',
     'ppt-content.md': '@/bmad/ppt/agents/content-producer.md',
-    'ppt-file.md': '@/bmad/ppt/agents/file-generator.md'
+    'ppt-file.md': '@/bmad/ppt/agents/file-generator.md',
   };
 
   for (const [filename, content] of Object.entries(commands)) {
@@ -96,8 +101,9 @@ async function registerToBMAD() {
   if (await fs.pathExists(manifestPath)) {
     const content = await fs.readFile(manifestPath, 'utf-8');
     if (!content.includes('ppt-creator')) {
-      await fs.appendFile(manifestPath,
-        '\n"ppt-creator","Complete 5-stage PPT creation workflow","ppt","bmad/ppt/workflows/ppt-creator-workflow.yaml"'
+      await fs.appendFile(
+        manifestPath,
+        '\n"ppt-creator","Complete 5-stage PPT creation workflow","ppt","bmad/ppt/workflows/ppt-creator-workflow.yaml"',
       );
       console.log(chalk.green('  ✓ Registered ppt-creator workflow'));
     } else {
@@ -111,8 +117,8 @@ async function registerToBMAD() {
 async function install() {
   // ... 现有逻辑 ...
 
-  await triggerBuild();      // 新增
-  await registerToBMAD();    // 新增
+  await triggerBuild(); // 新增
+  await registerToBMAD(); // 新增
 
   // ... 后续逻辑 ...
 }

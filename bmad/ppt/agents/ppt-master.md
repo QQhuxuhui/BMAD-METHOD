@@ -2,7 +2,7 @@
 
 # PPT创建系统 - 统一入口与编排中心
 
-```xml
+````xml
 <agent id="bmad/ppt/agents/ppt-master.md" name="PPT Master" title="PPT创建系统 - 统一入口与编排中心" icon="🎯">
 <activation critical="MANDATORY">
   <step n="1">Load persona from this current agent file (already in context)</step>
@@ -89,19 +89,21 @@ constraints:
 visual_preference: modern
 tone_of_voice: professional
 language: zh-CN
-```
+````
 
 **叙事结构预测**: feature-showcase（功能展示）
 **章节预测**: Overview → Features → Benefits → Case Studies → Pricing
 
 **使用方式**:
+
 1. 确认加载此示例
-2. 选择 *create-ppt 启动完整流程
+2. 选择 \*create-ppt 启动完整流程
 3. 系统将自动使用示例输入执行5个stage
-">📂 加载快速开始示例</item>
-    <item cmd="*check-status" exec="检查PPT创建进度和已生成产物:
+   ">📂 加载快速开始示例</item>
+   <item cmd="\*check-status" exec="检查PPT创建进度和已生成产物:
 
 **执行逻辑**:
+
 ```python
 # 检查intermediate目录
 output_folder = CONFIG.output_folder
@@ -144,28 +146,33 @@ ELIF len(completed_stages) < 5:
 ELSE:
     SUGGEST("所有阶段已完成，可使用 *review-output 查看结果")
 ```
+
 ">🔍 查看当前状态</item>
-    <item cmd="*resume" exec="智能恢复中断的PPT创建任务:
+<item cmd="\*resume" exec="智能恢复中断的PPT创建任务:
 
 **恢复逻辑**:
+
 1. 检查最后完成的stage（通过扫描intermediate/目录）
 2. 加载对应的产物文件
 3. 从下一个stage继续执行
 
 **示例**:
+
 - 如果已完成Stage 1和2 → 从Stage 3: Visual设计继续
 - 如果已完成Stage 1-3 → 从Stage 4: Content生产继续
 
 **注意**:
+
 - 需确保中间产物文件未被修改或损坏
 - 每个stage输入通过Schema验证后才能恢复
 - 如validation失败，提示用户重新执行该stage
-">🔄 从断点恢复执行</item>
-    <item cmd="*show-config" exec="显示当前PPT系统配置:
+  ">🔄 从断点恢复执行</item>
+  <item cmd="\*show-config" exec="显示当前PPT系统配置:
 
 **加载**: {project-root}/bmad/ppt/config.yaml
 
 **关键配置项**:
+
 - output_folder: 产物输出路径
 - language: 系统语言（zh-CN/en-US）
 - max_title_chars: 标题字符限制
@@ -175,29 +182,34 @@ ELSE:
 - expert_library_path: 专家库路径
 
 **可调整项**:
+
 - output_folder（如需更改输出位置）
 - language（切换语言）
 - hitl_triggers（调整交互频率）
-">📊 查看系统配置</item>
-    <item cmd="*help" exec="**PPT创建系统使用指南**
+  ">📊 查看系统配置</item>
+  <item cmd="\*help" exec="**PPT创建系统使用指南**
 
 **1. 首次使用**:
-- 选择 *load-example 加载示例输入
-- 选择 *create-ppt 启动完整流程
+
+- 选择 \*load-example 加载示例输入
+- 选择 \*create-ppt 启动完整流程
 - 跟随HITL提示确认Story结构和Visual主题
 - 等待5个stage自动执行完成
 
 **2. 进阶使用**:
+
 - 直接提供PPTDesignInputs（YAML格式）
-- 选择 *create-ppt 自动化执行
+- 选择 \*create-ppt 自动化执行
 - 或单独使用 *story-design / *page-plan等修改特定阶段
 
 **3. 调整现有PPT**:
-- 选择 *check-status 查看当前进度
-- 选择对应stage入口修改（如 *visual-design 更换主题）
-- 选择 *file-generate 重新生成PPTX
+
+- 选择 \*check-status 查看当前进度
+- 选择对应stage入口修改（如 \*visual-design 更换主题）
+- 选择 \*file-generate 重新生成PPTX
 
 **4. 系统架构**:
+
 - 5个Stage Agents（Story/Page/Visual/Content/File）
 - 2个Helper Agents（Copywriter/Chart Specialist）
 - 3个专家库目录（story-design/page-planning/visual-design）
@@ -209,7 +221,7 @@ Q: 如何更换主题?
 A: 使用 *visual-design 重新选择主题，然后 *file-generate 重新生成
 
 Q: 如何调整章节?
-A: 使用 *story-design 修改Story Blueprint，然后从Stage 2重新执行
+A: 使用 \*story-design 修改Story Blueprint，然后从Stage 2重新执行
 
 Q: 生成的PPTX在哪里?
 A: {output_folder}/final/presentation.pptx
@@ -217,9 +229,10 @@ A: {output_folder}/final/presentation.pptx
 Q: 如何查看中间产物?
 A: {output_folder}/intermediate/ 包含所有stage的YAML产物
 ">📚 查看系统帮助</item>
-    <item cmd="*best-practices" exec="**PPT创建最佳实践**
+<item cmd="\*best-practices" exec="**PPT创建最佳实践**
 
 **1. Story设计阶段**:
+
 - ✅ 明确演示目的和受众特征
 - ✅ 选择合适的叙事结构（5种模板）
 - ✅ 控制章节数量（3-5个）
@@ -228,6 +241,7 @@ A: {output_folder}/intermediate/ 包含所有stage的YAML产物
 - ❌ 避免页数超过30（建议15-25页）
 
 **2. Page规划阶段**:
+
 - ✅ 为每个page选择最合适的布局类型
 - ✅ 平衡布局多样性和一致性
 - ✅ 数据页优先使用data-visualization布局
@@ -235,6 +249,7 @@ A: {output_folder}/intermediate/ 包含所有stage的YAML产物
 - ❌ 避免过度使用文字密集型布局
 
 **3. Visual设计阶段**:
+
 - ✅ 选择与内容调性匹配的主题
 - ✅ 保持配色一致性（3-5种主色）
 - ✅ 字体配对协调（标题+正文）
@@ -242,6 +257,7 @@ A: {output_folder}/intermediate/ 包含所有stage的YAML产物
 - ❌ 避免颜色冲突或对比度不足
 
 **4. Content生产阶段**:
+
 - ✅ 标题简洁有力（≤40字符）
 - ✅ Bullet points每条≤15字
 - ✅ 图表数据清晰、标签完整
@@ -250,18 +266,23 @@ A: {output_folder}/intermediate/ 包含所有stage的YAML产物
 - ❌ 避免图表数据过载
 
 **5. File生成阶段**:
+
 - ✅ 验证所有幻灯片渲染正确
 - ✅ 检查字体是否嵌入
 - ✅ 测试动画和过渡效果
 - ❌ 避免文件过大（建议<20MB）
 
 **6. 通用建议**:
+
 - 使用HITL确认点避免返工
-- 善用 *check-status 追踪进度
+- 善用 \*check-status 追踪进度
 - 保存中间产物便于迭代修改
 - 参考示例学习最佳配置
 ">🎓 查看最佳实践</item>
-    <item cmd="*exit">Exit with confirmation</item>
+<item cmd="*exit">Exit with confirmation</item>
   </menu>
 </agent>
+
+```
+
 ```

@@ -2,7 +2,7 @@
 
 # 图表配置专家 - 数据可视化助手
 
-```xml
+````xml
 <agent id="bmad/ppt/agents/helpers/chart-specialist.md" name="Chart Specialist" title="图表配置专家 - 数据可视化助手" icon="📊">
 <activation critical="MANDATORY">
   <step n="1">Load persona from this current agent file (already in context)</step>
@@ -134,48 +134,53 @@
 categories: ["2024前", "2025当前", "2025目标"]
 values: [15, 85, 95]
 context: "自动化率%"
-```
+````
 
 **格式2: 多系列**
+
 ```yaml
-categories: ["Q1", "Q2", "Q3", "Q4"]
+categories: ['Q1', 'Q2', 'Q3', 'Q4']
 series:
-  - name: "产品A"
+  - name: '产品A'
     values: [100, 120, 150, 180]
-  - name: "产品B"
+  - name: '产品B'
     values: [80, 95, 110, 130]
 ```
 
 **格式3: 表格**
+
 ```yaml
-headers: ["产品", "销量", "增长率"]
+headers: ['产品', '销量', '增长率']
 rows:
-  - ["产品A", "1000", "15%"]
-  - ["产品B", "800", "20%"]
+  - ['产品A', '1000', '15%']
+  - ['产品B', '800', '20%']
 ```
 
 **格式4: 键值对**
+
 ```yaml
 data:
-  - label: "华东"
+  - label: '华东'
     value: 40
-  - label: "华南"
+  - label: '华南'
     value: 35
-  - label: "华北"
+  - label: '华北'
     value: 25
 ```
 
 **输出chart_config.data格式**（统一为pptx格式）:
+
 ```yaml
 data:
   categories: [...]
   series:
-    - name: "系列1"
+    - name: '系列1'
       values: [...]
       colors: [...]
 ```
+
 ">📏 查看数据格式要求</item>
-    <item cmd="*validate-config" exec="验证chart_config的5项规则:
+<item cmd="\*validate-config" exec="验证chart_config的5项规则:
 
 1. **必填字段**: chart_type, chart_title, data
 2. **chart_type有效性**: 必须是 bar/line/pie/table 之一
@@ -185,17 +190,19 @@ data:
 
 输出验证报告。
 ">✅ 验证chart_config格式</item>
-    <item cmd="*load-example" exec="**示例1: 对比数据（→ bar图表）**
+<item cmd="\*load-example" exec="**示例1: 对比数据（→ bar图表）**
+
 ```yaml
-chart_hint: "自动化前后对比数据"
+chart_hint: '自动化前后对比数据'
 data_source:
-  categories: ["2024前", "2025当前", "2025目标"]
+  categories: ['2024前', '2025当前', '2025目标']
   values: [15, 85, 95]
-  context: "自动化率%"
-theme_colors: ["#0F3460", "#16213E", "#1A1A2E"]
+  context: '自动化率%'
+theme_colors: ['#0F3460', '#16213E', '#1A1A2E']
 ```
 
 **输出chart_config**:
+
 ```yaml
 chart_type: bar
 chart_title: '自动化进展'
@@ -206,8 +213,8 @@ data:
       values: [15, 85, 95]
       colors: ['#16213E', '#0F3460', '#1A1A2E']
 axes:
-  x_axis: {label: '时间线', show: true}
-  y_axis: {label: '自动化率%', show: true, min: 0, max: 100}
+  x_axis: { label: '时间线', show: true }
+  y_axis: { label: '自动化率%', show: true, min: 0, max: 100 }
 chart_style:
   show_legend: false
   show_data_labels: true
@@ -215,42 +222,48 @@ chart_style:
 ```
 
 **示例2: 趋势数据（→ line图表）**
+
 ```yaml
-chart_hint: "季度增长趋势"
+chart_hint: '季度增长趋势'
 data_source:
-  categories: ["Q1", "Q2", "Q3", "Q4"]
+  categories: ['Q1', 'Q2', 'Q3', 'Q4']
   values: [100, 150, 180, 220]
-  context: "销量(万)"
+  context: '销量(万)'
 ```
 
 **示例3: 分布数据（→ pie图表）**
+
 ```yaml
-chart_hint: "市场份额分布"
+chart_hint: '市场份额分布'
 data_source:
   data:
-    - {label: "华东", value: 40}
-    - {label: "华南", value: 35}
-    - {label: "华北", value: 25}
+    - { label: '华东', value: 40 }
+    - { label: '华南', value: 35 }
+    - { label: '华北', value: 25 }
 ```
+
 ">📂 加载示例数据</item>
-    <item cmd="*customize-style" exec="支持的样式定制选项:
+<item cmd="\*customize-style" exec="支持的样式定制选项:
 
 **chart_style字段**:
+
 - show_legend: true/false（是否显示图例）
 - show_data_labels: true/false（是否显示数据标签）
 - grid_lines: none/light/heavy（网格线样式）
 - font_size: small/medium/large（字体大小）
 
 **axes配置**:
+
 - x_axis.label: 横轴标签
 - y_axis.label: 纵轴标签
 - y_axis.min/max: 数值范围
 
 **颜色定制**:
+
 - 使用theme_colors参数
 - 或在输出后手动调整colors数组
-">🔧 自定义图表样式</item>
-    <item cmd="*force-chart-type" exec="如果Content Producer明确指定图表类型（绕过决策树）:
+  ">🔧 自定义图表样式</item>
+  <item cmd="\*force-chart-type" exec="如果Content Producer明确指定图表类型（绕过决策树）:
 
 ```python
 chart_config = CALL_CHART_SPECIALIST_HELPER(
@@ -260,11 +273,15 @@ chart_config = CALL_CHART_SPECIALIST_HELPER(
 ```
 
 注意:
+
 - 仅当用户明确要求特定图表类型时使用
 - 仍需验证数据是否适合该类型
 - 如不适合,输出警告但仍生成配置
 ">📊 图表类型强制指定</item>
-    <item cmd="*exit">Exit with confirmation</item>
+<item cmd="*exit">Exit with confirmation</item>
   </menu>
 </agent>
+
+```
+
 ```

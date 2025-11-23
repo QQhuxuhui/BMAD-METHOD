@@ -16,6 +16,7 @@ The build system MUST generate metadata file to record build information.
 **Priority**: P0 (Critical)
 
 **Acceptance Criteria**:
+
 - 文件`.build-meta.json`包含模块名称
 - 包含构建时间戳
 - 包含源码哈希值
@@ -26,12 +27,14 @@ The build system MUST generate metadata file to record build information.
 **Given**: 构建已完成
 **When**: 读取`bmad/ppt/.build-meta.json`
 **Then**:
+
 - JSON包含`module: "ppt"`
 - 包含`buildTime`字段（ISO 8601格式）
 - 包含`sourceHash`字段
 - 包含`agents: 8`
 
 **Validation**:
+
 ```bash
 node -e "
 const meta = require('./bmad/ppt/.build-meta.json');
@@ -48,10 +51,12 @@ console.log('✅ Build metadata valid');
 ## Cross-References
 
 **依赖于**:
+
 - `source-migration` - 需要源码目录和资源文件
 - `agent-conversion` - 需要YAML agents已创建
 
 **被依赖于**:
+
 - `installer-upgrade` - 安装器需要触发构建
 
 ---

@@ -25,13 +25,17 @@
 #### 1. Agent格式不符合BMAD规范
 
 **当前格式**（简单Markdown）：
+
 ```markdown
 # Story Designer Agent
+
 ## 角色定位
+
 你是Story Designer,PPT创建系统Stage 1的专家Agent...
 ```
 
 **应该是**（BMAD XML格式）：
+
 ```xml
 <agent id="bmad/ppt/agents/story-designer.md"
        name="Story Designer"
@@ -60,6 +64,7 @@
 ```
 
 **需要重构的Agents**（6个主Agent + 2个Helper）：
+
 - `story-designer.md`
 - `page-planner.md`
 - `visual-stylist.md`
@@ -122,31 +127,37 @@
 需要在 `.claude/commands/bmad/` 创建slash command文件：
 
 **文件**: `.claude/commands/bmad/ppt.md`
+
 ```markdown
 @/bmad/ppt/agents/ppt-master.md
 ```
 
 **文件**: `.claude/commands/bmad/ppt-story.md`
+
 ```markdown
 @/bmad/ppt/agents/story-designer.md
 ```
 
 **文件**: `.claude/commands/bmad/ppt-page.md`
+
 ```markdown
 @/bmad/ppt/agents/page-planner.md
 ```
 
 **文件**: `.claude/commands/bmad/ppt-visual.md`
+
 ```markdown
 @/bmad/ppt/agents/visual-stylist.md
 ```
 
 **文件**: `.claude/commands/bmad/ppt-content.md`
+
 ```markdown
 @/bmad/ppt/agents/content-producer.md
 ```
 
 **文件**: `.claude/commands/bmad/ppt-file.md`
+
 ```markdown
 @/bmad/ppt/agents/file-generator.md
 ```
@@ -195,6 +206,7 @@ EOF
 **时间估算**: 2-3小时
 
 **关键点**:
+
 - 保持现有功能逻辑不变
 - 添加XML activation结构
 - 添加menu系统
@@ -207,6 +219,7 @@ EOF
 **时间估算**: 30分钟
 
 **关键点**:
+
 - 提供完整workflow入口
 - 提供单阶段Agent入口
 - 集成示例加载功能
@@ -218,6 +231,7 @@ EOF
 **时间估算**: 30分钟
 
 **关键点**:
+
 - 在 `.claude/commands/bmad/` 创建命令文件
 - 更新 `workflow-manifest.csv`
 - 更新 `task-manifest.csv`（如需要）
@@ -229,6 +243,7 @@ EOF
 **时间估算**: 1小时
 
 **关键点**:
+
 - 添加BMAD注册步骤
 - 添加slash command创建
 - 添加manifest更新
@@ -240,6 +255,7 @@ EOF
 **时间估算**: 1小时
 
 **测试场景**:
+
 1. 使用 `/bmad-ppt` 启动PPT模块
 2. 从主菜单选择完整workflow
 3. 从主菜单选择单阶段Agent
@@ -281,23 +297,28 @@ bash bmad/ppt/_module-installer/install.sh
 ## 改造收益
 
 ### 1. **标准化集成**
+
 - 符合BMAD架构规范
 - 与其他模块（bmb、core、aps）一致的使用体验
 
 ### 2. **便捷访问**
+
 - 通过slash command快速激活
 - 无需手动告知Claude使用哪个系统
 
 ### 3. **框架感知**
+
 - 在 `/bmad-master` 的模块列表中显示
 - workflow在 `*list-workflows` 中可见
 
 ### 4. **专业体验**
+
 - Agent persona系统
 - 菜单驱动交互
 - 状态管理和上下文保持
 
 ### 5. **可扩展性**
+
 - 未来可添加更多PPT相关workflows
 - 可集成到更大的文档生成系统
 

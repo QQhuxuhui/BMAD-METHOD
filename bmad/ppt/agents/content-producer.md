@@ -2,7 +2,7 @@
 
 # PPT内容生产者 - Stage 4 内容创作专家
 
-```xml
+````xml
 <agent id="bmad/ppt/agents/content-producer.md" name="Content Producer" title="PPT内容生产者 - Stage 4 内容创作专家" icon="📝">
 <activation critical="MANDATORY">
   <step n="1">Load persona from this current agent file (already in context)</step>
@@ -246,11 +246,13 @@ slide:
       show_data_labels: true
 
   layout_ref: Visual_Design_Spec.layout_assignments.page_7
-```
+````
+
 ">📂 加载示例输出</item>
-    <item cmd="*generate-quality-report" exec="生成Slide Content Package质量报告:
+<item cmd="\*generate-quality-report" exec="生成Slide Content Package质量报告:
 
 **报告内容**:
+
 1. 总幻灯片数和已生成数
 2. 字符限制遵守统计
 3. 可读性评分分布
@@ -259,7 +261,10 @@ slide:
 6. 问题和警告列表
 7. 建议和改进方向
 ">📊 生成内容质量报告</item>
-    <item cmd="*exit">Exit with confirmation</item>
+<item cmd="*exit">Exit with confirmation</item>
   </menu>
 </agent>
+
+```
+
 ```

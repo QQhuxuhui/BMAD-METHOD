@@ -40,11 +40,13 @@ src/modules/ppt/                    # 源码根目录
 ### 源码 vs 分发目录
 
 **源码目录** (`src/modules/ppt/`):
+
 - 开发时编辑的YAML格式agents
 - 版本控制的原始文件
 - 构建脚本和配置
 
 **分发目录** (`bmad/ppt/`):
+
 - **自动生成**的Markdown格式agents（包含XML结构）
 - 构建产物，不应手动编辑
 - 实际被BMAD框架加载的文件
@@ -58,6 +60,7 @@ src/modules/ppt/                    # 源码根目录
 ### 1. 修改Agent
 
 编辑YAML源文件：
+
 ```bash
 # 修改某个agent
 vim src/modules/ppt/agents/story-designer.agent.yaml
@@ -66,6 +69,7 @@ vim src/modules/ppt/agents/story-designer.agent.yaml
 ### 2. 构建模块
 
 将YAML转换为Markdown（XML格式）：
+
 ```bash
 # 方式1: 使用npm script
 npm run build:ppt
@@ -166,7 +170,7 @@ agent:
   menu:
     - description: 🚀 开始Story设计
       trigger: start-design
-      workflow: "{project-root}/bmad/ppt/workflows/..."
+      workflow: '{project-root}/bmad/ppt/workflows/...'
 ```
 
 ### Markdown格式 (构建产物)
@@ -214,6 +218,7 @@ agent:
 ### Workflow注册
 
 在 `bmad/_cfg/workflow-manifest.csv`:
+
 ```csv
 "ppt-creator","Complete 5-stage PPT creation workflow","ppt","bmad/ppt/workflows/ppt-creator-workflow.yaml"
 ```
@@ -238,14 +243,17 @@ bash bmad/ppt/_module-installer/install.sh
 ## 参考资料
 
 **架构参考**:
+
 - `src/modules/aps/` - APS模块（相同架构）
 - `src/modules/aps/build.js` - 构建脚本参考
 
 **文档**:
+
 - `docs/ppt-agent-system/bmad-integration-plan.md` - 迁移计划
 - `openspec/changes/migrate-ppt-to-bmad-arch/` - OpenSpec提案
 
 **工具**:
+
 - `tools/cli/lib/yaml-xml-builder.js` - YAML→XML构建工具
 
 ---
@@ -255,8 +263,8 @@ bash bmad/ppt/_module-installer/install.sh
 **Q: 为什么要分离源码和分发目录？**
 A: 遵循软件工程最佳实践，源码易于编辑和版本控制，分发产物自动化生成，确保一致性。
 
-**Q: 可以直接编辑 bmad/ppt/agents/*.md 吗？**
-A: 不建议。这些是构建产物，下次构建时会被覆盖。应编辑 src/modules/ppt/agents/*.agent.yaml。
+**Q: 可以直接编辑 bmad/ppt/agents/\*.md 吗？**
+A: 不建议。这些是构建产物，下次构建时会被覆盖。应编辑 src/modules/ppt/agents/\*.agent.yaml。
 
 **Q: 如何添加新的Agent？**
 A: 在 src/modules/ppt/agents/ 创建新的 .agent.yaml 文件，参考现有agent格式，然后运行 npm run build:ppt。

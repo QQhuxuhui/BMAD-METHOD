@@ -2,7 +2,7 @@
 
 # PPT文件生成器 - Stage 5 PPTX生成专家
 
-```xml
+````xml
 <agent id="bmad/ppt/agents/file-generator.md" name="File Generator" title="PPT文件生成器 - Stage 5 PPTX生成专家" icon="📁">
 <activation critical="MANDATORY">
   <step n="1">Load persona from this current agent file (already in context)</step>
@@ -97,13 +97,15 @@
   <!-- 基于layout_zones生成内容 -->
 </body>
 </html>
-```
+````
+
 ">📄 生成单页HTML</item>
-    <item cmd="*convert-chart" exec="将chart_config转换为PptxGenJS兼容格式:
+<item cmd="\*convert-chart" exec="将chart_config转换为PptxGenJS兼容格式:
 
 **关键转换**: 去除HEX颜色的#前缀
 
 示例:
+
 ```python
 # 原始颜色 (YAML)
 colors: ["#0F3460", "#16213E", "#1A1A2E"]
@@ -114,7 +116,7 @@ colors: ["0F3460", "16213E", "1A1A2E"]
 
 **函数**: REMOVE_HASH_PREFIX(color)
 ">📊 转换图表配置</item>
-    <item cmd="*validate-pptx" exec="验证生成的PPTX文件的5项规则:
+<item cmd="\*validate-pptx" exec="验证生成的PPTX文件的5项规则:
 
 1. ✅ **文件存在且非空**:
    file_size > 1KB
@@ -133,35 +135,40 @@ colors: ["0F3460", "16213E", "1A1A2E"]
 
 5. ✅ **缩略图生成成功** (可选):
    使用thumbnail.py生成预览图
-">📊 验证PPTX质量</item>
-    <item cmd="*count-slides" exec="统计PPTX文件中的幻灯片数量:
+   ">📊 验证PPTX质量</item>
+   <item cmd="\*count-slides" exec="统计PPTX文件中的幻灯片数量:
 
 **方法1**: 使用markitdown提取文本
+
 ```bash
 python -m markitdown {pptx_path}
 # 统计 "## Slide" 出现次数
 ```
 
 **方法2**: 解压PPTX统计XML文件
+
 ```bash
 unzip {pptx_path} -d {temp_dir}
 ls {temp_dir}/ppt/slides/slide*.xml | wc -l
 ```
+
 ">💾 统计幻灯片数量</item>
-    <item cmd="*check-structure" exec="验证PPTX文件结构完整性:
+<item cmd="\*check-structure" exec="验证PPTX文件结构完整性:
 
 **必需文件**:
+
 - [Content_Types].xml
 - ppt/presentation.xml
 - ppt/slides/slide1.xml
 
 **验证步骤**:
+
 1. 解压PPTX到临时目录
 2. 检查必需文件是否存在
 3. 尝试解析presentation.xml（验证XML格式）
 4. 清理临时目录
-">🔍 验证PPTX结构</item>
-    <item cmd="*retry-overflow" exec="处理Content overflow错误（最多3次重试）:
+   ">🔍 验证PPTX结构</item>
+   <item cmd="\*retry-overflow" exec="处理Content overflow错误（最多3次重试）:
 
 **Retry 1**: 减少padding 10%
 adjustment = { padding_reduction: 0.1 }
@@ -174,9 +181,10 @@ adjustment = { padding_reduction: 0.2, font_size_reduction: 0.1 }
 
 **Fallback**: 如果仍失败，触发Fallback导出
 ">🔄 溢出错误重试机制</item>
-    <item cmd="*fallback-export" exec="生成失败时创建design_export.zip:
+<item cmd="\*fallback-export" exec="生成失败时创建design_export.zip:
 
 **包含文件**:
+
 - README.md (使用说明)
 - story_blueprint.yaml
 - page_manifest.yaml
@@ -188,17 +196,18 @@ adjustment = { padding_reduction: 0.2, font_size_reduction: 0.1 }
 
 **ZIP路径**: {output_folder}/design_export.zip
 ">🚨 Fallback导出机制</item>
-    <item cmd="*show-errors" exec="**常见错误类型**:
+<item cmd="\*show-errors" exec="**常见错误类型**:
 
-| 错误 | 原因 | 解决方案 |
-|------|------|----------|
-| Content overflow | HTML内容超出720pt×405pt | 减少padding，缩小字号，重试 |
-| Module not found | Node.js依赖缺失 | npm install pptxgenjs playwright sharp |
-| Invalid color | 颜色包含#前缀 | 去除#前缀 |
-| Chart data format | 数据格式不兼容 | 检查chart_type和数据结构 |
-| File too large | 生成文件>50MB | 压缩图片，减少页数 |
+| 错误              | 原因                    | 解决方案                               |
+| ----------------- | ----------------------- | -------------------------------------- |
+| Content overflow  | HTML内容超出720pt×405pt | 减少padding，缩小字号，重试            |
+| Module not found  | Node.js依赖缺失         | npm install pptxgenjs playwright sharp |
+| Invalid color     | 颜色包含#前缀           | 去除#前缀                              |
+| Chart data format | 数据格式不兼容          | 检查chart_type和数据结构               |
+| File too large    | 生成文件>50MB           | 压缩图片，减少页数                     |
+
 ">🔧 查看常见错误和解决方案</item>
-    <item cmd="*generate-thumbnails" exec="生成PPTX的缩略图预览:
+<item cmd="\*generate-thumbnails" exec="生成PPTX的缩略图预览:
 
 ```bash
 python scripts/thumbnail.py {pptx_path} {output_dir}/thumbnails
@@ -206,18 +215,21 @@ python scripts/thumbnail.py {pptx_path} {output_dir}/thumbnails
 
 **输出**: 所有幻灯片的缩略图（PNG格式）
 ">🖼️ 生成缩略图</item>
-    <item cmd="*generate-markdown" exec="将Slide Content Package转换为Markdown格式:
+<item cmd="\*generate-markdown" exec="将Slide Content Package转换为Markdown格式:
 
 **格式**:
+
 ```markdown
 # 幻灯片内容
 
 ## Slide 1: cover
 
 ### Title
+
 [标题文本]
 
 ### Subtitle
+
 [副标题文本]
 
 ---
@@ -225,64 +237,68 @@ python scripts/thumbnail.py {pptx_path} {output_dir}/thumbnails
 ## Slide 7: data-chart
 
 ### Title
+
 [标题文本]
 
 ### Chart: 自动化进展
+
 Type: bar
 Data:
+
 - 自动化率(%): [15, 85, 95]
 
 ---
 ```
+
 ">📝 生成Markdown幻灯片内容</item>
-    <item cmd="*load-example-script" exec="**示例PptxGenJS脚本**:
+<item cmd="\*load-example-script" exec="**示例PptxGenJS脚本**:
 
 ```javascript
 const pptxgen = require('pptxgenjs');
 const html2pptx = require('html2pptx.js');
 
 async function generatePresentation() {
-    const pptx = new pptxgen();
-    pptx.layout = 'LAYOUT_16x9';
-    pptx.author = 'PPT Agent System';
-    pptx.title = 'Business Pitch';
+  const pptx = new pptxgen();
+  pptx.layout = 'LAYOUT_16x9';
+  pptx.author = 'PPT Agent System';
+  pptx.title = 'Business Pitch';
 
-    // Slide 1
-    const { slide: slide1, placeholders: ph1 } =
-        await html2pptx('html_slides/slide_01.html', pptx);
+  // Slide 1
+  const { slide: slide1, placeholders: ph1 } = await html2pptx('html_slides/slide_01.html', pptx);
 
-    // Slide 7 with chart
-    const { slide: slide7, placeholders: ph7 } =
-        await html2pptx('html_slides/slide_07.html', pptx);
+  // Slide 7 with chart
+  const { slide: slide7, placeholders: ph7 } = await html2pptx('html_slides/slide_07.html', pptx);
 
-    const chartData7 = [
-        {
-            name: '自动化率(%)',
-            labels: ['2024前', '2025当前', '2025目标'],
-            values: [15, 85, 95]
-        }
-    ];
+  const chartData7 = [
+    {
+      name: '自动化率(%)',
+      labels: ['2024前', '2025当前', '2025目标'],
+      values: [15, 85, 95],
+    },
+  ];
 
-    slide7.addChart(pptx.charts.BAR, chartData7, {
-        ...ph7[0],
-        showTitle: true,
-        title: '自动化进展',
-        chartColors: ['0F3460', '16213E', '1A1A2E']
-    });
+  slide7.addChart(pptx.charts.BAR, chartData7, {
+    ...ph7[0],
+    showTitle: true,
+    title: '自动化进展',
+    chartColors: ['0F3460', '16213E', '1A1A2E'],
+  });
 
-    // Save
-    await pptx.writeFile({ fileName: 'output.pptx' });
+  // Save
+  await pptx.writeFile({ fileName: 'output.pptx' });
 }
 
-generatePresentation().catch(err => {
-    console.error('Error:', err);
-    process.exit(1);
+generatePresentation().catch((err) => {
+  console.error('Error:', err);
+  process.exit(1);
 });
 ```
+
 ">📂 加载示例PptxGenJS脚本</item>
-    <item cmd="*generate-validation-report" exec="生成PPTX文件质量验证报告:
+<item cmd="\*generate-validation-report" exec="生成PPTX文件质量验证报告:
 
 **报告内容**:
+
 1. 文件基本信息（大小、页数）
 2. 结构完整性验证结果
 3. 页面数量一致性检查
@@ -291,7 +307,10 @@ generatePresentation().catch(err => {
 6. 重试次数和调整记录
 7. 最终结论（成功/Fallback）
 ">📊 生成质量验证报告</item>
-    <item cmd="*exit">Exit with confirmation</item>
+<item cmd="*exit">Exit with confirmation</item>
   </menu>
 </agent>
+
+```
+
 ```

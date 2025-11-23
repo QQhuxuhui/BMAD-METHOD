@@ -397,7 +397,21 @@ agent:
                   type: integer
                 page_type:
                   type: string
-                  enum: [cover, agenda, section-divider, text-heavy, image-focus, data-chart, data-table, comparison, timeline, process-flow, quote, summary]
+                  enum:
+                    [
+                      cover,
+                      agenda,
+                      section-divider,
+                      text-heavy,
+                      image-focus,
+                      data-chart,
+                      data-table,
+                      comparison,
+                      timeline,
+                      process-flow,
+                      quote,
+                      summary,
+                    ]
                 section_ref:
                   type: string
                 content_slots:
