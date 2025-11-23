@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>APS调度智能体系统 - 产品介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 右上角三角装饰 */
+        .triangle-decoration {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 150px 150px 0;
+            border-color: transparent #0066FF transparent transparent;
+        }
+
+        .triangle-decoration::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -130px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 80px 80px 0;
+            border-color: transparent #FFB800 transparent transparent;
+        }
+
+        .triangle-decoration::before {
+            content: '';
+            position: absolute;
+            top: 60px;
+            right: -90px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 40px 40px 0;
+            border-color: transparent white transparent transparent;
+        }
+
+        /* 标题区 */
+        .slide-header {
+            background: linear-gradient(135deg, #0066FF 0%, #3399FF 100%);
+            padding: 15px 80px;
+            color: white;
+            height: 10vh;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .slide-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* 内容区 */
+        .slide-content {
+            flex: 1;
+            padding: 30px 80px;
+            overflow: auto;
+        }
+
+        /* 封面样式 */
+        .cover-slide {
+            background: linear-gradient(135deg, #0066FF 0%, #3399FF 50%, #66B3FF 100%);
+            color: white;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cover-title {
+            font-size: 72px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .cover-subtitle {
+            font-size: 36px;
+            margin-bottom: 60px;
+            opacity: 0.95;
+        }
+
+        .cover-info {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-top: 40px;
+        }
+
+        .cover-info div {
+            margin: 10px 0;
+        }
+
+        /* 内容框样式 */
+        .content-box {
+            background: white;
+            border-left: 5px solid #0066FF;
+            padding: 30px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .content-box-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 20px;
+        }
+
+        .content-box-text {
+            font-size: 18px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        .content-box-text p {
+            margin: 15px 0;
+        }
+
+        /* 两栏布局 */
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            margin: 20px 0;
+        }
+
+        /* 高亮框 */
+        .highlight-box {
+            background: #FFF8E1;
+            border-left: 5px solid #FFB800;
+            padding: 25px;
+            margin: 20px 0;
+        }
+
+        .highlight-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FF8F00;
+            margin-bottom: 15px;
+        }
+
+        .highlight-text {
+            font-size: 18px;
+            color: #333;
+            line-height: 1.8;
+        }
+
+        /* 数据展示 */
+        .stat-row {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            margin: 30px 0;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            min-width: 200px;
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 10px;
+        }
+
+        .stat-label {
+            font-size: 16px;
+            color: #666;
+        }
+
+        /* 列表样式 */
+        .bullet-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .bullet-list li {
+            padding: 12px 0 12px 30px;
+            font-size: 18px;
+            color: #333;
+            line-height: 1.8;
+            position: relative;
+        }
+
+        .bullet-list li::before {
+            content: '▸';
+            color: #0066FF;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 20px;
+        }
+
+        /* 问题-价值框 */
+        .problem-value-box {
+            background: linear-gradient(135deg, #f8f9ff 0%, #ffffff 100%);
+            border: 2px dashed #0066FF;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 20px 0;
+        }
+
+        .problem-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #c62828;
+            margin-bottom: 15px;
+            padding-left: 15px;
+            border-left: 5px solid #c62828;
+        }
+
+        .section-title.tech {
+            color: #0066FF;
+            border-left-color: #0066FF;
+        }
+
+        .section-title.value {
+            color: #2e7d32;
+            border-left-color: #2e7d32;
+        }
+
+        .section-content {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #333;
+            margin-left: 20px;
+        }
+
+        /* 技术卡片 */
+        .tech-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 15px 0;
+            transition: all 0.3s;
+        }
+
+        .tech-card:hover {
+            border-color: #0066FF;
+            box-shadow: 0 4px 12px rgba(0,102,255,0.15);
+        }
+
+        .tech-card-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 15px;
+        }
+
+        .tech-card-content {
+            font-size: 17px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        /* 对比表格 */
+        .compare-table {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 25px 0;
+        }
+
+        .compare-item {
+            padding: 20px;
+            border-radius: 8px;
+        }
+
+        .compare-item.old {
+            background: #ffebee;
+            border-left: 5px solid #c62828;
+        }
+
+        .compare-item.new {
+            background: #e8f5e9;
+            border-left: 5px solid #2e7d32;
+        }
+
+        .compare-label {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .compare-label.old {
+            color: #c62828;
+        }
+
+        .compare-label.new {
+            color: #2e7d32;
+        }
+
+        .compare-text {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #333;
+        }
+
+        /* 页码 */
+        .page-number {
+            position: absolute;
+            bottom: 30px;
+            right: 80px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        /* 三栏数据 */
+        .three-col {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin: 25px 0;
+        }
+
+        /* 流程图样式 */
+        .flowchart {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 25px 0;
+        }
+
+        .flow-step {
+            background: linear-gradient(135deg, #0066FF 0%, #3399FF 100%);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            margin: 10px 0;
+            position: relative;
+        }
+
+        .flow-step.highlight {
+            background: linear-gradient(135deg, #FFB800 0%, #FFA000 100%);
+        }
+
+        .flow-arrow {
+            text-align: center;
+            color: #0066FF;
+            font-size: 24px;
+            margin: 5px 0;
+        }
+
+        .flow-description {
+            font-size: 14px;
+            color: #666;
+            text-align: center;
+            margin-top: 5px;
+        }
+
+        /* 架构图样式 */
+        .architecture-diagram {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 25px 0;
+        }
+
+        .arch-layer {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            background: #f8f9ff;
+        }
+
+        .arch-layer-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .arch-boxes {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .arch-box {
+            background: white;
+            border: 2px solid #0066FF;
+            border-radius: 6px;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #0066FF;
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .arch-box.center {
+            background: linear-gradient(135deg, #0066FF 0%, #3399FF 100%);
+            color: white;
+            border: none;
+            font-size: 16px;
+            padding: 18px 25px;
+        }
+
+        .arch-box.support {
+            border-color: #FFB800;
+            color: #FFB800;
+        }
+
+        .arch-connector {
+            text-align: center;
+            color: #0066FF;
+            font-size: 20px;
+            margin: 10px 0;
+        }
+
+        /* 对比架构图 */
+        .compare-arch {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 25px 0;
+        }
+
+        .arch-item {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .arch-item.old {
+            border-color: #c62828;
+        }
+
+        .arch-item.new {
+            border-color: #2e7d32;
+        }
+
+        .arch-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .arch-title.old {
+            color: #c62828;
+        }
+
+        .arch-title.new {
+            color: #2e7d32;
+        }
+
+        .arch-visual {
+            background: #f5f5f5;
+            border-radius: 6px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+
+        .token-bar {
+            background: #e0e0e0;
+            height: 30px;
+            border-radius: 4px;
+            position: relative;
+            margin: 15px 0;
+        }
+
+        .token-fill {
+            background: linear-gradient(90deg, #c62828 0%, #d32f2f 100%);
+            height: 100%;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .token-fill.new {
+            background: linear-gradient(90deg, #2e7d32 0%, #388e3c 100%);
+        }
+
+        /* 三层加载图 */
+        .loading-diagram {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 30px;
+            margin: 25px 0;
+        }
+
+        .loading-layer {
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px solid #0066FF;
+            position: relative;
+        }
+
+        .loading-layer::before {
+            content: attr(data-layer);
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: white;
+            padding: 0 10px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #0066FF;
+        }
+
+        .loading-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .loading-content {
+            flex: 1;
+            font-size: 15px;
+            color: #333;
+        }
+
+        .loading-stats {
+            background: #f8f9ff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            text-align: center;
+            min-width: 150px;
+        }
+
+        .loading-stats-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066FF;
+        }
+
+        .loading-stats-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1366px) {
+            .slide-title { font-size: 40px; }
+            .slide-content { padding: 40px 60px; }
+        }
+
+        @media print {
+            .slide {
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <!-- 第1页: 封面 -->
+        <div class="slide cover-slide">
+            <div class="triangle-decoration"></div>
+            <div style="text-align: center;">
+                <div class="cover-title">APS调度智能体系统</div>
+                <div class="cover-subtitle">从业务需求到可执行代码的端到端AI专家团队</div>
+                <div style="font-size: 28px; margin: 40px 0; opacity: 0.9;">
+                    Advanced Planning & Scheduling Agent System
+                </div>
+                <div class="cover-info">
+                    <div>版本: V4.3 (1.0.0-alpha)</div>
+                    <div>架构基础: BMAD-CORE v6-alpha</div>
+                    <div>发布时间: 2025-10-20</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 第2页: 产品定位与核心价值 -->
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">产品定位与核心价值</div>
+                <div class="slide-subtitle">让非专家也能快速获得专业级调度解决方案</div>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div>
+                        <div class="content-box">
+                            <div class="content-box-title">📌 产品定位</div>
+                            <div class="content-box-text">
+                                <p>APS调度智能体系统是一个面向调度优化领域的专业AI Agent系统,通过7个专家智能体的协作,提供从需求分析到代码生成的端到端调度问题求解能力。系统将调度优化专家经验知识化、模块化、自动化,让业务人员无需运筹学背景即可获得专业级调度方案。</p>
+                            </div>
+                        </div>
+
+                        <div class="highlight-box">
+                            <div class="highlight-title">🎯 核心价值主张</div>
+                            <div class="highlight-text">
+                                <p><strong>降低专业门槛:</strong> 业务人员通过自然语言描述需求,无需运筹学和编程背景,即可获得专业级调度优化方案。学习成本从数月培训降低至10分钟上手。</p>
+                                <p><strong>提升开发效率:</strong> 开发周期从传统的2-4周缩短至3-5天,效率提升85%。专家参与时间从80小时降至2小时,节省95%的专家时间。</p>
+                                <p><strong>保证方案质量:</strong> 基于验证过的知识模板生成代码,可用率达92%,远超通用AI的50-70%。需求理解准确度95%+,约束建模准确度99%+。</p>
+                                <p><strong>沉淀知识资产:</strong> 将专家经验标准化为可复用的知识模板,实现70-85%的知识复用率,确保组织知识资产的持续积累和传承。</p>
+                            </div>
+                        </div>
+
+                        <div class="stat-row" style="margin-top: 20px;">
+                            <div class="stat-item">
+                                <div class="stat-value">92%</div>
+                                <div class="stat-label">代码直接可用率</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">85%</div>
+                                <div class="stat-label">开发效率提升</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="content-box">
+                            <div class="content-box-title">⚙️ Theory-to-Code 端到端自动化</div>
+                            <div class="content-box-text">
+                                <p>系统实现从自然语言需求到可执行代码的完整自动化流程:</p>
+
+                                <div class="flowchart">
+                                    <div class="flow-step">① 需求理解</div>
+                                    <div class="flow-description">自然语言处理 → 提取关键要素和约束条件</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step">② 十要素建模</div>
+                                    <div class="flow-description">构建TenElementModel统一真相源</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step highlight">③ 7专家协调</div>
+                                    <div class="flow-description">算法/约束/目标/领域 四维度并行协作</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step">④ 方案集成</div>
+                                    <div class="flow-description">融合专家建议 → 生成技术方案</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step">⑤ 代码生成</div>
+                                    <div class="flow-description">基于验证模板 → Python优化代码</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step">⑥ 质量保证</div>
+                                    <div class="flow-description">6层质量门禁验证 → 可直接运行</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number">2</div>
+        </div>
+
+        <!-- 第3页: 系统架构 - 七大专家智能体团队 -->
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">系统架构</div>
+                <div class="slide-subtitle">专业化分工 + 智能协作 + 知识复用</div>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <div class="content-box-title">🏗️ 七大专家智能体团队</div>
+                    <div class="content-box-text">
+                        <p>系统采用专业化分工的智能体协作架构,每个智能体专注于特定领域,通过统一的十要素模型(TenElementModel)进行协作。这种设计既保证了各领域的专业深度,又通过标准化接口实现了高效协作。</p>
+                    </div>
+                </div>
+
+                <!-- 添加架构图 -->
+                <div class="architecture-diagram">
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">编排层</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box center">🎯 系统编排协调智能体</div>
+                        </div>
+                        <div style="text-align: center; font-size: 14px; color: #666; margin-top: 10px;">Phase 0-4 流程编排 | 专家协调 | 人机交互触发 | 状态持久化 | Todo任务追踪</div>
+                    </div>
+
+                    <div class="arch-connector">↕</div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">协作中枢</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box" style="background: linear-gradient(135deg, #FFB800 0%, #FFA000 100%); color: white; border: none; font-size: 16px; padding: 18px 25px;">📋 TenElementModel (统一真相源)</div>
+                        </div>
+                        <div style="text-align: center; font-size: 14px; color: #666; margin-top: 10px;">决策变量 | 约束 | 目标 | 算法 | 时间模型 | 不确定性 | 求解器配置 | 输入输出</div>
+                    </div>
+
+                    <div class="arch-connector">↕</div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">核心专家层 (四大领域专家)</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box">🔧 调度算法专家<br><small>张效率</small></div>
+                            <div class="arch-box">📏 约束模式专家<br><small>李严谨</small></div>
+                            <div class="arch-box">🎯 目标优化专家<br><small>王目标</small></div>
+                            <div class="arch-box">🌐 领域应用专家<br><small>赵领域</small></div>
+                        </div>
+                        <div style="text-align: center; font-size: 14px; color: #666; margin-top: 10px;">30+算法模板 | 50+约束模板 | 40+目标模板 | 多领域知识库</div>
+                    </div>
+
+                    <div class="arch-connector">↕</div>
+
+                    <div class="arch-layer">
+                        <div class="arch-layer-title">支持专家层</div>
+                        <div class="arch-boxes">
+                            <div class="arch-box support">📚 算法扩展指导<br><small>钱扩展</small></div>
+                            <div class="arch-box support">✅ 质量评测专家<br><small>孙质量</small></div>
+                        </div>
+                        <div style="text-align: center; font-size: 14px; color: #666; margin-top: 10px;">知识模板化 | 6层质量门禁</div>
+                    </div>
+                </div>
+
+                <div class="two-column" style="margin-top: 30px;">
+                    <div>
+                        <div class="tech-card">
+                            <div class="tech-card-title">🔧 调度算法专家 (张效率)</div>
+                            <div class="tech-card-content">
+                                <p><strong>专业领域:</strong> 调度算法选择与参数优化</p>
+                                <p><strong>知识库:</strong> 精确算法/启发式/元启发式,共30+算法模板</p>
+                                <p><strong>核心能力:</strong> 算法推荐(决策树智能匹配) | 复杂度分析与性能预测 | Theory-to-Code代码生成 | 算法参数配置优化</p>
+                                <p><strong>Token优化:</strong> 通过Sidecar模式,节省87%的Token消耗</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-card">
+                            <div class="tech-card-title">📏 约束模式专家 (李严谨)</div>
+                            <div class="tech-card-content">
+                                <p><strong>专业领域:</strong> 约束识别、建模与验证</p>
+                                <p><strong>知识库:</strong> 容量/时间/空间/逻辑/业务规则,50+约束模板</p>
+                                <p><strong>核心能力:</strong> 约束自动识别与分类 | 数学建模(线性/非线性/整数约束) | 约束验证与冲突检测 | 业务规则到数学约束的转换</p>
+                                <p><strong>准确度:</strong> 约束建模准确度达99%+</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="tech-card">
+                            <div class="tech-card-title">🎯 目标优化专家 (王目标)</div>
+                            <div class="tech-card-content">
+                                <p><strong>专业领域:</strong> 优化目标设计与多目标权衡</p>
+                                <p><strong>知识库:</strong> 成本/时间/效率/质量/可持续性,40+目标模板</p>
+                                <p><strong>核心能力:</strong> 目标函数设计与建模 | 多目标优化建模(加权/帕累托) | 权重配置与灵敏度分析 | 目标评估指标设计</p>
+                            </div>
+                        </div>
+
+                        <div class="tech-card">
+                            <div class="tech-card-title">🌐 领域应用专家 (赵领域)</div>
+                            <div class="tech-card-content">
+                                <p><strong>专业领域:</strong> 行业领域知识与最佳实践</p>
+                                <p><strong>知识库:</strong> 物流/制造/服务/项目/供应链等领域</p>
+                                <p><strong>核心能力:</strong> 领域自动识别(VRP/JSP/RCPSP等) | 业务规则提取与转换 | 领域适配器生成 | 行业最佳实践推荐</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-title">💡 架构优势</div>
+                    <div class="highlight-text">
+                        <p><strong>专业深度:</strong> 每个智能体专注特定领域,拥有该领域的完整知识库和专业能力 | <strong>协作效率:</strong> 通过TenElementModel统一真相源,实现跨专家无缝协作 | <strong>Token优化:</strong> Sidecar按需加载机制,平均节省75-87%的Token消耗 | <strong>质量保证:</strong> 多层验证机制,确保方案的准确性和一致性</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number">3</div>
+        </div>
+
+        <!-- 第4页: 技术创新1 - Doc-as-Agent智能体架构 -->
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">技术创新 ①</div>
+                <div class="slide-subtitle">Doc-as-Agent: 智能体即文档,文档即智能体</div>
+            </div>
+            <div class="slide-content">
+                <div class="problem-value-box">
+                    <div class="problem-section">
+                        <div class="section-title tech">💡 采用的技术方案</div>
+                        <div class="section-content">
+                            <p>提出"文档即智能体(Doc as Agent)"理念,将传统"智能体包含知识"的架构转变为"文档本身就是智能体"的创新设计。智能体定义采用轻量级YAML配置(500 tokens),包含角色定位、核心行为和菜单指令,而专业能力来自模块化的Markdown知识文档库,按需动态加载。</p>
+
+                            <!-- 添加对比架构图 -->
+                            <div class="compare-arch">
+                                <div class="arch-item old">
+                                    <div class="arch-title old">❌ 传统 Agent as Prompt</div>
+                                    <div class="arch-visual">
+                                        <div style="background: #c62828; color: white; padding: 15px; border-radius: 6px; margin: 10px 0; font-weight: bold; text-align: center;">Agent = Prompt + 嵌入知识</div>
+                                        <div style="margin: 15px 0;">
+                                            <div class="token-bar">
+                                                <div class="token-fill" style="width: 100%;">50K+ tokens</div>
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 14px; color: #666; text-align: left; line-height: 1.8;">
+                                            <p>• 全部知识打包在Prompt中</p>
+                                            <p>• 每次调用加载所有内容</p>
+                                            <p>• 利用率仅10-20%</p>
+                                            <p>• 更新需重写整个Prompt</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="arch-item new">
+                                    <div class="arch-title new">✅ 创新 Doc as Agent</div>
+                                    <div class="arch-visual">
+                                        <div style="background: #2e7d32; color: white; padding: 12px; border-radius: 6px; margin: 10px 0; font-weight: bold; text-align: center;">Agent定义 (500 tokens)</div>
+                                        <div style="text-align: center; margin: 10px 0; color: #0066FF; font-size: 20px;">⬇ 按需加载</div>
+                                        <div style="background: #f8f9ff; padding: 12px; border-radius: 6px; border: 2px dashed #0066FF;">
+                                            <div style="font-size: 13px; text-align: center; color: #333;">
+                                                知识库索引 (5K) → 分类索引 (2-3K) → 具体模板 (1-2K)
+                                            </div>
+                                        </div>
+                                        <div style="margin: 15px 0;">
+                                            <div class="token-bar">
+                                                <div class="token-fill new" style="width: 30%;">8-15K tokens</div>
+                                            </div>
+                                        </div>
+                                        <div style="font-size: 14px; color: #666; text-align: left; line-height: 1.8;">
+                                            <p>• 智能体与知识分离</p>
+                                            <p>• 三层渐进式按需加载</p>
+                                            <p>• 利用率达80%+</p>
+                                            <p>• 文档更新几分钟生效</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p><strong>核心机制:</strong></p>
+                            <ul class="bullet-list">
+                                <li><strong>轻量级智能体定义:</strong> 每个智能体仅500 tokens,包含角色定位(role/identity)、核心行为(critical_actions)和命令工作流,不嵌入具体知识</li>
+                                <li><strong>模块化知识文档库:</strong> 按领域分类构建知识库(algorithm-library/constraint-library/objective-library/domain-library),每个知识模块采用标准化YAML模板,包含数学表达、实现说明、适用场景、参数配置等</li>
+                                <li><strong>动态知识加载引擎:</strong> 三层加载机制 - 初始化加载智能体定义(500 tokens) → 执行critical_actions加载知识库索引(5K tokens) → 根据需求特征动态加载具体知识模块(2-5K tokens)</li>
+                                <li><strong>智能体行为与文档的双向映射:</strong> 建立智能体行为与文档内容的精确映射关系,智能体行为可追溯到具体文档,文档更新自动影响智能体行为</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="problem-section">
+                        <div class="section-title">❌ 解决的核心问题</div>
+                        <div class="section-content">
+                            <p><strong>传统Agent as Prompt模式的痛点:</strong></p>
+                            <ul class="bullet-list">
+                                <li><strong>Token使用效率低:</strong> 传统架构需将全部知识嵌入Prompt,每次调用约50K tokens,但实际利用率仅10-20%,造成严重的资源浪费</li>
+                                <li><strong>知识维护成本高:</strong> 知识更新需要重写整个Prompt或重新训练模型,维护周期长达数天,需要专业AI工程师参与</li>
+                                <li><strong>系统扩展性差:</strong> 新增知识导致Prompt膨胀,受长度限制影响性能,难以支持大规模知识库</li>
+                                <li><strong>版本管理困难:</strong> 知识更新无法独立进行版本控制,团队协作时容易产生冲突,难以追溯变更历史</li>
+                                <li><strong>专家经验传承难:</strong> 专业知识以非结构化方式嵌入Prompt,难以实现标准化、模块化传承和跨项目复用</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="problem-section">
+                        <div class="section-title value">✅ 带来的业务价值</div>
+                        <div class="section-content">
+                            <div class="three-col">
+                                <div>
+                                    <p><strong>Token效率显著提升</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>从50K+ → 8-15K tokens</li>
+                                        <li>效率提升: 75-87%</li>
+                                        <li>响应速度提升: 3-5倍</li>
+                                        <li>成本降低: 约80%</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <p><strong>知识维护效率提升</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>从数天 → 几分钟</li>
+                                        <li>效率提升: 100倍+</li>
+                                        <li>业务专家可直接操作</li>
+                                        <li>支持实时更新生效</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <p><strong>系统扩展性增强</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>支持数千个知识模块</li>
+                                        <li>知识模块独立版本管理</li>
+                                        <li>多团队并行开发</li>
+                                        <li>跨项目知识复用</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <p style="margin-top: 20px;"><strong>专家经验标准化传承:</strong> 通过标准化的文档模板,实现专家经验的模块化沉淀。新人学习曲线从3个月缩短至2周,组织知识资产持续积累不流失,知识复用率达70-85%。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number">4</div>
+        </div>
+
+        <!-- 第5页: 技术创新2 - Sidecar按需加载机制 -->
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">技术创新 ②</div>
+                <div class="slide-subtitle">Sidecar模式: 按需加载的专家库体系设计</div>
+            </div>
+            <div class="slide-content">
+                <div class="problem-value-box">
+                    <div class="problem-section">
+                        <div class="section-title tech">💡 采用的技术方案</div>
+                        <div class="section-content">
+                            <p>采用Sidecar模式构建分离式知识库架构,将知识库与智能体运行时完全分离,实现按需、独立、高效的知识加载。通过三层渐进式加载机制和智能知识组合引擎,在保证知识完整性的同时,大幅提升加载效率。</p>
+
+                            <!-- 添加三层加载示意图 -->
+                            <div class="loading-diagram">
+                                <div class="loading-layer" data-layer="第一层">
+                                    <div class="loading-info">
+                                        <div class="loading-content">
+                                            <strong>知识库索引 (README.md)</strong><br>
+                                            内容: 知识分类体系 + 决策树 + 快速检索表
+                                        </div>
+                                        <div class="loading-stats">
+                                            <div class="loading-stats-value">5K</div>
+                                            <div class="loading-stats-label">tokens | 约5秒</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center; color: #0066FF; font-size: 24px; margin: 15px 0;">⬇ 按需加载</div>
+
+                                <div class="loading-layer" data-layer="第二层">
+                                    <div class="loading-info">
+                                        <div class="loading-content">
+                                            <strong>分类索引 (精确算法/启发式/元启发式)</strong><br>
+                                            内容: 该分类下所有模板概要 + 适用条件
+                                        </div>
+                                        <div class="loading-stats">
+                                            <div class="loading-stats-value">2-3K</div>
+                                            <div class="loading-stats-label">tokens | 2-3秒</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="text-align: center; color: #0066FF; font-size: 24px; margin: 15px 0;">⬇ 精准加载</div>
+
+                                <div class="loading-layer" data-layer="第三层">
+                                    <div class="loading-info">
+                                        <div class="loading-content">
+                                            <strong>具体知识模板 (遗传算法/节约算法等)</strong><br>
+                                            内容: 完整数学表达 + 实现细节 + 参数配置 + 使用示例
+                                        </div>
+                                        <div class="loading-stats">
+                                            <div class="loading-stats-value">1-2K</div>
+                                            <div class="loading-stats-label">tokens | 1-2秒</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="background: #f8f9ff; padding: 20px; border-radius: 8px; margin-top: 20px; text-align: center;">
+                                    <div style="font-size: 18px; font-weight: bold; color: #2e7d32; margin-bottom: 10px;">✅ 总消耗: 8-15K tokens (节省75-87%)</div>
+                                    <div style="font-size: 14px; color: #666;">利用率从10-20% → 80%+ | 加载时间从30-60秒 → 5-10秒</div>
+                                </div>
+                            </div>
+
+                            <p><strong>智能知识组合引擎:</strong> 实现需求分析 → 模板匹配 → 依赖分析 → 冲突检测 → 组合优化 → 动态加载的完整流程,能够根据用户需求自动识别、匹配和组合相关知识模板。</p>
+
+                            <p><strong>知识质量保证体系:</strong> 语法验证(YAML格式/必需字段/数据类型) + 语义验证(数学表达式/参数合理性/逻辑一致性) + 实用验证(场景匹配度/复杂度评估/用户反馈),确保知识库的准确性和实用性。</p>
+                        </div>
+                    </div>
+
+                    <div class="problem-section">
+                        <div class="section-title">❌ 解决的核心问题</div>
+                        <div class="section-content">
+                            <p><strong>传统静态知识库的局限:</strong></p>
+                            <ul class="bullet-list">
+                                <li><strong>知识加载效率低:</strong> 传统方案需要加载全部知识,无论实际使用多少。一个完整的调度优化知识库可能包含数百个算法模板、约束模板和目标模板,全部加载会消耗50K+tokens和30-60秒时间</li>
+                                <li><strong>知识更新困难:</strong> 更新知识需要重新加载整个系统或重新训练模型,维护成本极高。对于频繁更新的业务规则和算法参数,这种方式无法满足实时性需求</li>
+                                <li><strong>知识复用性差:</strong> 知识片段缺乏标准化模板,难以跨项目、跨领域复用。不同项目重复开发相似功能,造成严重的资源浪费</li>
+                                <li><strong>扩展性有限:</strong> 新增知识可能导致系统性能下降或超出内存限制,难以支持大规模知识库的持续增长</li>
+                                <li><strong>协作效率低:</strong> 多专家协作时,知识重复加载,版本冲突严重,缺乏有效的版本管理和冲突解决机制</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="problem-section">
+                        <div class="section-title value">✅ 带来的业务价值</div>
+                        <div class="section-content">
+                            <div class="compare-table">
+                                <div class="compare-item old">
+                                    <div class="compare-label old">传统静态加载方式</div>
+                                    <div class="compare-text">
+                                        <p><strong>加载方式:</strong> 系统启动时加载全部知识</p>
+                                        <p><strong>Token消耗:</strong> 50K+ tokens</p>
+                                        <p><strong>加载时间:</strong> 30-60秒</p>
+                                        <p><strong>利用率:</strong> 10-20%</p>
+                                        <p><strong>更新周期:</strong> 数天(需重新部署)</p>
+                                        <p><strong>扩展性:</strong> 受内存和长度限制</p>
+                                    </div>
+                                </div>
+                                <div class="compare-item new">
+                                    <div class="compare-label new">Sidecar按需加载方式</div>
+                                    <div class="compare-text">
+                                        <p><strong>加载方式:</strong> 三层渐进式按需加载</p>
+                                        <p><strong>Token消耗:</strong> 8-15K tokens</p>
+                                        <p><strong>加载时间:</strong> 5-10秒</p>
+                                        <p><strong>利用率:</strong> 80%+</p>
+                                        <p><strong>更新周期:</strong> 几分钟(热更新)</p>
+                                        <p><strong>扩展性:</strong> 支持无限扩展</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="three-col" style="margin-top: 30px;">
+                                <div>
+                                    <p><strong>知识复用率大幅提升</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>模板复用率: 70-85%</li>
+                                        <li>跨项目复用: 减少重复开发60%</li>
+                                        <li>跨领域迁移: 支持知识迁移应用</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <p><strong>协作效率显著提升</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>版本冲突减少: 90%</li>
+                                        <li>协作效率提升: 80%</li>
+                                        <li>知识一致性: 100%</li>
+                                    </ul>
+                                </div>
+                                <div>
+                                    <p><strong>系统可扩展性增强</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>支持数千个知识模板</li>
+                                        <li>多专家并行开发</li>
+                                        <li>知识动态插拔更新</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <p style="margin-top: 20px;"><strong>实际应用效果:</strong> 在车辆路径优化问题中,传统方式需要加载所有路径算法(50+种),消耗50K tokens。采用Sidecar模式后,系统仅加载VRP相关的遗传算法、节约算法等5-6个模板,消耗12K tokens,节省76%,响应速度提升5倍。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number">5</div>
+        </div>
+
+        <!-- 第6页: 技术创新3 - Guardrails强约束 + 状态持久化 -->
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">技术创新 ③</div>
+                <div class="slide-subtitle">Guardrails强约束 + 智能体长任务避免幻觉机制</div>
+            </div>
+            <div class="slide-content">
+                <div class="content-box" style="margin-bottom: 30px;">
+                    <div class="content-box-title">🛡️ Guardrails强约束 + ⚡ 智能体长任务避免幻觉机制</div>
+                    <div class="content-box-text">
+                        <p>通过强制引用机制和状态持久化管理,确保AI智能体在长时间任务执行中保持准确性和一致性,杜绝幻觉,保证质量。</p>
+                    </div>
+                </div>
+
+                <div class="two-column">
+                    <div>
+                        <div class="content-box">
+                            <div class="content-box-title">🛡️ Guardrails 强约束策略</div>
+                            <div class="content-box-text">
+                                <p><strong>核心原则:</strong> 有据可查,杜绝幻觉,保证质量</p>
+
+                                <p><strong>允许的知识来源(白名单机制):</strong></p>
+                                <ul class="bullet-list">
+                                    <li><strong>TenElementModel:</strong> 十要素模型作为统一真相源</li>
+                                    <li><strong>@专家库/*:</strong> 7大专家知识库</li>
+                                    <li><strong>@知识模块库/*:</strong> 通用知识模块</li>
+                                </ul>
+
+                                <p><strong>强制要求(citations_required: true):</strong></p>
+                                <ul class="bullet-list">
+                                    <li>所有输出必须附带@引用路径</li>
+                                    <li>禁止未经引用的推断与发挥</li>
+                                    <li>禁止超出职责边界的实现</li>
+                                    <li>禁止虚构算法/约束/目标/领域规则</li>
+                                </ul>
+
+                                <p><strong>能力缺口处理:</strong> 检测到知识库无法覆盖的场景时,系统输出"能力缺口报告",阻断流程直到问题解决。</p>
+
+                                <div class="stat-row" style="margin-top: 25px;">
+                                    <div class="stat-item">
+                                        <div class="stat-value">100%</div>
+                                        <div class="stat-label">引用完整性</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">95%+</div>
+                                        <div class="stat-label">知识准确率</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value"><5%</div>
+                                        <div class="stat-label">幻觉率</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="content-box">
+                            <div class="content-box-title">⚡ 智能体长任务避免幻觉机制</div>
+                            <div class="content-box-text">
+                                <p><strong>解决的问题:</strong> AI智能体在70-130分钟的长任务执行中,容易产生前后不一致的决策、任务偏离预期方向、中断后无法恢复等问题。</p>
+
+                                <!-- 添加流程图 -->
+                                <div class="flowchart" style="margin-top: 20px;">
+                                    <div class="flow-step">Phase X 开始执行</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step">自动保存状态 (phase_X_state.yaml)</div>
+                                    <div class="flow-description">立即验证文件完整性</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step highlight">实时偏离检测 (TodoTracker)</div>
+                                    <div class="flow-description">相似度计算: 当前分析 vs Phase 0基线</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 15px 0;">
+                                        <div class="flow-step" style="background: #2e7d32; font-size: 14px; padding: 10px;">
+                                            相似度 ≥0.60<br>✅ 继续执行
+                                        </div>
+                                        <div class="flow-step" style="background: #FF8F00; font-size: 14px; padding: 10px;">
+                                            相似度 0.40-0.60<br>⚠️ 半自动恢复
+                                        </div>
+                                        <div class="flow-step" style="background: #c62828; font-size: 14px; padding: 10px;">
+                                            相似度 <0.40<br>🚨 人工介入
+                                        </div>
+                                    </div>
+
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step">一致性验证</div>
+                                    <div class="flow-description">Phase间 + 专家间 + 模型一致性</div>
+                                    <div class="flow-arrow">↓</div>
+
+                                    <div class="flow-step">Phase X 完成</div>
+                                </div>
+
+                                <div class="stat-row" style="margin-top: 25px;">
+                                    <div class="stat-item">
+                                        <div class="stat-value">95%+</div>
+                                        <div class="stat-label">任务成功率</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">1-2分钟</div>
+                                        <div class="stat-label">恢复时间</div>
+                                    </div>
+                                    <div class="stat-item">
+                                        <div class="stat-value">67% ↓</div>
+                                        <div class="stat-label">任务偏离率</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-title">💎 创新价值总结</div>
+                    <div class="highlight-text">
+                        <p><strong>Guardrails强约束:</strong> 通过白名单机制和强制引用要求,确保所有输出有据可查,杜绝AI幻觉,引用完整性达100%,知识准确率95%+ | <strong>状态持久化:</strong> 支持长任务断点续传,中断恢复时间从重新开始降至1-2分钟,任务执行成功率提升至95%+ | <strong>偏离检测:</strong> 实时监测任务执行方向,任务偏离率降低67%,确保最终交付与用户需求高度一致 | <strong>智能恢复:</strong> 三层恢复机制,自动化处理85%的偏离情况,大幅降低人工干预成本</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number">6</div>
+        </div>
+
+        <!-- 第7页: 应用案例 - 生鲜配送调度优化 -->
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">应用案例</div>
+                <div class="slide-subtitle">生鲜配送调度优化 - 从需求到代码2天交付</div>
+            </div>
+            <div class="slide-content">
+                <div class="two-column">
+                    <div>
+                        <div class="content-box">
+                            <div class="content-box-title">📋 业务场景</div>
+                            <div class="content-box-text">
+                                <p><strong>客户背景:</strong> 某生鲜电商企业,服务某一线城市核心商圈</p>
+                                <p><strong>业务规模:</strong></p>
+                                <ul class="bullet-list">
+                                    <li>日均订单量: 100单</li>
+                                    <li>配送车队: 12辆冷藏车</li>
+                                    <li>平均车辆容量: 150件商品</li>
+                                    <li>配送范围: 城区30公里半径</li>
+                                </ul>
+                                <p><strong>业务承诺:</strong> 2小时送达服务承诺,超时赔付</p>
+
+                                <p style="margin-top: 20px;"><strong>核心挑战:</strong></p>
+                                <div class="tech-card">
+                                    <p><strong>⏰ 时间紧迫:</strong> 2小时送达承诺要求极高的配送效率,传统人工排线难以满足,高峰期超时率达15%</p>
+                                    <p><strong>💰 成本控制:</strong> 冷藏运输成本比普通配送高30%,油费、电费、设备折旧成本高。人工排线导致车辆利用率仅65%,空驶率高</p>
+                                    <p><strong>🌡️ 货物保鲜:</strong> 生鲜商品对温度控制要求严格(2-8℃),配送时间过长会影响商品品质。不同商品有不同的温控要求,需要分区管理</p>
+                                    <p><strong>📈 旺季压力:</strong> 节假日订单量激增50%+,现有人工排线方式无法应对,需要临时增加车辆和人员,成本大幅上升</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="content-box">
+                            <div class="content-box-title">⚙️ APS解决方案</div>
+                            <div class="content-box-text">
+                                <p><strong>Phase 1: 领域识别</strong></p>
+                                <p>系统自动识别为"冷链配送调度问题(Cold Chain VRP)",匹配到物流配送领域的车辆路径优化(VRP)子类</p>
+
+                                <p><strong>Phase 1.5: 十要素建模</strong></p>
+                                <ul class="bullet-list">
+                                    <li><strong>决策变量:</strong> 车辆路径序列、每个订单的配送顺序、车辆-订单分配关系</li>
+                                    <li><strong>关键约束:</strong> 时间窗约束(2小时送达) + 车辆容量约束(150件) + 温度控制约束(2-8℃) + 工作时间约束(8小时/班次)</li>
+                                    <li><strong>优化目标:</strong> 总成本最小化(权重0.7,包含油费、电费、人工成本) + 客户满意度最大化(权重0.3,准时率、商品品质)</li>
+                                    <li><strong>算法选择:</strong> 遗传算法(种群100,迭代500代) + 2-opt局部搜索改进</li>
+                                </ul>
+
+                                <p><strong>Phase 2: 四专家协调</strong></p>
+                                <ul class="bullet-list">
+                                    <li><strong>领域专家:</strong> 识别冷链特征,提取温度分区要求、保鲜时限等业务规则</li>
+                                    <li><strong>约束专家:</strong> 建模时间窗约束(硬约束) + 容量约束(背包问题) + 温度监控逻辑</li>
+                                    <li><strong>目标专家:</strong> 设计成本函数(冷藏加成系数1.3) + 满意度函数(准时权重0.7,品质权重0.3)</li>
+                                    <li><strong>算法专家:</strong> 配置遗传算法参数(交叉率0.8,变异率0.2) + 设计2-opt/Or-opt改进算子</li>
+                                </ul>
+
+                                <p><strong>Phase 3: 代码生成</strong></p>
+                                <p>自动生成800行Python代码,包含节约算法初始化、遗传算法主循环、2-opt/Or-opt改进、时间窗验证、温度监控逻辑、结果可视化等完整模块</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-box" style="margin-top: 20px;">
+                    <div class="content-box-title">📊 优化效果</div>
+                    <div class="content-box-text">
+                        <div class="stat-row">
+                            <div class="stat-item">
+                                <div class="stat-value" style="color: #2e7d32;">15% ↓</div>
+                                <div class="stat-label">配送成本降低<br>15000元→12750元/日<br>年节省82万元</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">20% ↑</div>
+                                <div class="stat-label">车辆利用率提升<br>65%→85%<br>减少闲置损失</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" style="color: #e65100;">13% ↑</div>
+                                <div class="stat-label">准时率提升<br>85%→98%<br>超时赔付减少</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" style="color: #6a1b9a;">28% ↓</div>
+                                <div class="stat-label">配送时间减少<br>2.5h→1.8h<br>保鲜品质提升</div>
+                            </div>
+                        </div>
+
+                        <div class="compare-table" style="margin-top: 30px;">
+                            <div class="compare-item old">
+                                <div class="compare-label old">传统人工排线方式</div>
+                                <div class="compare-text">
+                                    <p><strong>开发周期:</strong> 3-4周(需求分析+建模+开发+测试)</p>
+                                    <p><strong>开发成本:</strong> 20000元(运筹学专家10天×2000元/天)</p>
+                                    <p><strong>维护成本:</strong> 高(业务规则变更需重新开发)</p>
+                                    <p><strong>效果:</strong> 车辆利用率65%,准时率85%</p>
+                                </div>
+                            </div>
+                            <div class="compare-item new">
+                                <div class="compare-label new">APS智能体系统</div>
+                                <div class="compare-text">
+                                    <p><strong>开发周期:</strong> 2天(1天求解+1天调试)</p>
+                                    <p><strong>开发成本:</strong> 1100元(LLM调用100元+人工审核1000元)</p>
+                                    <p><strong>维护成本:</strong> 低(参数调整几分钟完成)</p>
+                                    <p><strong>效果:</strong> 车辆利用率85%,准时率98%</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p style="margin-top: 20px; font-size: 18px; color: #2e7d32; font-weight: bold;">效率提升: 90% | 成本降低: 94.5% | 业务指标全面优化</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number">7</div>
+        </div>
+
+        <!-- 第8页: 应用场景与业务价值 -->
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">应用场景与业务价值</div>
+                <div class="slide-subtitle">广泛的应用领域 + 显著的业务价值</div>
+            </div>
+            <div class="slide-content">
+                <div class="content-box">
+                    <div class="content-box-title">🌐 广泛的应用场景</div>
+                    <div class="content-box-text">
+                        <div class="three-col">
+                            <div class="tech-card">
+                                <div class="tech-card-title">🚚 物流配送</div>
+                                <div class="tech-card-content">
+                                    <p><strong>典型场景:</strong> 生鲜配送、快递路径优化、多车型混合配送</p>
+                                    <p><strong>核心算法:</strong> 遗传算法+2-opt局部搜索</p>
+                                    <p><strong>优化效果:</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>配送成本降低15%</li>
+                                        <li>准时率达98%</li>
+                                        <li>车辆利用率提升20%</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tech-card">
+                                <div class="tech-card-title">🏭 生产制造</div>
+                                <div class="tech-card-content">
+                                    <p><strong>典型场景:</strong> 作业车间调度、产线排程、设备维护计划</p>
+                                    <p><strong>核心算法:</strong> 禁忌搜索+瓶颈启发式</p>
+                                    <p><strong>优化效果:</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>生产周期缩短20%</li>
+                                        <li>设备利用率+15%</li>
+                                        <li>准时交付率>95%</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="tech-card">
+                                <div class="tech-card-title">👥 人员排班</div>
+                                <div class="tech-card-content">
+                                    <p><strong>典型场景:</strong> 连锁门店排班、客服中心、医院护士排班</p>
+                                    <p><strong>核心算法:</strong> 整数规划(MILP)</p>
+                                    <p><strong>优化效果:</strong></p>
+                                    <ul class="bullet-list">
+                                        <li>人力成本降低12%</li>
+                                        <li>排班合理性+30%</li>
+                                        <li>员工投诉减少60%</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-box">
+                    <div class="content-box-title">💎 显著的业务价值</div>
+                    <div class="content-box-text">
+                        <div class="two-column">
+                            <div>
+                                <div class="problem-value-box">
+                                    <div class="section-title value">⚡ 效率提升</div>
+                                    <div class="section-content">
+                                        <p><strong>项目开发周期:</strong> 3-4周 → 3-5天,效率提升<span style="color: #2e7d32; font-weight: bold;">85%</span></p>
+                                        <p><strong>专家参与时间:</strong> 80小时 → 2小时,节省<span style="color: #2e7d32; font-weight: bold;">95%</span></p>
+                                        <p><strong>算法选择时间:</strong> 2天 → 10分钟,节省<span style="color: #2e7d32; font-weight: bold;">99.6%</span></p>
+                                        <p><strong>约束建模时间:</strong> 3天 → 15分钟,节省<span style="color: #2e7d32; font-weight: bold;">99.7%</span></p>
+                                        <p><strong>代码实现时间:</strong> 5-7天 → 自动生成,节省<span style="color: #2e7d32; font-weight: bold;">100%</span></p>
+                                    </div>
+                                </div>
+
+                                <div class="problem-value-box">
+                                    <div class="section-title value">💰 成本降低</div>
+                                    <div class="section-content">
+                                        <p><strong>人力成本:</strong> 20000元 → 1100元,降低<span style="color: #0066FF; font-weight: bold;">94.5%</span></p>
+                                        <p style="margin-left: 20px;">• 运筹学专家: 2000元/天×10天 = 20000元</p>
+                                        <p style="margin-left: 20px;">• APS系统: LLM调用100元 + 人工审核1000元</p>
+                                        <p><strong>试错成本:</strong> 方案不合适需重新开发2-3周 → 快速迭代1-2天,降低<span style="color: #0066FF; font-weight: bold;">90%</span></p>
+                                        <p><strong>维护成本:</strong> 代码可追溯到TenElementModel和知识模板,维护效率提升<span style="color: #0066FF; font-weight: bold;">70%</span></p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="problem-value-box">
+                                    <div class="section-title value">✅ 质量保证</div>
+                                    <div class="section-content">
+                                        <p><strong>代码可用率:</strong> 传统50-70% → <span style="color: #e65100; font-weight: bold;">92%</span>(基于验证模板生成)</p>
+                                        <p><strong>需求理解准确度:</strong> <span style="color: #e65100; font-weight: bold;">95%+</span>(Todo机制保证)</p>
+                                        <p><strong>约束建模准确度:</strong> <span style="color: #e65100; font-weight: bold;">99%+</span>(专家模板保证)</p>
+                                        <p><strong>算法选择合理性:</strong> <span style="color: #e65100; font-weight: bold;">95%+</span>(决策树智能匹配)</p>
+                                        <p><strong>跨专家一致性:</strong> <span style="color: #e65100; font-weight: bold;">98%+</span>(一致性检查保证)</p>
+                                        <p><strong>引用完整性:</strong> <span style="color: #e65100; font-weight: bold;">100%</span>(Guardrails强制要求)</p>
+                                        <p><strong>质量门禁:</strong> 6层验证(语法/逻辑/约束/引用/基准/完整性)</p>
+                                    </div>
+                                </div>
+
+                                <div class="problem-value-box">
+                                    <div class="section-title value">📚 知识积累</div>
+                                    <div class="section-content">
+                                        <p><strong>知识模板复用率:</strong> <span style="color: #6a1b9a; font-weight: bold;">70-85%</span>,减少重复开发</p>
+                                        <p><strong>知识提取效率:</strong> 3周 → 3-5天,提升<span style="color: #6a1b9a; font-weight: bold;">85%</span></p>
+                                        <p><strong>新人学习曲线:</strong> 3个月 → 2周,降低<span style="color: #6a1b9a; font-weight: bold;">87%</span></p>
+                                        <p><strong>专家经验传承:</strong> 100%可模板化,持续积累不流失</p>
+                                        <p><strong>组织知识资产:</strong> 支持跨项目、跨团队复用,价值持续增长</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box">
+                    <div class="highlight-title">🚀 核心优势总结</div>
+                    <div class="highlight-text">
+                        <p><strong>专业门槛降低:</strong> 从专家级降至业务级,学习成本从数月降至10分钟 | <strong>开发效率提升:</strong> 项目周期从3-4周缩短至3-5天,效率提升85% | <strong>成本大幅降低:</strong> 人力成本降低94.5%,试错成本降低90%,维护成本降低70% | <strong>质量显著提升:</strong> 代码可用率92%,需求准确度95%+,约束建模99%+ | <strong>知识持续积累:</strong> 模板复用率70-85%,组织知识资产持续增长</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page-number">8</div>
+        </div>
+    </div>
+
+    <script>
+        // 键盘导航
+        document.addEventListener('keydown', function(e) {
+            const container = document.querySelector('.slide-container');
+            const slideHeight = window.innerHeight;
+
+            if (e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ') {
+                e.preventDefault();
+                container.scrollBy({ top: slideHeight, behavior: 'smooth' });
+            } else if (e.key === 'ArrowUp' || e.key === 'PageUp') {
+                e.preventDefault();
+                container.scrollBy({ top: -slideHeight, behavior: 'smooth' });
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                container.scrollTo({ top: 0, behavior: 'smooth' });
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+            }
+        });
+
+        // 鼠标滚轮翻页
+        let scrollTimeout;
+        document.querySelector('.slide-container').addEventListener('wheel', function(e) {
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(function() {
+                const container = document.querySelector('.slide-container');
+                const slideHeight = window.innerHeight;
+                const currentSlide = Math.round(container.scrollTop / slideHeight);
+
+                if (e.deltaY > 0) {
+                    container.scrollTo({ top: (currentSlide + 1) * slideHeight, behavior: 'smooth' });
+                } else {
+                    container.scrollTo({ top: (currentSlide - 1) * slideHeight, behavior: 'smooth' });
+                }
+            }, 50);
+        }, { passive: true });
+    </script>
+</body>
+</html>

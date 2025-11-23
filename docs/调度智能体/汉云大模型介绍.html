@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉云大模型 - 产品介绍</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+
+        .slide-container {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 右上角三角装饰 */
+        .triangle-decoration {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 150px 150px 0;
+            border-color: transparent #0066FF transparent transparent;
+        }
+
+        .triangle-decoration::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: -130px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 80px 80px 0;
+            border-color: transparent #FFB800 transparent transparent;
+        }
+
+        .triangle-decoration::before {
+            content: '';
+            position: absolute;
+            top: 60px;
+            right: -90px;
+            width: 0;
+            height: 0;
+            border-style: solid;
+            border-width: 0 40px 40px 0;
+            border-color: transparent white transparent transparent;
+        }
+
+        /* 标题区 */
+        .slide-header {
+            background: linear-gradient(135deg, #0066FF 0%, #3399FF 100%);
+            padding: 15px 80px;
+            color: white;
+            height: 10vh;
+            min-height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .slide-title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 3px;
+        }
+
+        .slide-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        /* 内容区 */
+        .slide-content {
+            flex: 1;
+            padding: 30px 80px;
+            overflow: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 上半部分：应用场景 */
+        .scenarios-section {
+            margin-bottom: 25px;
+        }
+
+        .section-title {
+            font-size: 22px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 20px;
+            padding-left: 15px;
+            border-left: 5px solid #0066FF;
+        }
+
+        /* 下半部分：演进路线图 + 平台图片 */
+        .evolution-section {
+            display: flex;
+            gap: 20px;
+        }
+
+        .evolution-chart {
+            flex: 1;
+        }
+
+        .platform-preview {
+            flex: 0 0 300px;
+            background: #f8f9ff;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        .platform-preview-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .platform-preview-box {
+            width: 100%;
+            flex: 1;
+            background: white;
+            border: 2px dashed #0066FF;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-size: 14px;
+            text-align: center;
+            min-height: 350px;
+        }
+
+        /* 场景卡片 */
+        .scenario-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 20px;
+        }
+
+        .scenario-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 25px;
+            transition: all 0.3s;
+            height: 100%;
+        }
+
+        .scenario-card:hover {
+            border-color: #0066FF;
+            box-shadow: 0 4px 12px rgba(0,102,255,0.15);
+        }
+
+        .scenario-card.v1 {
+            border-left: 5px solid #0066FF;
+        }
+
+        .scenario-card.v2 {
+            border-left: 5px solid #FFB800;
+        }
+
+        .scenario-card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .scenario-version {
+            background: #0066FF;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+
+        .scenario-version.v2 {
+            background: #FFB800;
+        }
+
+        .scenario-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .scenario-content {
+            font-size: 14px;
+            color: #666;
+            line-height: 1.8;
+        }
+
+        .scenario-content p {
+            margin-bottom: 10px;
+        }
+
+        .scenario-subtitle {
+            font-size: 16px;
+            font-weight: bold;
+            color: #333;
+            margin: 18px 0 12px 0;
+            padding-left: 10px;
+            border-left: 3px solid #0066FF;
+        }
+
+        .scenario-subtitle.v2 {
+            border-left-color: #FFB800;
+        }
+
+        /* 小场景卡片网格 */
+        .scenario-mini-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .scenario-mini-card {
+            background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+            border: 2px solid #e0e0e0;
+            border-left: 3px solid #0066FF;
+            border-radius: 8px;
+            padding: 15px;
+            transition: all 0.3s;
+        }
+
+        .scenario-mini-card:hover {
+            border-color: #0066FF;
+            box-shadow: 0 3px 10px rgba(0,102,255,0.15);
+            transform: translateY(-2px);
+        }
+
+        .scenario-mini-card.v2 {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%);
+            border-left-color: #FFB800;
+        }
+
+        .scenario-mini-card.v2:hover {
+            border-color: #FFB800;
+            box-shadow: 0 3px 10px rgba(255,184,0,0.15);
+        }
+
+        .scenario-mini-card-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .scenario-mini-card-title {
+            font-size: 15px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 8px;
+        }
+
+        .scenario-mini-card-title.v2 {
+            color: #FF8F00;
+        }
+
+        .scenario-mini-card-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        /* 汉云OS底座 */
+        .base-platform {
+            background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+            border: 3px solid #0066FF;
+            border-radius: 12px;
+            padding: 25px 30px;
+            margin-bottom: 25px;
+        }
+
+        .base-platform-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .base-platform-icon {
+            font-size: 36px;
+            margin-right: 15px;
+        }
+
+        .base-platform-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066FF;
+        }
+
+        .base-platform-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .base-platform-feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .feature-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        /* 训练流程 */
+        .training-flow {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+
+        .training-flow-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .version-badge {
+            background: #0066FF;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .version-badge.v2 {
+            background: #FFB800;
+        }
+
+        .training-flow-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .training-pipeline {
+            display: flex;
+            align-items: stretch;
+            gap: 15px;
+        }
+
+        .pipeline-stage {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stage-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #0066FF 0%, #3399FF 100%);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,102,255,0.3);
+        }
+
+        .stage-box {
+            background: #f8f9ff;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            height: 100%;
+            transition: all 0.3s;
+        }
+
+        .stage-box:hover {
+            border-color: #0066FF;
+            box-shadow: 0 4px 12px rgba(0,102,255,0.15);
+        }
+
+        .stage-box.highlight {
+            background: linear-gradient(135deg, #fff8e1 0%, #ffffff 100%);
+            border-color: #FFB800;
+            border-width: 3px;
+        }
+
+        .stage-box.highlight:hover {
+            border-color: #FF8F00;
+            box-shadow: 0 4px 12px rgba(255,184,0,0.25);
+        }
+
+        .stage-box-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #0066FF;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .stage-box.highlight .stage-box-title {
+            color: #FF8F00;
+        }
+
+        .stage-box-content {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .data-source {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            padding: 12px;
+            background: white;
+            border-radius: 8px;
+            border-left: 3px solid #0066FF;
+        }
+
+        .data-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .data-desc {
+            flex: 1;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .data-desc strong {
+            display: block;
+            color: #333;
+            margin-bottom: 4px;
+            font-size: 14px;
+        }
+
+        .data-desc small {
+            color: #666;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .process-item {
+            padding: 8px 12px;
+            background: white;
+            border-radius: 6px;
+            font-size: 13px;
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .pipeline-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: #0066FF;
+            font-weight: bold;
+            padding: 0 5px;
+            flex-shrink: 0;
+            margin-top: 55px;
+        }
+
+        /* 页码 */
+        .page-number {
+            position: absolute;
+            bottom: 30px;
+            right: 80px;
+            font-size: 18px;
+            color: #666;
+        }
+
+        /* 响应式调整 */
+        @media (max-width: 1366px) {
+            .slide-title { font-size: 28px; }
+            .slide-content { padding: 30px 60px; }
+            .base-platform-content { grid-template-columns: 1fr; }
+            .training-pipeline { flex-direction: column; }
+            .pipeline-arrow {
+                transform: rotate(90deg);
+                margin: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slide-container">
+        <div class="slide">
+            <div class="triangle-decoration"></div>
+            <div class="slide-header">
+                <div class="slide-title">汉云工业大模型</div>
+                <div class="slide-subtitle">国产大模型底座 + 工业知识图谱 + 高质量数据集</div>
+            </div>
+
+            <div class="slide-content">
+                <!-- 应用场景 -->
+                <div class="scenarios-section">
+                    <div class="section-title">🎯 汉云大模型支撑场景</div>
+                    <div class="scenario-row">
+                        <div class="scenario-card v1">
+                            <div class="scenario-card-header">
+                                <span class="scenario-version">汉云大模型 1.0</span>
+                                <span class="scenario-title">设备智能运维诊断</span>
+                            </div>
+                            <div class="scenario-content">
+                                <p><strong>应用领域：</strong>工程机械设备（挖掘机、装载机、起重机等）和智能制造装备（数控机床、工业机器人、自动化产线）的全生命周期健康管理。</p>
+
+                                <p><strong>核心能力：</strong>基于工业知识图谱和海量设备运行数据训练，汉云大模型1.0能够深度理解设备运行机理，实现设备状态实时监测、故障模式智能识别、故障原因精准诊断和维修建议自动生成。</p>
+
+                                <div class="scenario-subtitle">典型应用场景</div>
+                                <div class="scenario-mini-cards">
+                                    <div class="scenario-mini-card">
+                                        <div class="scenario-mini-card-icon">🔧</div>
+                                        <div class="scenario-mini-card-title">设备运维</div>
+                                        <div class="scenario-mini-card-desc">7×24小时设备健康监控，异常自动告警，维护计划智能推荐，确保设备稳定运行</div>
+                                    </div>
+                                    <div class="scenario-mini-card">
+                                        <div class="scenario-mini-card-icon">⚠️</div>
+                                        <div class="scenario-mini-card-title">故障预测</div>
+                                        <div class="scenario-mini-card-desc">提前3-7天预测设备潜在故障，准确率达85%+，为维护争取宝贵时间</div>
+                                    </div>
+                                    <div class="scenario-mini-card">
+                                        <div class="scenario-mini-card-icon">📊</div>
+                                        <div class="scenario-mini-card-title">智能诊断</div>
+                                        <div class="scenario-mini-card-desc">秒级定位故障根因，生成可执行的维修指导方案，提升维修效率</div>
+                                    </div>
+                                    <div class="scenario-mini-card">
+                                        <div class="scenario-mini-card-icon">📈</div>
+                                        <div class="scenario-mini-card-title">健康评估</div>
+                                        <div class="scenario-mini-card-desc">设备健康度量化评分，剩余寿命预测，备件需求预测，优化维护策略</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="scenario-card v2">
+                            <div class="scenario-card-header">
+                                <span class="scenario-version v2">汉云大模型 2.0</span>
+                                <span class="scenario-title">工业时序预测分析</span>
+                            </div>
+                            <div class="scenario-content">
+                                <p><strong>应用领域：</strong>工业生产过程中的时序数据预测与优化，覆盖设备运行参数、生产工艺参数、能耗数据、质量指标等多维时序数据场景。</p>
+
+                                <p><strong>核心能力：</strong>基于海量工业时序数据训练的时序大模型，汉云大模型2.0能够捕捉复杂的时序模式和变化趋势，实现高精度的未来状态预测、异常趋势提前识别和最优控制策略推荐。</p>
+
+                                <div class="scenario-subtitle v2">典型应用场景</div>
+                                <div class="scenario-mini-cards">
+                                    <div class="scenario-mini-card v2">
+                                        <div class="scenario-mini-card-icon">📉</div>
+                                        <div class="scenario-mini-card-title v2">时序预测</div>
+                                        <div class="scenario-mini-card-desc">设备关键参数未来趋势预测，预测精度提升30%+，支撑预防性维护决策</div>
+                                    </div>
+                                    <div class="scenario-mini-card v2">
+                                        <div class="scenario-mini-card-icon">🎯</div>
+                                        <div class="scenario-mini-card-title v2">趋势分析</div>
+                                        <div class="scenario-mini-card-desc">生产过程长期趋势识别，工艺参数漂移检测，保障产品质量稳定性</div>
+                                    </div>
+                                    <div class="scenario-mini-card v2">
+                                        <div class="scenario-mini-card-icon">⏰</div>
+                                        <div class="scenario-mini-card-title v2">提前预警</div>
+                                        <div class="scenario-mini-card-desc">异常趋势提前7-15天预警，为生产调整和决策争取充足时间</div>
+                                    </div>
+                                    <div class="scenario-mini-card v2">
+                                        <div class="scenario-mini-card-icon">🔮</div>
+                                        <div class="scenario-mini-card-title v2">精准预判</div>
+                                        <div class="scenario-mini-card-desc">生产质量预测、能耗预测、产能预测，支撑精益生产和成本优化</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 演进路线 -->
+                <div class="evolution-section">
+                    <!-- 汉云OS底座 -->
+                    <div class="base-platform">
+                        <div class="base-platform-header">
+                            <div class="base-platform-icon">🏗️</div>
+                            <div class="base-platform-title">汉云OS - 工业大模型训练底座</div>
+                        </div>
+                        <div class="base-platform-content">
+                            <div class="base-platform-feature">
+                                <span class="feature-icon">🔧</span>
+                                <span class="feature-text"><strong>微调训练平台：</strong>提供模型微调工具链、超参数调优、分布式训练能力</span>
+                            </div>
+                            <div class="base-platform-feature">
+                                <span class="feature-icon">💾</span>
+                                <span class="feature-text"><strong>数据集供给：</strong>工业设备数据、知识图谱、专家标注数据、时序数据等多源数据管理</span>
+                            </div>
+                            <div class="base-platform-feature">
+                                <span class="feature-icon">📊</span>
+                                <span class="feature-text"><strong>模型管理：</strong>模型版本控制、效果评估、在线部署、A/B测试</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 汉云大模型1.0训练流程 -->
+                    <div class="training-flow">
+                        <div class="training-flow-header">
+                            <span class="version-badge v1">汉云大模型 1.0</span>
+                            <span class="training-flow-title">知识增强型大模型训练流程</span>
+                        </div>
+
+                        <div class="training-pipeline">
+                            <!-- 阶段1：数据准备 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">1</div>
+                                <div class="stage-box">
+                                    <div class="stage-box-title">数据语料准备</div>
+                                    <div class="stage-box-content">
+                                        <div class="data-source">
+                                            <span class="data-icon">📚</span>
+                                            <div class="data-desc">
+                                                <strong>工业知识图谱</strong><br>
+                                                <small>设备结构、故障模式、维修案例、专家经验知识</small>
+                                            </div>
+                                        </div>
+                                        <div class="data-source">
+                                            <span class="data-icon">🔧</span>
+                                            <div class="data-desc">
+                                                <strong>设备运行数据</strong><br>
+                                                <small>500万+设备、100亿+条运行记录、故障日志</small>
+                                            </div>
+                                        </div>
+                                        <div class="data-source">
+                                            <span class="data-icon">📋</span>
+                                            <div class="data-desc">
+                                                <strong>专家标注数据</strong><br>
+                                                <small>故障诊断案例、维修方案、最佳实践标注</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-arrow">→</div>
+
+                            <!-- 阶段2：数据处理 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">2</div>
+                                <div class="stage-box">
+                                    <div class="stage-box-title">数据处理与增强</div>
+                                    <div class="stage-box-content">
+                                        <div class="process-item">✓ 数据清洗：去噪、去重、格式标准化</div>
+                                        <div class="process-item">✓ 知识提取：从非结构化文本提取结构化知识</div>
+                                        <div class="process-item">✓ 数据增强：基于规则的数据扩充、同义改写</div>
+                                        <div class="process-item">✓ 质量评估：数据质量评分、异常检测</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-arrow">→</div>
+
+                            <!-- 阶段3：微调训练 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">3</div>
+                                <div class="stage-box highlight">
+                                    <div class="stage-box-title">微调训练</div>
+                                    <div class="stage-box-content">
+                                        <div class="process-item">⚙️ 基座模型：国产大语言模型（7B/13B参数）</div>
+                                        <div class="process-item">🎯 训练目标：工业知识理解、故障诊断、方案生成</div>
+                                        <div class="process-item">📊 训练策略：LoRA微调 + 知识蒸馏</div>
+                                        <div class="process-item">💻 训练环境：分布式GPU集群、混合精度训练</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-arrow">→</div>
+
+                            <!-- 阶段4：评估部署 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">4</div>
+                                <div class="stage-box">
+                                    <div class="stage-box-title">评估与部署</div>
+                                    <div class="stage-box-content">
+                                        <div class="process-item">📈 效果评估：准确率、召回率、F1分数</div>
+                                        <div class="process-item">🧪 场景测试：设备运维、故障诊断场景验证</div>
+                                        <div class="process-item">🚀 模型部署：容器化部署、API服务化</div>
+                                        <div class="process-item">🔄 持续优化：用户反馈、迭代优化</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 汉云大模型2.0训练流程 -->
+                    <div class="training-flow">
+                        <div class="training-flow-header">
+                            <span class="version-badge v2">汉云大模型 2.0</span>
+                            <span class="training-flow-title">时序预测型大模型训练流程</span>
+                        </div>
+
+                        <div class="training-pipeline">
+                            <!-- 阶段1：时序数据准备 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">1</div>
+                                <div class="stage-box">
+                                    <div class="stage-box-title">时序数据语料</div>
+                                    <div class="stage-box-content">
+                                        <div class="data-source">
+                                            <span class="data-icon">📊</span>
+                                            <div class="data-desc">
+                                                <strong>传感器时序数据</strong><br>
+                                                <small>温度、压力、振动、电流等多维传感器数据流</small>
+                                            </div>
+                                        </div>
+                                        <div class="data-source">
+                                            <span class="data-icon">⚙️</span>
+                                            <div class="data-desc">
+                                                <strong>设备运行时序</strong><br>
+                                                <small>工作状态、运行参数、性能指标时序记录</small>
+                                            </div>
+                                        </div>
+                                        <div class="data-source">
+                                            <span class="data-icon">🏭</span>
+                                            <div class="data-desc">
+                                                <strong>生产工艺时序</strong><br>
+                                                <small>工艺参数、质量指标、能耗数据时序轨迹</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-arrow">→</div>
+
+                            <!-- 阶段2：时序数据预处理 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">2</div>
+                                <div class="stage-box">
+                                    <div class="stage-box-title">时序数据预处理</div>
+                                    <div class="stage-box-content">
+                                        <div class="process-item">✓ 时间对齐：多源异构时序数据对齐</div>
+                                        <div class="process-item">✓ 缺失填充：时序缺失值插值、异常值处理</div>
+                                        <div class="process-item">✓ 特征工程：时序特征提取、频域分析</div>
+                                        <div class="process-item">✓ 序列切分：滑动窗口、序列分段</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-arrow">→</div>
+
+                            <!-- 阶段3：时序模型训练 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">3</div>
+                                <div class="stage-box highlight">
+                                    <div class="stage-box-title">时序模型训练</div>
+                                    <div class="stage-box-content">
+                                        <div class="process-item">⚙️ 基座模型：Time-LLM时序大模型架构</div>
+                                        <div class="process-item">🎯 训练目标：时序预测、趋势识别、异常检测</div>
+                                        <div class="process-item">📊 训练策略：预训练+微调、多任务联合训练</div>
+                                        <div class="process-item">💻 模型架构：Transformer编码器 + 时序解码器</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pipeline-arrow">→</div>
+
+                            <!-- 阶段4：评估部署 -->
+                            <div class="pipeline-stage">
+                                <div class="stage-number">4</div>
+                                <div class="stage-box">
+                                    <div class="stage-box-title">评估与部署</div>
+                                    <div class="stage-box-content">
+                                        <div class="process-item">📈 预测精度：MAE、RMSE、MAPE评估</div>
+                                        <div class="process-item">🧪 场景测试：设备预测、质量预测验证</div>
+                                        <div class="process-item">🚀 实时部署：流式推理、低延迟预测服务</div>
+                                        <div class="process-item">🔄 在线学习：增量学习、模型自适应</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-number">1</div>
+        </div>
+    </div>
+</body>
+</html>
