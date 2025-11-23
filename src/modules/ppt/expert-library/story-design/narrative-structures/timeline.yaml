@@ -1,0 +1,46 @@
+# Timeline Narrative Structure
+# 时间线叙事结构
+
+name: Timeline
+type: timeline
+description: "按时间顺序展示发展历程、里程碑或路线图。适合公司历程回顾、项目进展汇报。"
+
+suitable_for:
+  purposes: [company_overview, progress_report, roadmap_presentation]
+  audiences: [stakeholders, team_members, investors]
+
+standard_sections:
+  - section_name: Introduction
+    typical_pages: 2
+    key_elements: [Overview, Timeline scope]
+
+  - section_name: Past
+    typical_pages: 3-4
+    key_elements: [Historical achievements, Learnings]
+
+  - section_name: Present
+    typical_pages: 3-4
+    key_elements: [Current status, Ongoing initiatives]
+
+  - section_name: Future
+    typical_pages: 3-4
+    key_elements: [Roadmap, Vision, Goals]
+
+  - section_name: Conclusion
+    typical_pages: 2
+    key_elements: [Summary, Next steps]
+
+page_allocation_strategy:
+  "15":
+    cover: 1
+    agenda: 1
+    Introduction: 2
+    Past: 3
+    Present: 4
+    Future: 3
+    Conclusion: 2
+
+design_principles:
+  - "使用时间轴可视化增强理解"
+  - "每个时期有明确的里程碑事件"
+  - "Past→Present→Future逻辑连贯"

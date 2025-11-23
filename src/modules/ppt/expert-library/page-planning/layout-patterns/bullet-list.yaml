@@ -1,0 +1,29 @@
+# Bullet-List Layout Pattern
+name: Bullet-List
+category: text-focused
+description: "标准bullet list布局,适合文本内容"
+
+compatible_page_types:
+  - text-heavy
+  - agenda
+
+layout_zones:
+  - zone: header
+    element: title
+    position: top
+    size_percent: 15
+
+  - zone: main
+    element: bullet_points
+    position: center-left
+    size_percent: 70
+
+  - zone: footer
+    element: footnote
+    position: bottom
+    size_percent: 10
+
+text_formatting:
+  bullet_style: "filled_circle"
+  indent: 40px
+  line_height: 1.5

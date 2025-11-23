@@ -1,0 +1,43 @@
+# Business Pitch Deck 示例输入
+# 场景: 商业推介(投资人)
+
+purpose: pitch_deck
+
+audience:
+  primary: investors
+  knowledge_level: business_professional
+  pain_points:
+    - ROI证明
+    - 市场规模验证
+    - 团队能力展示
+    - 竞争优势分析
+
+message:
+  core_points:
+    - 市场痛点严重性
+    - 解决方案创新性
+    - 市场潜力巨大
+    - 团队执行能力强
+  key_data:
+    - metric: market_size
+      value: "100亿美元"
+      context: TAM(总体可达市场)
+    - metric: growth_rate
+      value: 85
+      context: 年增长率%
+    - metric: automation_achieved
+      value: 85
+      context: 自动化率%
+
+narrative: problem-solution # 将由Story Designer确认
+
+constraints:
+  target_pages: 15
+  duration_minutes: 20
+  brand_guidelines: null # 可选
+
+visual_preference: professional
+
+tone_of_voice: persuasive
+
+language: zh-CN

@@ -1,0 +1,11 @@
+name: Process-3Step
+layout_id: process-3step
+category: special
+compatible_page_types: [process-flow]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: step1, element: step_card, position: { x: left-80px, width: 28% } }
+  - { zone_id: arrow1, element: arrow_icon, position: between_step1_step2 }
+  - { zone_id: step2, element: step_card, position: { x: center, width: 28% } }
+  - { zone_id: arrow2, element: arrow_icon, position: between_step2_step3 }
+  - { zone_id: step3, element: step_card, position: { x: right-100px, width: 28% } }

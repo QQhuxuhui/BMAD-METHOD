@@ -1,0 +1,7 @@
+name: Section-Divider-Bold
+layout_id: section-divider-bold
+category: special
+compatible_page_types: [section-divider]
+layout_zones:
+  - { zone_id: section_number, element: large_number, position: { x: left-80px, y: center }, font_size: 120, opacity: 0.1 }
+  - { zone_id: section_title, element: title, position: { x: center, y: center }, alignment: center, font_size: 48 }

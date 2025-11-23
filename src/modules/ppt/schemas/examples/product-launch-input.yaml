@@ -1,0 +1,39 @@
+# Product Launch 示例输入
+# 场景: 产品发布(客户)
+
+purpose: product_launch
+
+audience:
+  primary: customers
+  knowledge_level: intermediate
+  pain_points:
+    - 易用性
+    - 性价比
+    - 技术支持
+    - 与现有系统集成
+
+message:
+  core_points:
+    - 产品核心功能
+    - 客户价值主张
+    - 竞争优势
+  key_data:
+    - metric: user_satisfaction
+      value: 95
+      context: 客户满意度%
+    - metric: implementation_time
+      value: "2周"
+      context: 平均部署时间
+
+narrative: feature-showcase
+
+constraints:
+  target_pages: 20
+  duration_minutes: 30
+  brand_guidelines: null
+
+visual_preference: creative
+
+tone_of_voice: persuasive
+
+language: zh-CN

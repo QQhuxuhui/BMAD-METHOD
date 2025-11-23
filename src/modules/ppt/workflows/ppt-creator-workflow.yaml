@@ -1,0 +1,233 @@
+# PPT Creator Main Workflow
+# 5-Stage Creative Workflow for Professional Presentations
+
+name: ppt-creator
+description: "5阶段智能PPT创建系统 - Story Design → Page Planning → Visual Design → Content Production → File Generation"
+version: "1.0.0"
+author: "BMAD PPT Module"
+
+# Configuration
+config_source: "{project-root}/bmad/ppt/config.yaml"
+communication_language: "zh-CN"
+
+# Workflow path
+installed_path: "{project-root}/bmad/ppt/workflows"
+
+# Schemas
+schemas:
+  ppt_design_inputs: "{project-root}/bmad/ppt/schemas/ppt_design_inputs.yaml"
+  story_blueprint: "{project-root}/bmad/ppt/schemas/story_blueprint.yaml"
+  page_manifest: "{project-root}/bmad/ppt/schemas/page_manifest.yaml"
+  visual_design_spec: "{project-root}/bmad/ppt/schemas/visual_design_spec.yaml"
+  slide_content_package: "{project-root}/bmad/ppt/schemas/slide_content_package.yaml"
+
+# Expert Library References
+expert_library:
+  story_design: "{project-root}/bmad/ppt/expert-library/story-design/"
+  page_planning: "{project-root}/bmad/ppt/expert-library/page-planning/"
+  visual_design: "{project-root}/bmad/ppt/expert-library/visual-design/"
+  content_production: "{project-root}/bmad/ppt/expert-library/content-production/"
+
+# Agents
+agents:
+  story_designer: "{project-root}/bmad/ppt/agents/story-designer.md"
+  page_planner: "{project-root}/bmad/ppt/agents/page-planner.md"
+  visual_stylist: "{project-root}/bmad/ppt/agents/visual-stylist.md"
+  content_producer: "{project-root}/bmad/ppt/agents/content-producer.md"
+  file_generator: "{project-root}/bmad/ppt/agents/file-generator.md"
+  # Helpers
+  copywriter: "{project-root}/bmad/ppt/agents/helpers/copywriter.md"
+  chart_specialist: "{project-root}/bmad/ppt/agents/helpers/chart-specialist.md"
+
+# State Management
+state_tracking:
+  enabled: true
+  state_file: "{output_folder}/ppt_workflow_state.yaml"
+  checkpoints:
+    - stage_1_complete
+    - stage_2_complete
+    - stage_3_complete
+    - stage_4_complete
+    - stage_5_complete
+
+# HITL Configuration
+hitl:
+  enabled: true
+  points:
+    - stage: stage_1
+      trigger: after_stage_complete
+      type: confirmation
+      description: "确认Story Blueprint(叙事结构)"
+      timeout_seconds: 300
+      default_action: continue
+
+    - stage: stage_3
+      trigger: after_stage_complete
+      type: selection
+      description: "选择视觉主题(A/B/C)"
+      options: 3
+      timeout_seconds: 300
+      default_action: select_first
+
+# Workflow Stages
+stages:
+  # Stage 1: Story Design
+  - id: stage_1
+    name: Story Design
+    description: "故事设计 - 叙事结构选择,内容大纲设计"
+    agent: story_designer
+    input:
+      - user_requirements # PPTDesignInputs
+    output:
+      - story_blueprint
+    expert_library_refs:
+      - narrative_structures # 5种叙事结构
+      - audience_analysis # 8个受众分析模板
+      - content_organization # 6种内容组织模式
+    estimated_duration_minutes: 10-15
+    hitl_after_stage: true
+    validation:
+      - total_pages_within_range
+      - sections_count_valid
+      - key_messages_present
+
+  # Stage 2: Page Planning
+  - id: stage_2
+    name: Page Planning
+    description: "页面规划 - 页面类型分配,信息架构"
+    agent: page_planner
+    input:
+      - story_blueprint
+    output:
+      - page_manifest
+    expert_library_refs:
+      - page_types # 12种页面类型
+      - layout_patterns # 15种布局模式
+    estimated_duration_minutes: 10-15
+    hitl_after_stage: false
+    validation:
+      - pages_match_story_total
+      - all_sections_covered
+      - content_slots_defined
+
+  # Stage 3: Visual Design
+  - id: stage_3
+    name: Visual Design
+    description: "视觉设计 - 主题推荐,布局匹配,设计标准"
+    agent: visual_stylist
+    input:
+      - page_manifest
+      - user_requirements.brand_guidelines # optional
+    output:
+      - visual_design_spec
+      - theme_options # A/B/C for HITL
+    expert_library_refs:
+      - themes # 8个视觉主题
+      - layouts # 20个布局模板
+    estimated_duration_minutes: 15-20
+    hitl_after_stage: true
+    validation:
+      - theme_options_count_equals_3
+      - layouts_match_page_types
+      - crap_principles_applied
+      - color_contrast_wcag_aa
+
+  # Stage 4: Content Production
+  - id: stage_4
+    name: Content Production
+    description: "内容制作 - 文案生成,图表配置,内容打包"
+    agent: content_producer
+    helpers:
+      - copywriter
+      - chart_specialist
+    input:
+      - page_manifest
+      - visual_design_spec
+      - story_blueprint
+    output:
+      - slide_content_package
+    estimated_duration_minutes: 20-30
+    hitl_after_stage: false
+    validation:
+      - all_pages_have_content
+      - char_limits_respected
+      - readability_score_above_70
+      - charts_configured_correctly
+
+  # Stage 5: File Generation
+  - id: stage_5
+    name: File Generation
+    description: "文件生成 - PPTX创建,质量验证,Fallback处理"
+    agent: file_generator
+    input:
+      - slide_content_package
+      - visual_design_spec
+    output:
+      - presentation.pptx
+      - quality_report.yaml
+      - design_export.zip # fallback
+    external_tool: document-skills:pptx
+    estimated_duration_minutes: 5-10
+    hitl_after_stage: false
+    retry_config:
+      max_attempts: 3
+      retry_on_errors:
+        - timeout
+        - transient_failure
+    fallback:
+      enabled: true
+      trigger: generation_failed_after_retries
+      action: export_design_documents
+      output: design_export.zip
+    validation:
+      - file_exists
+      - page_count_matches
+      - file_size_reasonable
+      - structural_integrity
+
+# Error Handling
+error_handling:
+  on_validation_failure:
+    action: halt_and_report
+  on_hitl_timeout:
+    action: use_default
+  on_external_tool_failure:
+    action: trigger_fallback
+
+# Progress Tracking
+progress_tracking:
+  enabled: true
+  format: "Stage {{current_stage}}/5: {{stage_name}} [{{progress_bar}}] {{percentage}}%"
+  show_estimated_time_remaining: true
+
+# Quality Metrics
+quality_metrics:
+  design_consistency_threshold: 85
+  content_clarity_threshold: 90
+  generation_success_target: 80
+
+# Output Configuration
+output_folder: "{project-root}/outputs/ppt/{{timestamp}}"
+output_structure:
+  - intermediate/
+  - intermediate/stage_1_story_blueprint.yaml
+  - intermediate/stage_2_page_manifest.yaml
+  - intermediate/stage_3_visual_design_spec.yaml
+  - intermediate/stage_4_slide_content/
+  - final/presentation.pptx
+  - final/quality_report.yaml
+  - logs/workflow_log.txt
+
+# Example Usage
+examples:
+  - name: business_pitch
+    input: "{project-root}/bmad/ppt/schemas/examples/business_pitch_input.yaml"
+    expected_output: "15-page professional pitch deck"
+
+  - name: product_launch
+    input: "{project-root}/bmad/ppt/schemas/examples/product_launch_input.yaml"
+    expected_output: "20-page creative product launch deck"
+
+  - name: technical_report
+    input: "{project-root}/bmad/ppt/schemas/examples/technical_report_input.yaml"
+    expected_output: "12-page technical report deck"

@@ -1,0 +1,8 @@
+name: Thank-You-Simple
+layout_id: thank-you-simple
+category: special
+compatible_page_types: [summary]
+layout_zones:
+  - { zone_id: thank_you_text, element: large_text, position: { x: center, y: 35% }, alignment: center, font_size: 56 }
+  - { zone_id: contact_info, element: contact_details, position: { x: center, y: 55% }, alignment: center }
+  - { zone_id: cta, element: call_to_action, position: { x: center, y: 70% }, alignment: center }

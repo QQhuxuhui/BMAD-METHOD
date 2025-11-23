@@ -1,0 +1,207 @@
+# Problem-Solution Narrative Structure
+# 问题-解决方案叙事结构
+
+name: Problem-Solution
+type: problem-solution
+description: "先建立问题的严重性和紧迫性,再展示解决方案的创新性和有效性。适合商业推介、产品营销等说服性场景。"
+
+# 适用场景
+suitable_for:
+  purposes:
+    - pitch_deck
+    - product_launch
+    - sales_proposal
+  audiences:
+    - investors
+    - decision_makers
+    - customers
+  message_types:
+    - value_proposition
+    - solution_benefits
+    - market_opportunity
+
+# 叙事弧线
+narrative_arc:
+  - phase: Hook
+    description: "开场吸引注意"
+    emotional_tone: curiosity
+    duration_percent: 10
+
+  - phase: Problem_Setup
+    description: "建立问题背景和严重性"
+    emotional_tone: concern
+    duration_percent: 20
+
+  - phase: Solution_Introduction
+    description: "引入解决方案"
+    emotional_tone: hope
+    duration_percent: 15
+
+  - phase: Solution_Deep_Dive
+    description: "深入展示解决方案细节和价值"
+    emotional_tone: excitement
+    duration_percent: 30
+
+  - phase: Proof_and_Validation
+    description: "提供证据和验证"
+    emotional_tone: confidence
+    duration_percent: 15
+
+  - phase: Call_to_Action
+    description: "行动呼吁"
+    emotional_tone: urgency
+    duration_percent: 10
+
+# 标准章节结构
+standard_sections:
+  - section_number: 1
+    section_name: Introduction
+    typical_pages: 2
+    key_elements:
+      - Company/Product introduction
+      - Vision and mission
+      - Credibility establishment
+    content_templates:
+      - cover_slide
+      - company_overview
+
+  - section_number: 2
+    section_name: Problem
+    typical_pages: 3
+    key_elements:
+      - Market pain points
+      - Current solution limitations
+      - Problem severity quantification
+    content_templates:
+      - pain_points_visualization
+      - market_gap_analysis
+      - user_struggles
+
+  - section_number: 3
+    section_name: Solution
+    typical_pages: 4-6
+    key_elements:
+      - Core value proposition
+      - Key features and benefits
+      - How it solves the problem
+      - Differentiation
+    content_templates:
+      - solution_overview
+      - feature_highlights
+      - before_after_comparison
+      - unique_value
+
+  - section_number: 4
+    section_name: Validation
+    typical_pages: 2-4
+    key_elements:
+      - Market opportunity
+      - Traction/proof points
+      - Customer testimonials/case studies
+      - Competitive advantage
+    content_templates:
+      - market_size
+      - traction_metrics
+      - customer_success
+      - competitive_landscape
+
+  - section_number: 5
+    section_name: Ask
+    typical_pages: 2
+    key_elements:
+      - Clear ask (funding/partnership/purchase)
+      - Use of funds/roadmap
+      - Summary and contact
+    content_templates:
+      - funding_request
+      - roadmap
+      - closing_summary
+
+# 页面分配策略
+page_allocation_strategy:
+  # 10-page deck
+  "10":
+    cover: 1
+    agenda: 0
+    Introduction: 1
+    Problem: 2
+    Solution: 4
+    Validation: 2
+    Ask: 1
+
+  # 15-page deck
+  "15":
+    cover: 1
+    agenda: 1
+    Introduction: 2
+    Problem: 3
+    Solution: 5
+    Validation: 3
+    Ask: 2
+
+  # 20-page deck
+  "20":
+    cover: 1
+    agenda: 1
+    Introduction: 2
+    Problem: 4
+    Solution: 7
+    Validation: 4
+    Ask: 2
+
+# 受众适配指南
+audience_adaptation:
+  investors:
+    emphasis:
+      - Market size and opportunity
+      - ROI and financial projections
+      - Team credibility
+    language: Business-focused, data-driven
+    problem_framing: "Market inefficiency, revenue opportunity"
+
+  customers:
+    emphasis:
+      - Pain point resonance
+      - Ease of use
+      - Value for money
+    language: Benefit-focused, relatable
+    problem_framing: "Daily frustrations, time/money waste"
+
+  partners:
+    emphasis:
+      - Win-win collaboration
+      - Market expansion
+      - Resource complementarity
+    language: Partnership-focused
+    problem_framing: "Shared market challenges"
+
+# 关键设计原则
+design_principles:
+  - "问题描述要具体且可量化,避免抽象泛泛而谈"
+  - "解决方案要直接对应问题点,建立清晰的因果关系"
+  - "使用before/after对比增强说服力"
+  - "在Problem阶段建立紧迫感,在Solution阶段提供希望"
+  - "用数据和案例验证解决方案有效性"
+
+# 常见错误
+common_pitfalls:
+  - pitfall: "Problem描述不足,直接跳到Solution"
+    fix: "至少用2-3页深入建立问题严重性"
+
+  - pitfall: "Solution过于宽泛,缺乏差异化"
+    fix: "明确指出与现有方案的3个核心差异点"
+
+  - pitfall: "缺乏量化证据"
+    fix: "在Problem和Validation章节都要有数据支撑"
+
+# 示例应用
+example_applications:
+  - scenario: "SaaS产品商业推介"
+    problem_focus: "手工流程效率低下,错误率高,成本高昂"
+    solution_focus: "AI自动化,提升效率85%,降低成本70%"
+    validation_focus: "12家客户验证,ROI回报期6个月"
+
+  - scenario: "新硬件产品发布"
+    problem_focus: "现有设备性能瓶颈,用户体验差"
+    solution_focus: "新技术突破,性能提升3倍,体验革新"
+    validation_focus: "用户测试满意度95%,预订量突破10000台"

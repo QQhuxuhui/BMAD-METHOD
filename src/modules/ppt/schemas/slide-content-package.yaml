@@ -1,0 +1,322 @@
+# Slide Content Package Schema
+# Stage 4 (Content Production) 输出
+
+# 这是包级别的manifest文件
+type: object
+required:
+  - total_slides
+  - slides
+  - validation
+
+properties:
+  total_slides:
+    type: integer
+    minimum: 10
+    maximum: 20
+    description: 总幻灯片数
+
+  slides:
+    type: array
+    items:
+      type: object
+      required:
+        - file
+        - page_number
+        - page_type
+      properties:
+        file:
+          type: string
+          description: 幻灯片内容文件路径
+          examples:
+            - slide_01_cover.yaml
+            - slide_07_data_chart.yaml
+
+        page_number:
+          type: integer
+          minimum: 1
+
+        page_type:
+          type: string
+          enum:
+            - cover
+            - agenda
+            - section-divider
+            - text-heavy
+            - image-focus
+            - data-chart
+            - data-table
+            - comparison
+            - timeline
+            - process-flow
+            - quote
+            - summary
+
+        has_text:
+          type: boolean
+          description: 是否包含文本内容
+
+        has_chart:
+          type: boolean
+          description: 是否包含图表
+
+        has_image:
+          type: boolean
+          description: 是否包含图片
+
+  validation:
+    type: object
+    required:
+      - all_pages_present
+      - all_content_slots_filled
+      - char_limit_compliance
+    properties:
+      all_pages_present:
+        type: boolean
+        description: 所有页面是否都存在
+
+      all_content_slots_filled:
+        type: boolean
+        description: 所有内容槽位是否都已填充
+
+      char_limit_compliance:
+        type: number
+        minimum: 0
+        maximum: 100
+        description: 字符限制遵守率(%)
+
+      charts_configured:
+        type: integer
+        description: 配置的图表数量
+
+      readability_scores:
+        type: object
+        description: 可读性评分
+        properties:
+          average:
+            type: number
+          minimum:
+            type: number
+
+# 示例
+example:
+  total_slides: 15
+  slides:
+    - file: slide_01_cover.yaml
+      page_number: 1
+      page_type: cover
+      has_text: true
+      has_chart: false
+      has_image: true
+
+    - file: slide_07_data_chart.yaml
+      page_number: 7
+      page_type: data-chart
+      has_text: true
+      has_chart: true
+      has_image: false
+
+  validation:
+    all_pages_present: true
+    all_content_slots_filled: true
+    char_limit_compliance: 100
+    charts_configured: 3
+    readability_scores:
+      average: 75
+      minimum: 70
+
+---
+# 单个幻灯片内容文件格式
+# 文件名: slide_{NN}_{page_type}.yaml
+
+slide:
+  page_number:
+    type: integer
+
+  page_type:
+    type: string
+
+  source_page_manifest:
+    type: string
+    description: 对应的Page Manifest页面ID
+
+  text_content:
+    type: object
+    description: 文本内容
+    properties:
+      title:
+        type: object
+        properties:
+          text:
+            type: string
+          char_count:
+            type: integer
+          style_ref:
+            type: string
+            description: 引用Visual Design Spec的样式
+
+      subtitle:
+        type: object
+        properties:
+          text:
+            type: string
+          char_count:
+            type: integer
+          style_ref:
+            type: string
+
+      body:
+        type: object
+        properties:
+          text:
+            type: string
+          char_count:
+            type: integer
+          style_ref:
+            type: string
+          bullet_points:
+            type: array
+            items:
+              type: string
+
+      footnote:
+        type: object
+        properties:
+          text:
+            type: string
+          char_count:
+            type: integer
+          style_ref:
+            type: string
+
+  chart_config:
+    type: object
+    description: 图表配置(如果has_chart=true)
+    properties:
+      chart_type:
+        type: string
+        enum: [bar, line, pie, table, area, scatter]
+
+      chart_title:
+        type: string
+        maxLength: 40
+
+      data:
+        type: object
+        properties:
+          categories:
+            type: array
+            items:
+              type: string
+
+          series:
+            type: array
+            items:
+              type: object
+              properties:
+                name:
+                  type: string
+                values:
+                  type: array
+                  items:
+                    type: number
+                colors:
+                  type: array
+                  items:
+                    type: string
+
+      axes:
+        type: object
+        properties:
+          x_axis:
+            type: object
+            properties:
+              label:
+                type: string
+              show:
+                type: boolean
+
+          y_axis:
+            type: object
+            properties:
+              label:
+                type: string
+              show:
+                type: boolean
+              min:
+                type: number
+              max:
+                type: number
+
+      chart_style:
+        type: object
+        properties:
+          show_legend:
+            type: boolean
+          show_data_labels:
+            type: boolean
+          colors:
+            type: array
+            items:
+              type: string
+
+  image_config:
+    type: object
+    description: 图片配置(如果has_image=true)
+    properties:
+      image_path:
+        type: string
+      image_description:
+        type: string
+      image_placement:
+        type: string
+        enum: [full-width, left, right, center, background]
+
+  layout_ref:
+    type: string
+    description: 引用Visual Design Spec的布局
+
+# 单个幻灯片示例
+slide_example:
+  page_number: 7
+  page_type: data-chart
+  source_page_manifest: page_7
+
+  text_content:
+    title:
+      text: "85% 自动化率 - 6个月达成"
+      char_count: 38
+      style_ref: Visual_Design_Spec.typography.H1
+
+    body:
+      text: "我们的AI调度系统减少了70小时/周的人工工作,释放团队专注战略任务。"
+      char_count: 118
+      style_ref: Visual_Design_Spec.typography.body
+
+    footnote:
+      text: "基于12家中小企业客户数据, 2025年1-6月"
+      char_count: 48
+      style_ref: Visual_Design_Spec.typography.caption
+
+  chart_config:
+    chart_type: bar
+    chart_title: 自动化进展
+    data:
+      categories: ["2024前", "2025当前", "2025目标"]
+      series:
+        - name: 自动化率(%)
+          values: [15, 85, 95]
+          colors: ["#16213E", "#0F3460", "#1A1A2E"]
+    axes:
+      x_axis:
+        label: 时间线
+        show: true
+      y_axis:
+        label: 自动化率%
+        show: true
+        min: 0
+        max: 100
+    chart_style:
+      show_legend: false
+      show_data_labels: true
+
+  layout_ref: Visual_Design_Spec.layout_assignments.page_7

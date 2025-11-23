@@ -1,0 +1,34 @@
+# Chart-Dominant Layout Pattern
+name: Chart-Dominant
+category: data-focused
+description: "图表占据主要区域(50-70%),文字辅助说明"
+
+compatible_page_types:
+  - data-chart
+  - data-table
+
+layout_zones:
+  - zone: header
+    element: title
+    position: top
+    size_percent: 10-15
+
+  - zone: main
+    element: chart
+    position: center
+    size_percent: 50-70
+
+  - zone: insight
+    element: body_text
+    position: below_chart
+    size_percent: 10-15
+
+  - zone: footer
+    element: footnote
+    position: bottom
+    size_percent: 5-10
+
+spacing_rules:
+  margin: 60-80px
+  chart_padding: 40px
+  text_padding: 20px

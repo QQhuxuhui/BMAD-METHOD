@@ -1,0 +1,86 @@
+# Text-Heavy Page Type
+# 文本为主页面
+
+name: Text-Heavy
+type: text-heavy
+description: "以文字内容为主的页面,适合大部分内容展示场景"
+
+# 典型位置
+typical_position: null # 任意位置
+
+# 默认Content Slots
+default_content_slots:
+  title:
+    max_chars_en: 50
+    max_chars_cn: 15
+    hierarchy: H1
+    required: true
+    content_hint: "页面主题"
+
+  body:
+    max_chars_en: 300
+    max_chars_cn: 100
+    hierarchy: body
+    required: true
+    bullet_points: 3-5
+    content_hint: "主要内容,建议使用bullet points"
+    formatting:
+      - "每个bullet point控制在1-2行"
+      - "使用简短句子,避免长段落"
+      - "3-5个要点最佳"
+
+  footnote:
+    max_chars_en: 80
+    max_chars_cn: 25
+    hierarchy: caption
+    required: false
+    content_hint: "补充说明、数据来源或免责声明"
+
+# 特殊需求
+default_special_requirements:
+  has_image: false
+  has_chart: false
+  has_diagram: false
+
+# 信息架构模式
+info_architecture_patterns:
+  - "title + 3_bullets"
+  - "title + 4_bullets"
+  - "title + 5_bullets"
+  - "title + bullets + footnote"
+  - "title + paragraph + bullets"
+
+# 布局模板兼容性
+compatible_layouts:
+  - single-column-text.yaml
+  - two-column-text.yaml
+  - bullet-list.yaml
+
+# 设计原则
+design_principles:
+  - "保持简洁,避免文字墙"
+  - "使用bullet points增强可读性"
+  - "每点1-2行最佳,最多3行"
+  - "留白很重要,不要填满整页"
+
+# Bullet Points最佳实践
+bullet_points_guidelines:
+  max_count: 5
+  min_count: 2
+  chars_per_point_en: 50-80
+  chars_per_point_cn: 15-25
+  formatting:
+    - "并列结构(都用动词开头或都用名词短语)"
+    - "长度相近"
+    - "语气一致"
+
+# 常见错误
+common_pitfalls:
+  - pitfall: "Bullet points超过7个"
+    fix: "合并相似要点或拆分成2页"
+
+  - pitfall: "单个bullet point超过3行"
+    fix: "精简表述或拆分成子要点"
+
+  - pitfall: "文字密度过大"
+    fix: "增加行间距,使用更大字号"

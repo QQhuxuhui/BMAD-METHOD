@@ -1,0 +1,229 @@
+# Page Manifest Schema
+# Stage 2 (Page Planning) 输出
+
+type: object
+required:
+  - total_pages
+  - pages
+
+properties:
+  total_pages:
+    type: integer
+    minimum: 10
+    maximum: 20
+    description: 总页数(必须与Story Blueprint一致)
+
+  pages:
+    type: array
+    minItems: 10
+    maxItems: 20
+    items:
+      type: object
+      required:
+        - page_number
+        - page_type
+        - section_ref
+        - content_slots
+      properties:
+        page_number:
+          type: integer
+          minimum: 1
+          description: 页码
+
+        page_type:
+          type: string
+          enum:
+            - cover # 封面
+            - agenda # 议程
+            - section-divider # 章节分隔
+            - text-heavy # 文本为主
+            - image-focus # 图片为主
+            - data-chart # 数据图表
+            - data-table # 数据表格
+            - comparison # 对比
+            - timeline # 时间线
+            - process-flow # 流程图
+            - quote # 引用
+            - summary # 总结
+          description: 页面类型
+
+        section_ref:
+          type: string
+          description: 对应的Story Blueprint章节
+          examples:
+            - section_1_Introduction
+            - section_2_Problem
+
+        content_slots:
+          type: object
+          description: 内容槽位定义
+          properties:
+            title:
+              type: object
+              properties:
+                max_chars:
+                  type: integer
+                  description: 标题最大字符数
+                hierarchy:
+                  type: string
+                  enum: [H1, H2]
+                content_hint:
+                  type: string
+
+            subtitle:
+              type: object
+              properties:
+                max_chars:
+                  type: integer
+                hierarchy:
+                  type: string
+                  enum: [H2, H3]
+                content_hint:
+                  type: string
+
+            body:
+              type: object
+              properties:
+                max_chars:
+                  type: integer
+                hierarchy:
+                  type: string
+                  enum: [body, caption]
+                content_hint:
+                  type: string
+                bullet_points:
+                  type: integer
+                  minimum: 1
+                  maximum: 5
+
+            footnote:
+              type: object
+              properties:
+                max_chars:
+                  type: integer
+                hierarchy:
+                  type: string
+                  default: caption
+                content_hint:
+                  type: string
+
+        special_requirements:
+          type: object
+          description: 特殊需求
+          properties:
+            has_chart:
+              type: boolean
+              default: false
+
+            chart_hint:
+              type: string
+              description: 图表提示(如果has_chart=true)
+
+            has_image:
+              type: boolean
+              default: false
+
+            image_hint:
+              type: string
+              description: 图片提示(如果has_image=true)
+
+            has_diagram:
+              type: boolean
+              default: false
+
+        info_architecture:
+          type: string
+          description: 信息架构描述
+          examples:
+            - title + 3_bullets
+            - title + chart + insight
+            - title + image + caption
+
+        template_priority:
+          type: string
+          enum: [high, medium, low]
+          default: medium
+          description: 模板匹配优先级
+
+  validation:
+    type: object
+    properties:
+      total_pages_match:
+        type: boolean
+        description: 页数是否与Story Blueprint一致
+
+      all_sections_covered:
+        type: boolean
+        description: 是否覆盖所有章节
+
+      page_type_distribution:
+        type: object
+        description: 页面类型分布统计
+
+# 示例
+example:
+  total_pages: 15
+
+  pages:
+    - page_number: 1
+      page_type: cover
+      section_ref: section_1_Introduction
+      content_slots:
+        title:
+          max_chars: 40
+          hierarchy: H1
+          content_hint: 公司名称或产品名称
+        subtitle:
+          max_chars: 80
+          hierarchy: H2
+          content_hint: 副标题或Tagline
+      special_requirements:
+        has_image: true
+        image_hint: 公司logo
+
+    - page_number: 7
+      page_type: data-chart
+      section_ref: section_3_Solution
+      content_slots:
+        title:
+          max_chars: 60
+          hierarchy: H1
+          content_hint: 自动化效率
+        body:
+          max_chars: 120
+          hierarchy: body
+          content_hint: 关键洞察
+        footnote:
+          max_chars: 80
+          hierarchy: caption
+          content_hint: 数据来源
+      special_requirements:
+        has_chart: true
+        chart_hint: 自动化前后对比数据
+      info_architecture: title + chart + insight
+
+    - page_number: 10
+      page_type: text-heavy
+      section_ref: section_4_Market
+      content_slots:
+        title:
+          max_chars: 50
+          hierarchy: H1
+          content_hint: 市场规模
+        body:
+          max_chars: 300
+          hierarchy: body
+          content_hint: 市场分析
+          bullet_points: 4
+      info_architecture: title + 4_bullets
+
+  validation:
+    total_pages_match: true
+    all_sections_covered: true
+    page_type_distribution:
+      cover: 1
+      agenda: 1
+      text-heavy: 7
+      data-chart: 4
+      data-table: 1
+      summary: 1

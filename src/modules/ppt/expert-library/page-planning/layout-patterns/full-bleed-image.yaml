@@ -1,0 +1,6 @@
+name: Full-Bleed-Image
+category: visual-focused
+compatible_page_types: [cover, image-focus]
+layout_zones:
+  - { zone: background, element: full_image, position: full_page }
+  - { zone: overlay, element: title, position: center or bottom }

@@ -1,0 +1,18 @@
+# Cover-Centered Layout Pattern
+name: Cover-Centered
+category: title-focused
+description: "居中对齐的封面布局"
+
+compatible_page_types:
+  - cover
+  - section-divider
+
+layout_zones:
+  - zone: center
+    element: title + subtitle
+    position: vertical_center
+    alignment: center
+
+  - zone: logo
+    element: company_logo
+    position: top_right or bottom_center

@@ -1,0 +1,8 @@
+name: Chart-Split
+layout_id: chart-split
+category: data
+compatible_page_types: [data-chart, comparison]
+layout_zones:
+  - { zone_id: title, position: { y: top-60px } }
+  - { zone_id: chart_left, element: chart_1, position: { x: left-80px, width: 45% } }
+  - { zone_id: chart_right, element: chart_2, position: { x: right-100px, width: 45% } }

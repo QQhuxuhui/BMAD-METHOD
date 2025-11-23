@@ -1,0 +1,25 @@
+# Process-Flow Page Type
+name: Process-Flow
+type: process-flow
+description: "流程图页,展示步骤或工作流"
+
+default_content_slots:
+  title:
+    max_chars_en: 50
+    max_chars_cn: 15
+    hierarchy: H1
+  process_steps:
+    hierarchy: body
+    content_hint: "3-5个流程步骤"
+
+default_special_requirements:
+  has_diagram: true
+  diagram_hint: "process flow diagram"
+
+info_architecture_patterns:
+  - "title + horizontal_flow"
+  - "title + vertical_flow"
+
+compatible_layouts:
+  - three-zone.yaml
+  - text-image-split.yaml

@@ -1,0 +1,7 @@
+name: Text-Image-Right
+layout_id: text-image-right
+category: content
+compatible_page_types: [text-heavy, image-focus]
+layout_zones:
+  - { zone_id: left, element: image, position: { x: left-80px, y: 150px, width: 45% } }
+  - { zone_id: right, element: text, position: { x: right-100px, y: 150px, width: 45% } }

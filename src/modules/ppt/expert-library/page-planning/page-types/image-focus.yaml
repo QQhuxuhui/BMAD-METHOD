@@ -1,0 +1,28 @@
+# Image-Focus Page Type
+name: Image-Focus
+type: image-focus
+description: "以图片为主的页面,适合产品展示、截图演示"
+
+default_content_slots:
+  title:
+    max_chars_en: 50
+    max_chars_cn: 15
+    hierarchy: H1
+  caption:
+    max_chars_en: 100
+    max_chars_cn: 30
+    hierarchy: body
+    content_hint: "图片说明"
+
+default_special_requirements:
+  has_image: true
+  image_hint: "产品截图、实物照片或示意图"
+
+info_architecture_patterns:
+  - "title + image + caption"
+  - "title + full_bleed_image"
+
+compatible_layouts:
+  - image-left.yaml
+  - image-right.yaml
+  - full-bleed-image.yaml
