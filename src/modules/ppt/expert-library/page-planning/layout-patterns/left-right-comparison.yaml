@@ -1,0 +1,204 @@
+# Left-Right Comparison Layout Pattern
+# 左右对比布局 - 适合痛点vs方案、传统vs创新等对比展示
+
+name: Left-Right-Comparison
+category: comparison
+description: "左右对比型布局，左侧展示问题/痛点/现状，右侧展示解决方案/优势/目标，强调对比和转变"
+
+# 适用页面类型
+compatible_page_types:
+  - comparison # 对比页
+  - solution-intro # 方案介绍
+  - before-after # 前后对比
+  - problem-solution # 问题-解决方案
+
+# 布局特点
+layout_characteristics:
+  split_ratio: "45:45" # 左右区域比例（45% vs 45%，中间10%留白）
+  contrast_emphasis: high # 高对比度强调
+  visual_separator: true # 中间分隔符
+  alignment: vertical_center # 垂直居中对齐
+
+# 布局区域定义
+layout_zones:
+  # 顶部：核心目标（红色强调）
+  - zone: header
+    element: core_objective
+    position: top_full_width
+    size_percent: 10
+    optional: true
+    style:
+      background: "#FFB800" # 黄色背景（或红色 #FF0000 用于核心目标）
+      text_color: "#FFFFFF"
+      font_size: 24
+      font_weight: bold
+      padding: 15
+      text_align: center
+      border_radius: 6
+
+  # 左侧：痛点/问题/现状
+  - zone: left_panel
+    element: pain_points_or_problems
+    position: left
+    size_percent: 45
+    style:
+      background: "#FAFAFA" # 浅灰背景
+      border: "2px solid #E94560" # 红色边框（负面）
+      border_radius: 8
+      padding: 30
+
+    content_structure:
+      # 标题
+      - type: section_title
+        text_example: "传统方式的痛点"
+        style:
+          font_size: 24
+          font_weight: bold
+          color: "#E94560" # 红色标题（负面）
+          margin_bottom: 20
+
+      # 痛点列表（使用菱形符号◆）
+      - type: bullet_list
+        bullet_style: "◆" # 菱形符号
+        bullet_color: "#E94560" # 红色
+        max_items: "4-6"
+        item_style:
+          font_size: 16
+          line_height: 1.8
+          spacing: 15
+
+  # 中间分隔符（可选）
+  - zone: separator
+    element: visual_divider
+    position: center_vertical
+    size_percent: 2
+    optional: true
+    style:
+      type: arrow_or_line
+      color: "#0066FF"
+      direction: "left_to_right" # 从左指向右（暗示转变）
+
+  # 右侧：解决方案/优势/目标
+  - zone: right_panel
+    element: solutions_or_benefits
+    position: right
+    size_percent: 45
+    style:
+      background: "#FFFFFF" # 白色背景
+      border: "2px solid #0066FF" # 蓝色边框（正面）
+      border_radius: 8
+      padding: 30
+
+    content_structure:
+      # 标题
+      - type: section_title
+        text_example: "我们的AI解决方案"
+        style:
+          font_size: 24
+          font_weight: bold
+          color: "#0066FF" # 蓝色标题（正面）
+          margin_bottom: 20
+
+      # 方案分层展示
+      - type: layered_solution
+        layers: "3-5"
+        layer_style:
+          background: "#CCE5FF" # 浅蓝背景
+          border: "1px dashed #0066FF"
+          border_radius: 6
+          padding: 12
+          margin_bottom: 10
+          icon_color: "#0066FF"
+
+# 公司标准主题适配
+company_standard_styling:
+  left_panel:
+    title_color: "#E94560" # 红色痛点标题
+    bullet_symbol: "◆"
+    bullet_color: "#E94560"
+    background: "#FAFAFA"
+    border: "2px solid #E94560"
+
+  right_panel:
+    title_color: "#0066FF" # 蓝色方案标题
+    layer_background: "#CCE5FF" # 浅蓝
+    layer_border: "1px dashed #0066FF"
+    border: "2px solid #0066FF"
+
+  core_objective:
+    background: "#FF0000" # 红色强调（仅核心目标）
+    text_color: "#FFFFFF"
+
+  separator:
+    type: "arrow"
+    color: "#0066FF"
+    width: 3
+
+# 内容约束
+content_constraints:
+  section_title:
+    max_chars: 40
+    recommended: "8-16字"
+
+  pain_point_item:
+    max_chars: 60
+    recommended: "15-30字"
+
+  solution_layer:
+    max_chars: 50
+    recommended: "10-25字"
+
+  left_right_balance:
+    item_count_diff: "≤2" # 左右两侧条目数量差异不超过2个
+
+# 设计原则
+design_principles:
+  - "左侧负面（红色系）vs 右侧正面（蓝色系），色彩强烈对比"
+  - "左右内容数量平衡，视觉权重相当"
+  - "使用箭头或分隔线强调'转变'关系"
+  - "痛点使用菱形符号◆，方案使用分层卡片"
+  - "核心目标使用红色背景突出"
+
+# 使用场景
+use_cases:
+  - scenario: "补能调度方案介绍"
+    left_title: "传统人工调度的痛点"
+    left_items:
+      - "人工排班效率低，80%时间浪费"
+      - "无法应对突发需求变化"
+      - "调度质量不稳定"
+    right_title: "AI智能调度方案"
+    right_layers:
+      - "实时需求感知层"
+      - "智能匹配算法层"
+      - "自动执行监控层"
+      - "持续优化学习层"
+
+  - scenario: "产品价值主张"
+    core_objective: "目标：降低运营成本50%，提升效率300%"
+    left_title: "市场现状"
+    right_title: "我们的价值"
+
+  - scenario: "技术方案对比"
+    left_title: "传统架构"
+    right_title: "新一代架构"
+
+# 变体配置
+layout_variants:
+  # 变体1：痛点vs方案（默认）
+  pain_solution:
+    left_emphasis: negative
+    right_emphasis: positive
+    separator: arrow_right
+
+  # 变体2：现状vs目标
+  current_target:
+    left_emphasis: neutral
+    right_emphasis: positive
+    separator: dashed_line
+
+  # 变体3：传统vs创新
+  traditional_innovative:
+    left_emphasis: outdated
+    right_emphasis: modern
+    separator: vs_symbol

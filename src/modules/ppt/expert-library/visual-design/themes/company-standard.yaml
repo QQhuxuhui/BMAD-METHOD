@@ -1,0 +1,459 @@
+# Company Standard Theme
+# 公司标准产品汇报主题
+
+name: Company Standard
+style: professional
+description: "公司标准产品汇报风格，蓝黄配色体系，适合内部产品汇报、技术评审、项目进展等场景"
+
+# 适用场景
+suitable_for:
+  purposes:
+    - internal_report # 内部汇报
+    - product_review # 产品评审
+    - project_update # 项目进展
+    - technical_report # 技术汇报
+    - solution_intro # 方案介绍
+  audiences:
+    - executives # 公司高层
+    - colleagues # 部门同事
+    - project_team # 项目团队
+    - internal_customers # 内部客户
+  scenarios:
+    - 产品季度汇报
+    - 技术方案评审
+    - 项目进展汇报
+    - 解决方案介绍
+    - 团队工作总结
+
+# 色彩系统
+color_palette:
+  # 蓝色系（主色调）
+  primary: "#0066FF" # 标题蓝（主要用于H1、H2标题）
+  secondary: "#3399FF" # 内容蓝（用于H3、模块标题）
+  tertiary: "#66B3FF" # 浅蓝（用于背景色、辅助元素）
+  light_blue: "#CCE5FF" # 极浅蓝（用于卡片背景）
+
+  # 黄色系（辅助强调色）
+  accent:
+    primary: "#FFB800" # 强调黄（重要数据、关键指标）
+    secondary: "#FFD54F" # 次要黄（次级强调元素）
+
+  # 警示色（仅核心目标使用）
+  alert: "#FF0000" # 红色（核心目标、关键问题）
+
+  # 中性色（文字和背景）
+  background:
+    primary: "#FFFFFF" # 主背景（白色）
+    card: "#F5F5F5" # 卡片背景（浅灰）
+    section: "#FAFAFA" # 章节分隔背景
+
+  text:
+    primary: "#333333" # 主文字（深灰）
+    secondary: "#666666" # 次要文字（中灰）
+    tertiary: "#999999" # 三级文字（浅灰）
+    disabled: "#CCCCCC" # 禁用文字（极浅灰）
+
+  # 对比度验证（WCAG AA标准：≥4.5）
+  contrast_ratios:
+    primary_on_white: 9.8 # #0066FF on #FFFFFF
+    text_primary_on_white: 12.6 # #333333 on #FFFFFF
+    accent_on_white: 3.2 # #FFB800 on #FFFFFF (仅用于大号字体)
+
+# 字体系统
+typography:
+  # 字体家族
+  font_family:
+    heading_cn: "微软雅黑 Bold" # 中文标题
+    body_cn: "微软雅黑 Regular" # 中文正文
+    heading_en: "Arial Bold" # 英文标题
+    body_en: "Arial Regular" # 英文正文
+    number: "Arial" # 数字专用（保持一致性）
+
+  # 标题字号（pt）
+  heading_sizes:
+    H1: 44 # 主标题（40-48pt range，页面主标题）
+    H2: 30 # 副标题（28-32pt range，一级板块标题）
+    H3: 22 # 三级标题（20-24pt range，二级标题）
+
+  # 正文字号（pt）
+  body_sizes:
+    body: 16 # 正文（14-16pt）
+    small: 14 # 小字（辅助文字）
+    caption: 12 # 说明文字（footnote、来源标注）
+
+  # 行高
+  line_height:
+    heading: 1.2 # 标题紧凑
+    body: 1.6 # 正文舒适（中文优化）
+    caption: 1.4 # 说明适中
+
+  # 字重
+  font_weights:
+    heading: 700 # Bold（标题）
+    body: 400 # Regular（正文）
+    emphasis: 600 # Semi-bold（强调）
+
+# 设计标准
+design_standards:
+  # 页面规格
+  page:
+    aspect_ratio: "16:9"
+    width: 1920
+    height: 1080
+
+  # 间距系统（px，基于1920x1080）
+  spacing:
+    margin:
+      horizontal: "5-7%" # 左右边距：96-134px
+      top: 60 # 顶部边距
+      bottom: 60 # 底部边距
+
+    title_zone_height: "10-15%" # 标题区高度：108-162px
+
+    padding:
+      card: 20 # 卡片内边距
+      section: 40 # 章节间距
+      element: 15 # 元素间距
+
+  # 圆角矩形样式（核心视觉元素）
+  card_style:
+    border_radius: 6 # 圆角半径（5-8px range）
+    border: "1px dashed #0066FF" # 蓝色虚线边框
+    background: "#FFFFFF"
+    shadow: "0 2px 4px rgba(0, 102, 255, 0.1)" # 淡蓝色阴影
+    padding: 20
+
+  # 按钮样式
+  button_style:
+    background: "linear-gradient(135deg, #0066FF 0%, #3399FF 100%)" # 蓝色渐变
+    text_color: "#FFFFFF" # 白色文字
+    border_radius: 6
+    padding_horizontal: 24
+    padding_vertical: 12
+    font_size: 16
+    font_weight: 600
+
+  # 流程箭头
+  arrow_style:
+    width: 2.5 # 2-3pt
+    color: "#0066FF"
+    style: "solid"
+    head_size: 8
+
+  # 图标风格
+  icon_style:
+    type: "flat" # 扁平化
+    color: "#0066FF" # 单色蓝色系
+    size_small: 24
+    size_medium: 32
+    size_large: 48
+
+  # 对齐规则
+  alignment:
+    title: "left" # 标题左对齐
+    body: "left" # 正文左对齐
+    numbers: "right" # 数字右对齐
+    chart_title: "left" # 图表标题左对齐
+    center_exceptions: # 仅以下元素可居中
+      - cover_page
+      - section_divider
+      - thank_you_page
+
+  # 视觉层级
+  visual_hierarchy:
+    - element: title
+      priority: 1
+      emphasis: "size(H1=44pt) + weight(Bold) + color(#0066FF) + position(top-left)"
+
+    - element: key_content
+      priority: 2
+      emphasis: "size(larger) + color(#FFB800 for accent) + visual_weight"
+
+    - element: body_text
+      priority: 3
+      emphasis: "size(16pt) + color(#333333) + left_aligned"
+
+    - element: footnote
+      priority: 4
+      emphasis: "size(12pt) + color(#999999) + bottom_placement"
+
+  # CRAP原则应用
+  crap:
+    # Contrast（对比）
+    contrast:
+      enabled: true
+      rules:
+        - "标题 vs 正文字号比 = 44/16 = 2.75"
+        - "蓝色标题 vs 白色背景，高对比度"
+        - "黄色强调 vs 主内容，颜色对比"
+        - "深灰文字 vs 白色背景，可读性优化"
+
+    # Repetition（重复）
+    repetition:
+      enabled: true
+      rules:
+        - "所有页面使用一致的margin: 5-7%水平，60px垂直"
+        - "标题位置固定在左上角（除封面、章节页）"
+        - "色彩系统化：蓝色主调 + 黄色点缀"
+        - "圆角矩形样式统一：6px圆角 + 虚线边框"
+
+    # Alignment（对齐）
+    alignment:
+      enabled: true
+      rules:
+        - "所有元素左对齐（符合中文阅读习惯）"
+        - "数字右对齐（表格/图表）"
+        - "居中对齐仅用于封面、章节分隔、结束页"
+
+    # Proximity（亲密性）
+    proximity:
+      enabled: true
+      rules:
+        - "相关元素间距：15px"
+        - "不相关元素间距：40px"
+        - "章节分隔：60px"
+        - "卡片内部元素紧密分组"
+
+# 布局偏好
+layout_preferences:
+  # 封面页
+  cover:
+    preferred:
+      - cover-centered # 居中式封面（推荐）
+      - cover-left-aligned # 左对齐封面
+    avoid:
+      - full-bleed-image # 避免全屏图片（保持简洁）
+
+  # 内容页
+  content:
+    preferred:
+      - bullet-list # 项目列表（常用）
+      - text-image-split # 左右分栏（图文结合）
+      - two-column-text # 双栏文字
+      - three-zone # 三区域布局（产品架构）
+    avoid:
+      - text-dominant # 避免纯文字页面
+
+  # 数据页
+  data:
+    preferred:
+      - chart-dominant # 图表为主（推荐）
+      - text-chart-combo # 文字+图表组合
+      - split-data # 数据分栏对比
+    avoid:
+      - table-layout # 减少使用表格（影响视觉）
+
+  # 流程页
+  process:
+    preferred:
+      - process-flow # 流程图布局
+      - timeline # 时间轴布局
+
+  # 对比页
+  comparison:
+    preferred:
+      - text-image-split # 左右对比
+      - two-column-text # 双栏对比
+
+# 特殊效果
+visual_effects:
+  # 阴影（淡化使用，避免过度装饰）
+  shadows:
+    card: "0 2px 4px rgba(0, 102, 255, 0.1)" # 卡片淡蓝色阴影
+    button: "0 3px 6px rgba(0, 102, 255, 0.15)" # 按钮阴影
+    elevated: "0 4px 8px rgba(0, 102, 255, 0.2)" # 提升元素
+
+  # 渐变（仅按钮和强调元素）
+  gradients:
+    button: "linear-gradient(135deg, #0066FF 0%, #3399FF 100%)"
+    accent: "linear-gradient(90deg, #FFB800 0%, #FFD54F 100%)"
+
+  # 边框
+  borders:
+    standard: "1px solid #CCCCCC" # 标准边框
+    emphasis: "1px dashed #0066FF" # 强调边框（虚线）
+    thick: "2px solid #0066FF" # 粗边框
+
+# 图表样式
+chart_styling:
+  default_chart_type: bar # 默认柱状图
+
+  # 图表配色
+  chart_colors:
+    primary_series: "#0066FF" # 主数据系列
+    secondary_series: "#3399FF" # 次数据系列
+    tertiary_series: "#66B3FF" # 第三系列
+
+    accent_series: "#FFB800" # 强调数据系列
+
+    positive: "#2A9D8F" # 正面数据（增长、成功）
+    negative: "#E94560" # 负面数据（下降、问题）
+    neutral: "#999999" # 中性数据
+
+    target: "#FF0000" # 目标线（红色）
+
+  # 图表字体
+  chart_fonts:
+    title:
+      family: "微软雅黑 Bold"
+      size: 24
+      color: "#0066FF"
+
+    labels:
+      family: "微软雅黑 Regular"
+      size: 14
+      color: "#666666"
+
+    data_labels:
+      family: "Arial"
+      size: 16
+      color: "#333333"
+      weight: 600
+
+  # 图表背景
+  chart_backgrounds:
+    transparent: false # 图表背景不透明
+    background_color: "#FFFFFF" # 白色背景
+    grid_color: "#E5E5E5" # 网格线颜色
+    axis_color: "#999999" # 坐标轴颜色
+
+  # 图表边距
+  chart_margins:
+    top: 20
+    right: 20
+    bottom: 40
+    left: 60
+
+# 页面类型专属样式
+
+page_type_styles:
+  # 产品架构图页
+  product_architecture:
+    layout: three-zone # 3-5栏并列
+    module_card:
+      background: "#F5F5F5"
+      border: "1px dashed #0066FF"
+      border_radius: 6
+      title_color: "#0066FF"
+      title_background: "#CCE5FF"
+    grouping_box:
+      border: "2px dashed #3399FF"
+      background: "rgba(204, 229, 255, 0.3)"
+
+  # 方案介绍页（左右对比）
+  solution_intro:
+    layout: text-image-split
+    pain_point_icon: "◆" # 菱形符号
+    pain_point_color: "#E94560" # 红色痛点
+    solution_layer_color: "#0066FF" # 蓝色方案
+    target_highlight: "#FF0000" # 红色核心目标
+
+  # 流程展示页
+  process_flow:
+    layout: process-flow
+    node_style:
+      background: "linear-gradient(135deg, #0066FF 0%, #3399FF 100%)"
+      text_color: "#FFFFFF"
+      border_radius: 6
+    arrow_color: "#0066FF"
+    arrow_width: 2.5
+
+  # 数据展示页
+  data_showcase:
+    layout: text-chart-combo
+    number_size: 32 # 大号数字
+    number_color: "#0066FF" # 蓝色数字
+    accent_number_color: "#FFB800" # 黄色强调数字
+    chart_dominant: true
+
+  # 产品演示页
+  product_demo:
+    layout: image-left
+    screenshot_border: "1px solid #CCCCCC"
+    screenshot_shadow: "0 4px 8px rgba(0, 0, 0, 0.1)"
+    feature_list_icon: "✓"
+    feature_list_color: "#0066FF"
+
+# 品牌整合建议
+brand_integration:
+  logo_placement: "top-right" # Logo位置
+  logo_size: "small" # Logo大小（避免喧宾夺主）
+  logo_margin: 20
+
+  # 如有品牌色，可以替换的元素
+  color_override_strategy:
+    - "品牌主色可替换 primary (#0066FF)"
+    - "品牌辅助色可替换 accent.primary (#FFB800)"
+    - "保持整体蓝黄配色基调"
+
+  # 品牌字体整合
+  font_override_strategy:
+    - "品牌字体可替换标题字体"
+    - "正文字体保持微软雅黑/Arial以确保可读性"
+
+# 使用示例
+example_usage:
+  scenario: "产品季度汇报PPT"
+  page_count: 12
+  structure:
+    - page: 1
+      type: cover
+      highlight: "蓝色渐变标题 + 公司Logo右上角"
+
+    - page: 2-3
+      type: product_architecture
+      highlight: "3栏架构图，蓝色虚线边框卡片"
+
+    - page: 4-5
+      type: solution_intro
+      highlight: "左侧痛点（红色菱形）vs 右侧方案（蓝色分层）"
+
+    - page: 6-7
+      type: data_showcase
+      highlight: "大号蓝色数字 + 柱状图可视化"
+
+    - page: 8-9
+      type: process_flow
+      highlight: "蓝色渐变节点 + 箭头连接"
+
+    - page: 10-11
+      type: product_demo
+      highlight: "左侧产品截图 + 右侧功能列表（蓝色✓）"
+
+    - page: 12
+      type: summary
+      highlight: "核心要点总结（黄色强调）"
+
+# 设计心理学
+design_psychology:
+  color_meaning:
+    blue: "专业、信任、稳定（主色调传递专业感）"
+    yellow: "活力、创新、重点（辅助色吸引注意力）"
+    white: "简洁、清晰、现代（背景保持干净）"
+
+  audience_perception:
+    executives: "专业、数据驱动、重点突出"
+    colleagues: "清晰、易懂、信息完整"
+    technical_team: "结构化、逻辑清晰、细节充分"
+
+# 注意事项
+best_practices:
+  do:
+    - "✅ 使用蓝色标题建立视觉层级"
+    - "✅ 用黄色强调关键数据和重点"
+    - "✅ 圆角矩形+虚线边框统一模块样式"
+    - "✅ 保持页面留白，避免信息过载"
+    - "✅ 数字大号显示，突出关键指标"
+
+  dont:
+    - "❌ 避免过多颜色（保持蓝黄白灰为主）"
+    - "❌ 避免红色滥用（仅核心目标/严重问题）"
+    - "❌ 避免单页文字过多（>300字）"
+    - "❌ 避免复杂表格（优先用图表）"
+    - "❌ 避免字号过小（最小12pt）"
+
+warnings:
+  - "确保投影环境：此主题基于白色背景，适合明亮环境投影"
+  - "打印友好：色彩方案适合彩色打印，黑白打印时注意对比度"
+  - "字体可用性：确保演示电脑安装微软雅黑字体"
+  - "文件大小：控制图片质量，避免PPT文件过大（建议<20MB）"

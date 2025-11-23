@@ -49,10 +49,10 @@ expert_library:
 
   page_planning:
     page_types: 12
-    layout_patterns: 15
+    layout_patterns: 20
 
   visual_design:
-    themes: 8
+    themes: 9
     layouts: 20
 
 supported_features:

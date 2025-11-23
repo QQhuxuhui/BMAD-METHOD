@@ -1,0 +1,273 @@
+# Card Grid Data Layout Pattern
+# 卡片网格数据布局 - 适合展示多个关键指标、数据对比、成果展示
+
+name: Card-Grid-Data
+category: data-focused
+description: "卡片网格型数据布局，2x2或3x2网格排列，每个卡片展示一个关键指标或数据，适合效率提升、性能指标、客户案例数据等多维数据展示"
+
+# 适用页面类型
+compatible_page_types:
+  - data-showcase # 数据展示
+  - metrics # 指标展示
+  - achievements # 成果展示
+  - comparison # 对比数据
+  - kpi-dashboard # KPI仪表盘
+
+# 布局特点
+layout_characteristics:
+  grid_layout: "2x2 or 3x2" # 2行2列 或 3行2列
+  card_based: true # 基于卡片设计
+  number_emphasis: high # 数字高度强调
+  visual_balance: symmetric # 对称平衡
+
+# 布局区域定义
+layout_zones:
+  # 顶部：标题
+  - zone: header
+    element: title
+    position: top_full_width
+    size_percent: 12
+    style:
+      text_align: left
+      font_size: 32
+      font_weight: bold
+      color: "#0066FF"
+      margin_bottom: 25
+
+  # 中部：卡片网格容器
+  - zone: grid_container
+    element: data_cards
+    position: center
+    size_percent: 80
+    layout_mode: grid
+
+    # 网格配置
+    grid_config:
+      rows: 2 # 默认2行
+      columns: 2 # 默认2列
+      row_gap: 30 # 行间距
+      column_gap: 30 # 列间距
+      flexible: true # 支持2x2或3x2灵活配置
+
+    # 数据卡片模板
+    card_template:
+      width: "auto" # 根据网格自动计算
+      min_height: 180 # 最小高度
+
+      style:
+        background: "#FFFFFF"
+        border: "1px solid #E5E5E5"
+        border_radius: 8
+        padding: 25
+        shadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
+        hover_effect:
+          shadow: "0 4px 12px rgba(0, 102, 255, 0.15)"
+          border_color: "#0066FF"
+
+      content_structure:
+        # 图标（可选）
+        - type: icon
+          position: top_left
+          optional: true
+          style:
+            size: 32
+            color: "#0066FF"
+            margin_bottom: 10
+
+        # 大号数字（核心）
+        - type: primary_number
+          position: center_or_top
+          style:
+            font_size: 48 # 24-36pt 大号
+            font_weight: bold
+            color: "#0066FF" # 蓝色数字（正面）
+            font_family: "Arial" # 数字专用字体
+            margin_bottom: 8
+
+        # 单位或标签
+        - type: unit_label
+          position: beside_number
+          style:
+            font_size: 20
+            font_weight: normal
+            color: "#666666"
+
+        # 指标名称
+        - type: metric_name
+          position: below_number
+          style:
+            font_size: 16
+            font_weight: 600
+            color: "#333333"
+            margin_bottom: 5
+
+        # 说明文字（可选）
+        - type: description
+          position: bottom
+          optional: true
+          style:
+            font_size: 14
+            color: "#999999"
+            max_chars: 40
+            line_height: 1.4
+
+# 公司标准主题适配
+company_standard_styling:
+  # 卡片样式
+  card:
+    background: "#FFFFFF"
+    border: "1px solid #E5E5E5"
+    border_radius: 8
+    shadow: "0 2px 8px rgba(0, 0, 0, 0.08)"
+    padding: 25
+
+  # 数字样式
+  primary_number:
+    font_size: 48
+    color: "#0066FF" # 蓝色正面数据
+    font_weight: bold
+    font_family: "Arial"
+
+  accent_number:
+    color: "#FFB800" # 黄色强调数据（对比、特殊指标）
+
+  negative_number:
+    color: "#E94560" # 红色负面数据（下降、问题）
+
+  # 图标样式
+  icon:
+    color: "#0066FF"
+    size: 32
+
+  # 文字样式
+  metric_name:
+    color: "#333333"
+    font_size: 16
+    font_weight: 600
+
+  description:
+    color: "#999999"
+    font_size: 14
+
+# 内容约束
+content_constraints:
+  primary_number:
+    max_chars: 8
+    recommended: "2-6位数字"
+    format_examples:
+      - "85%"
+      - "$2.3M"
+      - "10,000+"
+      - "4.5x"
+
+  metric_name:
+    max_chars: 25
+    recommended: "6-12字"
+
+  description:
+    max_chars: 40
+    recommended: "10-20字"
+
+  grid_size:
+    min_cards: 4 # 2x2
+    max_cards: 6 # 3x2
+    recommended: 4
+
+# 设计原则
+design_principles:
+  - "数字放大突出显示（48pt），使用蓝色强调正面数据"
+  - "卡片使用白色背景，淡灰边框，圆角矩形"
+  - "网格排列整齐，行列间距一致（30px）"
+  - "每个卡片一个核心指标，避免信息过载"
+  - "使用颜色区分：蓝色（正面）、黄色（强调）、红色（负面）"
+  - "可选图标增强可识别性"
+
+# 使用场景
+use_cases:
+  - scenario: "产品价值数据展示"
+    grid: "2x2"
+    cards:
+      - number: "85%"
+        metric: "效率提升"
+        description: "相比人工调度节省时间"
+        color: blue
+
+      - number: "$2.3M"
+        metric: "年成本节省"
+        description: "降低运营成本"
+        color: blue
+
+      - number: "10,000+"
+        metric: "日均调度次数"
+        description: "系统处理能力"
+        color: yellow
+
+      - number: "99.5%"
+        metric: "系统可用性"
+        description: "稳定性保障"
+        color: blue
+
+  - scenario: "客户案例数据"
+    grid: "3x2"
+    cards:
+      - { number: "50+", metric: "服务企业" }
+      - { number: "20万+", metric: "覆盖司机" }
+      - { number: "5大", metric: "应用场景" }
+      - { number: "95%", metric: "客户满意度" }
+      - { number: "3倍", metric: "ROI提升" }
+      - { number: "24/7", metric: "技术支持" }
+
+  - scenario: "性能指标对比"
+    grid: "2x2"
+    cards:
+      - { number: "< 50ms", metric: "响应时间", color: blue }
+      - { number: "98%", metric: "准确率", color: blue }
+      - { number: "1000/s", metric: "处理速度", color: yellow }
+      - { number: "0故障", metric: "运行记录", color: blue }
+
+# 网格变体配置
+grid_variants:
+  # 2x2 网格（标准，推荐）
+  two_by_two:
+    rows: 2
+    columns: 2
+    total_cards: 4
+    card_width_percent: 45
+    card_height: 200
+    best_for: "核心KPI展示、关键数据对比"
+
+  # 3x2 网格（详细）
+  three_by_two:
+    rows: 2
+    columns: 3
+    total_cards: 6
+    card_width_percent: 30
+    card_height: 180
+    best_for: "多维度数据、客户案例数据"
+
+# 数字格式化建议
+number_formatting:
+  percentage: "85%（百分比直接显示）"
+  money: "$2.3M（使用K/M/B缩写）"
+  large_number: "10,000+（千位分隔符+后缀）"
+  ratio: "4.5x（倍数）"
+  time: "< 50ms（带单位）"
+  range: "24/7（范围）"
+
+# 色彩使用策略
+color_strategy:
+  positive_metrics:
+    color: "#0066FF"
+    examples: ["效率提升", "成本节省", "满意度", "可用性"]
+
+  highlight_metrics:
+    color: "#FFB800"
+    examples: ["处理能力", "覆盖规模", "特殊成就"]
+
+  neutral_metrics:
+    color: "#666666"
+    examples: ["时间", "日期", "版本号"]
+
+  warning_metrics:
+    color: "#E94560"
+    examples: ["故障率", "投诉数", "下降指标"]

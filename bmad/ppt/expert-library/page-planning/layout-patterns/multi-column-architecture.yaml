@@ -1,0 +1,174 @@
+# Multi-Column Architecture Layout Pattern
+# 多栏架构图布局 - 适合产品功能模块展示
+
+name: Multi-Column-Architecture
+category: hybrid
+description: "3-5栏并列布局，适合展示产品架构、功能模块、技术栈等结构化内容"
+
+# 适用页面类型
+compatible_page_types:
+  - architecture # 架构图
+  - feature-showcase # 功能展示
+  - tech-stack # 技术栈
+  - module-overview # 模块概览
+
+# 布局特点
+layout_characteristics:
+  column_count: "3-5" # 支持3到5栏灵活配置
+  alignment: center # 栏位居中对齐
+  spacing_between_columns: 30 # 栏间距（px）
+  card_based: true # 基于卡片设计
+
+# 布局区域定义
+layout_zones:
+  # 顶部：产品定位说明（可选）
+  - zone: header
+    element: title
+    position: top_full_width
+    size_percent: 12
+    style:
+      background: transparent
+      text_align: left
+
+  - zone: subtitle
+    element: product_positioning
+    position: below_title
+    size_percent: 8
+    optional: true
+    style:
+      border: "1px dashed #0066FF" # 蓝色虚线边框
+      border_radius: 6
+      padding: 15
+      background: "#F5F5F5"
+
+  # 中部：多栏模块展示
+  - zone: columns_container
+    element: architecture_modules
+    position: center
+    size_percent: 70
+    layout_mode: flexible_columns
+
+    # 每个栏位的配置
+    column_template:
+      width_percent: "auto" # 根据栏数自动计算（100% / column_count）
+      spacing: 30
+
+      elements:
+        # 栏位标题
+        - type: column_header
+          style:
+            background: "#0066FF" # 蓝色背景
+            text_color: "#FFFFFF"
+            font_size: 20
+            font_weight: bold
+            padding: 10
+            border_radius: "6px 6px 0 0"
+
+        # 模块卡片（每栏可包含3-6个模块）
+        - type: module_cards
+          count: "3-6"
+          style:
+            background: "#FFFFFF"
+            border: "1px solid #E5E5E5"
+            border_radius: 6
+            padding: 12
+            margin_bottom: 8
+            icon_color: "#0066FF"
+            text_color: "#333333"
+
+  # 底部：分组框（可选，用虚线框分组相关模块）
+  - zone: grouping_boxes
+    element: module_groups
+    position: overlay_on_columns
+    optional: true
+    style:
+      border: "2px dashed #3399FF" # 蓝色虚线大框
+      border_radius: 8
+      background: "rgba(204, 229, 255, 0.3)" # 半透明浅蓝背景
+      padding: 20
+
+# 示例配置
+example_configurations:
+  # 3栏配置示例
+  three_column:
+    columns:
+      - title: "前端层"
+        modules:
+          - "Web界面"
+          - "移动端App"
+          - "数据可视化"
+
+      - title: "业务层"
+        modules:
+          - "调度引擎"
+          - "规则引擎"
+          - "优化算法"
+
+      - title: "数据层"
+        modules:
+          - "时序数据库"
+          - "关系数据库"
+          - "缓存层"
+
+  # 5栏配置示例
+  five_column:
+    columns:
+      - title: "接入层"
+      - title: "网关层"
+      - title: "服务层"
+      - title: "数据层"
+      - title: "基础设施"
+
+# 公司标准主题适配
+company_standard_styling:
+  column_header:
+    background: "#0066FF" # 标题蓝
+    text_color: "#FFFFFF"
+
+  module_card:
+    border: "1px dashed #0066FF" # 蓝色虚线边框
+    border_radius: 6
+    background: "#FFFFFF"
+    hover_background: "#F5F5F5"
+
+  grouping_box:
+    border: "2px dashed #3399FF" # 内容蓝虚线
+    background: "rgba(204, 229, 255, 0.2)" # 极浅蓝半透明
+
+# 内容约束
+content_constraints:
+  column_title:
+    max_chars: 20
+    recommended: "4-8字"
+
+  module_name:
+    max_chars: 30
+    recommended: "6-12字"
+
+  total_modules:
+    min: 9 # 3栏 x 3模块
+    max: 30 # 5栏 x 6模块
+    recommended: "12-18"
+
+# 设计原则
+design_principles:
+  - "栏位宽度均等，保持视觉平衡"
+  - "每栏模块数量相近（±1个），避免失衡"
+  - "使用蓝色系统一栏标题背景色"
+  - "卡片使用圆角矩形+虚线边框"
+  - "相关模块可用虚线大框分组"
+  - "留白充足，避免拥挤"
+
+# 使用场景
+use_cases:
+  - scenario: "APS产品架构展示"
+    columns: 4
+    example: "数据采集 | 智能调度 | 执行监控 | 分析优化"
+
+  - scenario: "技术栈展示"
+    columns: 3
+    example: "前端技术 | 后端技术 | 基础设施"
+
+  - scenario: "功能模块总览"
+    columns: 5
+    example: "核心功能按业务流程分5个阶段展示"
